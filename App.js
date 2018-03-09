@@ -1,16 +1,43 @@
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
+import thunkMiddleware from 'redux-thunk'; 
+import { createLogger } from 'redux-logger';
+import reducer from './reducers';
+import AppContainer from './containers/AppContainer';
+
+const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__ });
+
+function configureStore(initialState) {
+  const enhancer = compose(
+    applyMiddleware(
+      thunkMiddleware,
+      loggerMiddleware,
+    ),
+  );
+  return createStore(reducer, initialState, enhancer);
+}
+
+const store = configureStore({});
+
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import {
+    Platform
+  , StatusBar
+  , StyleSheet
+  , View
+} from 'react-native';
 import { AppLoading, Asset, Font } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import RootNavigation from './navigation/RootNavigation';
 
-export default class App extends React.Component {
+class ExpoApp extends React.Component {
   state = {
     isLoadingComplete: false,
   };
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
+      console.log('Hello, world!')
       return (
         <AppLoading
           startAsync={this._loadResourcesAsync}
@@ -55,6 +82,12 @@ export default class App extends React.Component {
     this.setState({ isLoadingComplete: true });
   };
 }
+
+export default App = () => (
+  <Provider store={store}>
+    <AppContainer />
+  </Provider>
+);
 
 const styles = StyleSheet.create({
   container: {
