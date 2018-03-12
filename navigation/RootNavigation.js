@@ -2,21 +2,30 @@ import { Notifications } from 'expo';
 import React from 'react';
 import { StackNavigator } from 'react-navigation';
 
-import MainTabNavigator from './MainTabNavigator';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
+
+// screens
+import MainTabNavigator from './MainTabNavigator';
+import MainDrawerNavigator from './MainDrawerNavigator';
+
+import LoginScreen from '../screens/LoginScreen';
+import CounrtyScreen from '../screens/CountryScreen';
+import FilterScreen from '../screens/FilterScreen';
+import ProductDetailsScreen from '../screens/ProductDetailsScreen';
+import ChatScreen from '../screens/ChatScreen'
 
 const RootStackNavigator = StackNavigator(
   {
-    Main: {
-      screen: MainTabNavigator,
-    },
+    mainScreen: { screen: MainDrawerNavigator },
+    loginScreen: { screen: LoginScreen },
+    counrtyScreen: { screen: CounrtyScreen },
+    filterScreen: { screen: FilterScreen },
+    productDetailsScreen: { screen: ProductDetailsScreen },
+    chatScreen: { screen: ChatScreen },
   },
   {
-    navigationOptions: () => ({
-      headerTitleStyle: {
-        fontWeight: 'normal',
-      },
-    }),
+    headerMode: 'none',
+    initialRouteName: 'counrtyScreen',
   }
 );
 
