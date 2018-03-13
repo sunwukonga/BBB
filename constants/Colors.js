@@ -8,6 +8,7 @@ const menuitemborder = '#dfeaea';
 const mainheaderbg = '#1fa6a4';
 const categorylistBorder = '#c8d5d5';
 const categoryAvtarBorder = '#e2eaea';
+const linegray = '#d9e3e3';
 const lightGray = '#d6e2e2';
 
 export default {
@@ -30,5 +31,6 @@ export default {
 	warningText: '#666804',
 	noticeBackground: tintColor,
 	noticeText: '#fff',
+	linegray,
 	lightGray,
 };

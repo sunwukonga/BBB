@@ -12,7 +12,7 @@ import { Colors, Layout } from '../constants/';
 
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
-import ChatScreen from '../screens/ChatScreen';
+// import ChatScreen from '../screens/ChatScreen';
 import FavoriteScreen from '../screens/FavoriteScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 import SettingScreen from '../screens/SettingScreen';
@@ -22,6 +22,8 @@ import SearchResultScreen from '../screens/SearchResultScreen';
 import FilterScreen from '../screens/FilterScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 import ChatDetailScreen from '../screens/ChatDetailScreen';
+import StrollersScreen from '../screens/StrollersScreen';
+import ChatListScreen from '../screens/ChatListScreen';
 import CreateNewItemScreen from '../screens/CreateNewItemScreen';
 
 import DrawerContainer from '../screens/DrawerContainer/';
@@ -38,7 +40,7 @@ import DrawerContainer from '../screens/DrawerContainer/';
 const DrawerStack = DrawerNavigator(
 	{
 		homeScreen: { screen: HomeScreen },
-		chatScreen: { screen: ChatScreen },
+		// chatScreen: { screen: ChatScreen },
 		favoriteScreen: { screen: FavoriteScreen },
 		notificationScreen: { screen: NotificationScreen },
 		settingScreen: { screen: SettingScreen },
@@ -48,6 +50,8 @@ const DrawerStack = DrawerNavigator(
 		filterScreen: { screen: FilterScreen },
 		productDetailsScreen: { screen: ProductDetailsScreen },
 		chatDetailScreen: { screen: ChatDetailScreen },
+		strollersScreen: { screen: StrollersScreen },
+		chatListScreen: { screen: ChatListScreen },
 		CreateNewItemScreen: { screen: CreateNewItemScreen },
 	},
 	{

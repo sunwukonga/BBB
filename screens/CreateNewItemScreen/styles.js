@@ -11,6 +11,14 @@ export default StyleSheet.create({
     width: Layout.WIDTH,
     backgroundColor: Colors.menuHeader,
   },
+  dateDropDown: {
+    borderWidth: 0.8,
+    borderColor: '#c8d5d5',
+    paddingLeft: Layout.moderateScale(10),
+    paddingRight: Layout.moderateScale(10),
+    paddingTop: Layout.moderateScale(10),
+    borderRadius: Layout.moderateScale(3),
+  },
   imagesSubView:{
     height: Layout.HEIGHT*0.22,
     width: Layout.HEIGHT*0.22,
