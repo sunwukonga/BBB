@@ -22,10 +22,18 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 // custom components
 import Baby from '../../components/Baby';
+import CheckboxBlank from '../../components/CheckboxBlank';
+import CheckboxChecked from '../../components/CheckboxChecked';
+import IdentityVerification1 from '../../components/IdentityVerification1';
+import IdentityVerification2 from '../../components/IdentityVerification2';
+import IdentityVerification3 from '../../components/IdentityVerification3';
+import IdentityVerification4 from '../../components/IdentityVerification4';
+import IdentityVerification5 from '../../components/IdentityVerification5';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from '../../components/CheckBox';
 import Dropdown from '../../components/Dropdown/dropdown';
+import Slider from '../../components/Slider';
 import { Ionicons } from '@expo/vector-icons';
 // screen style
 import styles from './styles';
@@ -35,46 +43,98 @@ export default class FilterScreen extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			segment: 4,
+			segment: 1,
 			truefalse: false,
 			typography: 'Please select',
+			SliderValue: 0,
 		};
+	}
+
+	onClick(data) {
+		data.checked = !data.checked;
+		// let msg = data.checked ? 'you checked ' : 'you unchecked ';
+	}
+
+	identifyFn(data) {
+		var temp = [];
+		if (data == 1) {
+			temp = (
+				<View style={{ marginLeft: Layout.moderateScale(10) }}>
+					<IdentityVerification1
+						width={Layout.moderateScale(30)}
+						height={Layout.moderateScale(30)}
+					/>
+				</View>
+			);
+		} else if (data == 2) {
+			temp = (
+				<View style={{ marginLeft: Layout.moderateScale(10) }}>
+					<IdentityVerification2
+						width={Layout.moderateScale(30)}
+						height={Layout.moderateScale(30)}
+					/>
+				</View>
+			);
+		} else if (data == 3) {
+			temp = (
+				<View style={{ marginLeft: Layout.moderateScale(10) }}>
+					<IdentityVerification3
+						width={Layout.moderateScale(30)}
+						height={Layout.moderateScale(30)}
+					/>
+				</View>
+			);
+		} else if (data == 4) {
+			temp = (
+				<View style={{ marginLeft: Layout.moderateScale(10) }}>
+					<IdentityVerification4
+						width={Layout.moderateScale(30)}
+						height={Layout.moderateScale(30)}
+					/>
+				</View>
+			);
+		} else {
+			temp = (
+				<View style={{ marginLeft: Layout.moderateScale(10) }}>
+					<IdentityVerification5
+						width={Layout.moderateScale(30)}
+						height={Layout.moderateScale(30)}
+					/>
+				</View>
+			);
+		}
+		return temp;
 	}
 
 	_renderActiveComponent = () => {
 		const { segment } = this.state;
-
-		var items = [
-			{
-				id: 1,
-				title: 'Adam Carlson',
-				userType: 'Electrical Mechanic',
-				userId: '#298640',
-				userText: 'Optus Brisbane',
-			},
-		];
 
 		if (segment === 1) {
 			var items = [
 				{
 					id: 1,
 					title: 'All',
+					checked: false,
 				},
 				{
 					id: 2,
 					title: 'Sale',
+					checked: false,
 				},
 				{
 					id: 3,
 					title: 'Barter',
+					checked: false,
 				},
 				{
 					id: 4,
 					title: 'Donate',
+					checked: false,
 				},
 				{
 					id: 5,
 					title: 'Sale & Barter',
+					checked: false,
 				},
 			];
 			return (
@@ -85,19 +145,39 @@ export default class FilterScreen extends React.Component {
 					<View>
 						{items.map((item, index) => {
 							return (
-								<ListItem style={styles.offersListItem} key={'mode_' + index}>
+								<View style={styles.offersListItem} key={'mode_' + index}>
 									<CheckBox
-										label={item.title}
-										labelStyle={styles.checkInputText}
+										style={styles.chboxRemember}
+										onClick={() => this.onClick(item)}
+										checkBoxColor={'#fff'}
+										rightText={item.title}
+										rightTextStyle={{
+											color: Colors.secondaryColor,
+											fontSize: Layout.moderateScale(18),
+											marginLeft: Layout.moderateScale(10),
+											fontFamily: 'roboto-reguler',
+										}}
+										unCheckedImage={
+											<CheckboxBlank
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
+										checkedImage={
+											<CheckboxChecked
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
 									/>
-								</ListItem>
+								</View>
 							);
 						})}
 					</View>
 				</View>
 			);
 		} else if (segment === 2) {
-			let items = [
+			var items = [
 				{
 					value: 1,
 				},
@@ -152,12 +232,12 @@ export default class FilterScreen extends React.Component {
 									baseColor="rgba(0, 0, 0, .00)"
 									containerStyle={styles.dateDropDown}
 								/>
-								<Ionicons
+								{/* <Ionicons
 									name="ios-arrow-down"
 									style={styles.imageDropDownStyle}
 									size={Layout.moderateScale(18)}
 									color="#272727"
-								/>
+								/> */}
 							</View>
 						</View>
 						<View style={styles.dropLayputSec}>
@@ -171,12 +251,12 @@ export default class FilterScreen extends React.Component {
 									baseColor="rgba(0, 0, 0, .00)"
 									containerStyle={styles.dateDropDown}
 								/>
-								<Ionicons
+								{/* <Ionicons
 									name="ios-arrow-down"
 									style={styles.imageDropDownStyle}
 									size={Layout.moderateScale(18)}
 									color="#272727"
-								/>
+								/> */}
 							</View>
 						</View>
 					</View>
@@ -187,22 +267,27 @@ export default class FilterScreen extends React.Component {
 				{
 					id: 1,
 					ratingvalue: 1,
+					checked: false,
 				},
 				{
 					id: 2,
 					ratingvalue: 2,
+					checked: false,
 				},
 				{
 					id: 3,
 					ratingvalue: 3,
+					checked: false,
 				},
 				{
 					id: 4,
 					ratingvalue: 4,
+					checked: false,
 				},
 				{
 					id: 5,
 					ratingvalue: 5,
+					checked: false,
 				},
 			];
 			return (
@@ -213,21 +298,42 @@ export default class FilterScreen extends React.Component {
 					<View>
 						{items.map((item, index) => {
 							return (
-								<ListItem
-									style={styles.offersListItem}
+								<List
+									style={[styles.offersListItem, { flexDirection: 'row' }]}
 									key={'ratings_' + index}>
-									<Left>
+									<View
+										style={{
+											width: Layout.WIDTH * 0.6,
+										}}>
 										<CheckBox
-											label={item.ratingvalue + ' Star'}
-											labelStyle={styles.checkInputText}
+											style={styles.chboxRemember}
+											onClick={() => this.onClick(item)}
+											checkBoxColor={'#fff'}
+											rightText={item.ratingvalue + ' Star'}
+											rightTextStyle={{
+												color: Colors.secondaryColor,
+												fontSize: Layout.moderateScale(18),
+												marginLeft: Layout.moderateScale(10),
+												fontFamily: 'roboto-reguler',
+											}}
+											unCheckedImage={
+												<CheckboxBlank
+													width={Layout.moderateScale(20)}
+													height={Layout.moderateScale(20)}
+												/>
+											}
+											checkedImage={
+												<CheckboxChecked
+													width={Layout.moderateScale(20)}
+													height={Layout.moderateScale(20)}
+												/>
+											}
 										/>
-									</Left>
-									<Right>
-										<View style={styles.ratingstarRight}>
-											{this.ratingStarfn(item)}
-										</View>
-									</Right>
-								</ListItem>
+									</View>
+									<View style={styles.ratingstarRight}>
+										{this.ratingStarfn(item)}
+									</View>
+								</List>
 							);
 						})}
 					</View>
@@ -238,22 +344,27 @@ export default class FilterScreen extends React.Component {
 				{
 					id: 1,
 					ratingvalue: 1,
+					checked: false,
 				},
 				{
 					id: 2,
 					ratingvalue: 2,
+					checked: false,
 				},
 				{
 					id: 3,
 					ratingvalue: 3,
+					checked: false,
 				},
 				{
 					id: 4,
 					ratingvalue: 4,
+					checked: false,
 				},
 				{
 					id: 5,
 					ratingvalue: 5,
+					checked: false,
 				},
 			];
 			return (
@@ -264,73 +375,81 @@ export default class FilterScreen extends React.Component {
 					<View>
 						{items.map((item, index) => {
 							return (
-								<ListItem
-									style={styles.offersListItem}
-									key={'identify_' + index}>
-									<Left>
-										<CheckBox
-											label={item.ratingvalue}
-											labelStyle={styles.checkInputText}
-										/>
-									</Left>
-								</ListItem>
+								<View style={styles.offersListItem} key={'identify_' + index}>
+									<CheckBox
+										style={styles.chboxRemember}
+										onClick={() => this.onClick(item)}
+										checkBoxColor={'#fff'}
+										rightTextView={this.identifyFn(item.ratingvalue)}
+										rightTextStyle={{
+											color: Colors.secondaryColor,
+											fontSize: Layout.moderateScale(18),
+											marginLeft: Layout.moderateScale(10),
+											fontFamily: 'roboto-reguler',
+										}}
+										unCheckedImage={
+											<CheckboxBlank
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
+										checkedImage={
+											<CheckboxChecked
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
+									/>
+								</View>
 							);
 						})}
 					</View>
-					<View style={styles.offersListItem}>
+					<View style={styles.offersListItem1}>
 						<Text style={styles.identityDescTitle}>
 							Verified the identity of the user(s) Information
 						</Text>
 
 						<View style={styles.row}>
-							<View>
+							<View style={styles.bulletText}>
 								<Text>{'\u2022' + ' '}</Text>
 							</View>
 							<View style={styles.bulletText}>
-								<Text>
-									<Text style={styles.identityDescText}>
-										If they are logged in with an social media account, they
-										have one green bar
-									</Text>
+								<Text style={styles.identityDescText}>
+									If they are logged in with an social media account, they have
+									one green bar
 								</Text>
 							</View>
 						</View>
 						<View style={styles.row}>
-							<View>
+							<View style={styles.bulletText}>
 								<Text>{'\u2022' + ' '}</Text>
 							</View>
 							<View style={styles.bulletText}>
-								<Text>
-									<Text style={styles.identityDescText}>
-										If they are logged in with an social media account, they
-										have one green bar
-									</Text>
+								<Text style={styles.identityDescText}>
+									If they are logged in with an social media account, they have
+									one green bar
 								</Text>
 							</View>
 						</View>
 						<View style={styles.row}>
-							<View>
+							<View style={styles.bulletText}>
 								<Text>{'\u2022' + ' '}</Text>
 							</View>
 							<View style={styles.bulletText}>
-								<Text>
-									<Text style={styles.identityDescText}>
-										Lorem Ipsum is simply dummy text of the printing and
-										typesetting industry
-									</Text>
+								<Text style={styles.identityDescText}>
+									Lorem Ipsum is simply dummy text of the printing and
+									typesetting industry
 								</Text>
 							</View>
 						</View>
 						<View style={styles.row}>
-							<View>
+							<View style={styles.bulletText}>
 								<Text>{'\u2022' + ' '}</Text>
 							</View>
 							<View style={styles.bulletText}>
-								<Text>
-									<Text style={styles.identityDescText}>
-										Lorem Ipsum is simply dummy text of the printing and
-										typesetting industry
-									</Text>
+								<Text style={styles.identityDescText}>
+									Lorem Ipsum is simply dummy text of the printing and
+									typesetting industry
 								</Text>
 							</View>
 						</View>
@@ -338,75 +457,128 @@ export default class FilterScreen extends React.Component {
 				</View>
 			);
 		} else if (segment === 5) {
-			return items.map((item, value) => {
-				return (
-					<View key={'distance' + item.id}>
-						<View style={styles.fltrTitleText}>
-							<Text style={styles.filterDetailsTitle}>Distance</Text>
-						</View>
-						<View>
-							<Text>Details</Text>
-						</View>
+			return (
+				<View key={'distance'}>
+					<View style={styles.fltrTitleText}>
+						<Text style={styles.filterDetailsTitle}>Distance</Text>
 					</View>
-				);
-			});
+					<View style={styles.distanceSlider}>
+						<Slider
+							minimumValue={0}
+							maximumValue={100}
+							step={25}
+							thumbTintColor="transparent"
+							minimumTrackTintColor="#0f9d58"
+							maximumTrackTintColor="#939393"
+							thumbStyle={styles.thumb}
+							thumbTouchSize={{
+								width: Layout.moderateScale(40),
+								height: Layout.moderateScale(100),
+							}}
+							custom={true}
+							onValueChange={ChangedValue =>
+								this.setState({ SliderValue: parseInt(ChangedValue) })
+							}
+							thumbImageComponent={
+								<View
+									style={{
+										position: 'absolute',
+										top: Layout.moderateScale(-50),
+										left: Layout.moderateScale(-20),
+									}}>
+									<BBBIcon
+										name="DistanceSliderSvg"
+										color="#0f9d58"
+										size={Layout.moderateScale(40)}
+										style={styles.thumbImageStyle}
+									/>
+									<Text
+										style={{
+											color: '#fff',
+											fontSize: Layout.moderateScale(10),
+											top: Layout.moderateScale(-40),
+											left: Layout.moderateScale(-5),
+											textAlign: 'center',
+										}}>
+										{this.state.SliderValue}
+									</Text>
+								</View>
+							}
+						/>
+					</View>
+				</View>
+			);
 		} else if (segment === 6) {
 			var items = [
 				{
 					id: 1,
 					title: 'Baby Strollers',
+					checked: false,
 				},
 				{
 					id: 2,
 					title: 'Baby Food',
+					checked: false,
 				},
 				{
 					id: 3,
 					title: 'Baby Clothes',
+					checked: false,
 				},
 				{
 					id: 4,
 					title: 'Baby Skincare',
+					checked: false,
 				},
 				{
 					id: 5,
 					title: 'Baby Toys',
+					checked: false,
 				},
 				{
 					id: 6,
 					title: 'Baby Books',
+					checked: false,
 				},
 				{
 					id: 7,
 					title: 'Baby Strollers',
+					checked: false,
 				},
 				{
 					id: 8,
 					title: 'Baby Food',
+					checked: false,
 				},
 				{
 					id: 9,
 					title: 'Baby Clothes',
+					checked: false,
 				},
 				{
 					id: 10,
 					title: 'Baby Skincare',
+					checked: false,
 				},
 				{
 					id: 11,
 					title: 'Baby Toys',
+					checked: false,
 				},
 				{
 					id: 12,
 					title: 'Baby Books',
+					checked: false,
 				},
 				{
 					id: 13,
 					title: 'Baby Strollers',
+					checked: false,
 				},
 				{
 					id: 14,
 					title: 'Baby Food',
+					checked: false,
 				},
 			];
 			return (
@@ -418,14 +590,32 @@ export default class FilterScreen extends React.Component {
 					<View>
 						{items.map((item, index) => {
 							return (
-								<ListItem
-									style={styles.offersListItem}
-									key={'categories_' + index}>
+								<View style={styles.offersListItem} key={'categories_' + index}>
 									<CheckBox
-										label={item.title}
-										labelStyle={styles.checkInputText}
+										style={styles.chboxRemember}
+										onClick={() => this.onClick(item)}
+										checkBoxColor={'#fff'}
+										rightText={item.title}
+										rightTextStyle={{
+											color: Colors.secondaryColor,
+											fontSize: Layout.moderateScale(18),
+											marginLeft: Layout.moderateScale(10),
+											fontFamily: 'roboto-reguler',
+										}}
+										unCheckedImage={
+											<CheckboxBlank
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
+										checkedImage={
+											<CheckboxChecked
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
 									/>
-								</ListItem>
+								</View>
 							);
 						})}
 					</View>
@@ -436,58 +626,72 @@ export default class FilterScreen extends React.Component {
 				{
 					id: 1,
 					title: 'Di-2045',
+					checked: false,
 				},
 				{
 					id: 2,
 					title: 'Di-2046',
+					checked: false,
 				},
 				{
 					id: 3,
 					title: 'Di-2047',
+					checked: false,
 				},
 				{
 					id: 4,
 					title: 'Di-2048',
+					checked: false,
 				},
 				{
 					id: 5,
 					title: 'Di-2049',
+					checked: false,
 				},
 				{
 					id: 6,
 					title: 'Di-2050',
+					checked: false,
 				},
 				{
 					id: 7,
 					title: 'Di-2051',
+					checked: false,
 				},
 				{
 					id: 8,
 					title: 'Di-2052',
+					checked: false,
 				},
 				{
 					id: 9,
 					title: 'Di-2053',
+					checked: false,
 				},
 				{
 					id: 10,
 					title: 'Di-2054',
+					checked: false,
 				},
 				{
 					id: 11,
 					title: 'Di-2055',
+					checked: false,
 				},
 				{
 					id: 12,
 					title: 'Di-2056',
+					checked: false,
 				},
 				{
 					id: 13,
 					title: 'Di-2057',
+					checked: false,
 				},
 				{
 					id: 14,
 					title: 'Di-2058',
+					checked: false,
 				},
 			];
 			return (
@@ -499,14 +703,32 @@ export default class FilterScreen extends React.Component {
 					<View>
 						{items.map((item, index) => {
 							return (
-								<ListItem
-									style={styles.offersListItem}
-									key={'template_' + index}>
+								<View style={styles.offersListItem} key={'template_' + index}>
 									<CheckBox
-										label={item.title}
-										labelStyle={styles.checkInputText}
+										style={styles.chboxRemember}
+										onClick={() => this.onClick(item)}
+										checkBoxColor={'#fff'}
+										rightText={item.title}
+										rightTextStyle={{
+											color: Colors.secondaryColor,
+											fontSize: Layout.moderateScale(18),
+											marginLeft: Layout.moderateScale(10),
+											fontFamily: 'roboto-reguler',
+										}}
+										unCheckedImage={
+											<CheckboxBlank
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
+										checkedImage={
+											<CheckboxChecked
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
 									/>
-								</ListItem>
+								</View>
 							);
 						})}
 					</View>
@@ -517,58 +739,72 @@ export default class FilterScreen extends React.Component {
 				{
 					id: 1,
 					title: 'All',
+					checked: false,
 				},
 				{
 					id: 2,
 					title: 'Stroller',
+					checked: false,
 				},
 				{
 					id: 3,
 					title: 'Philips',
+					checked: false,
 				},
 				{
 					id: 4,
 					title: 'Duluxe',
+					checked: false,
 				},
 				{
 					id: 5,
 					title: 'Pigeon',
+					checked: false,
 				},
 				{
 					id: 6,
 					title: 'Johnsons',
+					checked: false,
 				},
 				{
 					id: 7,
 					title: 'Walker',
+					checked: false,
 				},
 				{
 					id: 8,
 					title: 'Stroller',
+					checked: false,
 				},
 				{
 					id: 9,
 					title: 'Philips',
+					checked: false,
 				},
 				{
 					id: 10,
 					title: 'Duluxe',
+					checked: false,
 				},
 				{
 					id: 11,
 					title: 'Pigeon',
+					checked: false,
 				},
 				{
 					id: 12,
 					title: 'Johnsons',
+					checked: false,
 				},
 				{
 					id: 13,
 					title: 'Walker',
+					checked: false,
 				},
 				{
 					id: 14,
 					title: 'Duluxe',
+					checked: false,
 				},
 			];
 			return (
@@ -580,30 +816,74 @@ export default class FilterScreen extends React.Component {
 					<View>
 						{items.map((item, index) => {
 							return (
-								<ListItem style={styles.offersListItem} key={'tags_' + index}>
+								<View style={styles.offersListItem} key={'tags_' + index}>
 									<CheckBox
-										label={item.title}
-										labelStyle={styles.checkInputText}
+										style={styles.chboxRemember}
+										onClick={() => this.onClick(item)}
+										checkBoxColor={'#fff'}
+										rightText={item.title}
+										rightTextStyle={{
+											color: Colors.secondaryColor,
+											fontSize: Layout.moderateScale(18),
+											marginLeft: Layout.moderateScale(10),
+											fontFamily: 'roboto-reguler',
+										}}
+										unCheckedImage={
+											<CheckboxBlank
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
+										checkedImage={
+											<CheckboxChecked
+												width={Layout.moderateScale(20)}
+												height={Layout.moderateScale(20)}
+											/>
+										}
 									/>
-								</ListItem>
+								</View>
 							);
 						})}
 					</View>
 				</View>
 			);
 		} else if (segment === 9) {
+			var item = [
+				{
+					id: 1,
+					checked: false,
+				},
+			];
 			return (
 				<View key={'offers'}>
 					<View style={styles.fltrTitleText}>
 						<Text style={styles.filterDetailsTitle}>Counter Offers</Text>
 					</View>
-					<View>
-						<ListItem style={styles.offersListItem}>
-							<CheckBox
-								label="Allow counter offer"
-								labelStyle={styles.checkInputText}
-							/>
-						</ListItem>
+					<View style={styles.offersListItem}>
+						<CheckBox
+							style={styles.chboxRemember}
+							onClick={() => this.onClick(item)}
+							checkBoxColor={'#fff'}
+							rightText={'Allow counter offer'}
+							rightTextStyle={{
+								color: Colors.secondaryColor,
+								fontSize: Layout.moderateScale(18),
+								marginLeft: Layout.moderateScale(10),
+								fontFamily: 'roboto-reguler',
+							}}
+							unCheckedImage={
+								<CheckboxBlank
+									width={Layout.moderateScale(20)}
+									height={Layout.moderateScale(20)}
+								/>
+							}
+							checkedImage={
+								<CheckboxChecked
+									width={Layout.moderateScale(20)}
+									height={Layout.moderateScale(20)}
+								/>
+							}
+						/>
 					</View>
 				</View>
 			);
@@ -643,6 +923,19 @@ export default class FilterScreen extends React.Component {
 					style={styles.backarrow}
 				/>
 			</Button>
+		);
+
+		var rightComponent = (
+			<View style={styles.rightComponentStyle}>
+				<TouchableOpacity onPress={() => alert('RESET Clicked')}>
+					<Text style={styles.headerText}>RESET</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={{ marginLeft: Layout.moderateScale(8) }}
+					onPress={() => alert('APPLY Clicked')}>
+					<Text style={styles.headerText}>APPLY</Text>
+				</TouchableOpacity>
+			</View>
 		);
 
 		var filterItem = [
@@ -686,23 +979,15 @@ export default class FilterScreen extends React.Component {
 
 		return (
 			<Container style={styles.container}>
-				<BBBHeader title="Filter" leftComponent={leftComponent} />
+				<BBBHeader
+					title="Filter"
+					leftComponent={leftComponent}
+					rightComponent={rightComponent}
+				/>
 
-				<View style={{ flexDirection: 'row', width: Layout.WIDTH }}>
-					<Content
-						style={{
-							width: Layout.WIDTH * 0.15,
-							height: Layout.HEIGHT,
-							backgroundColor: '#272727',
-							borderWidth: 0,
-							borderColor: '#ffffff',
-						}}>
-						<View
-							style={{
-								flexDirection: 'column',
-								borderRightWidth: 0.3,
-								borderRightColor: '#ffffff',
-							}}>
+				<View style={styles.mainContent}>
+					<Content style={styles.contents}>
+						<View style={styles.filterContentSec}>
 							{filterItem.map((item, index) => {
 								return (
 									<TouchableOpacity
@@ -711,7 +996,9 @@ export default class FilterScreen extends React.Component {
 											styles.filterTitle,
 											{
 												backgroundColor:
-													this.state.segment == item.id ? '#ffffff' : '#272727',
+													this.state.segment == item.id
+														? Colors.white
+														: Colors.secondaryColor,
 											},
 										]}
 										key={index}>
@@ -720,7 +1007,9 @@ export default class FilterScreen extends React.Component {
 											size={Layout.moderateScale(18)}
 											style={{
 												color:
-													this.state.segment == item.id ? '#272727' : '#ffffff',
+													this.state.segment == item.id
+														? Colors.secondaryColor
+														: Colors.white,
 											}}
 										/>
 									</TouchableOpacity>

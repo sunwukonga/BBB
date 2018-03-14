@@ -4,6 +4,150 @@
     {
       "icon": {
         "paths": [
+          "M0 0h901.53l5.442 1023.59z",
+          "M58.163 0h-58.163l901.53 1021.279v-58.368z"
+        ],
+        "attrs": [
+          {
+            "fill": "rgb(254, 254, 254)"
+          },
+          {
+            "fill": "rgb(212, 213, 213)"
+          }
+        ],
+        "width": 907,
+        "isMulticolor": true,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": [
+          "MsgLeftSvg"
+        ],
+        "colorPermutations": {
+          "212213213122423423412542542541": [
+            {
+              "f": 2
+            },
+            {
+              "f": 0
+            }
+          ]
+        }
+      },
+      "attrs": [
+        {
+          "fill": "rgb(254, 254, 254)"
+        },
+        {
+          "fill": "rgb(212, 213, 213)"
+        }
+      ],
+      "properties": {
+        "order": 169,
+        "id": 1,
+        "name": "MsgLeftSvg",
+        "prevSize": 32,
+        "code": 59654,
+        "codes": [
+          59654,
+          59655
+        ]
+      },
+      "setIdx": 0,
+      "setId": 4,
+      "iconIdx": 0
+    },
+    {
+      "icon": {
+        "paths": [
+          "M906.971 0h-906.971l-5.559 1026.341z",
+          "M848.457 0h58.514l-906.971 1024v-58.514z"
+        ],
+        "attrs": [
+          {
+            "fill": "rgb(224, 234, 234)"
+          },
+          {
+            "fill": "rgb(212, 213, 213)"
+          }
+        ],
+        "width": 907,
+        "isMulticolor": true,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": [
+          "MsgRightSvg"
+        ],
+        "colorPermutations": {
+          "212213213122423423412542542541": [
+            {
+              "f": 1
+            },
+            {
+              "f": 0
+            }
+          ]
+        }
+      },
+      "attrs": [
+        {
+          "fill": "rgb(224, 234, 234)"
+        },
+        {
+          "fill": "rgb(212, 213, 213)"
+        }
+      ],
+      "properties": {
+        "order": 168,
+        "id": 0,
+        "name": "MsgRightSvg",
+        "prevSize": 32,
+        "code": 59662,
+        "codes": [
+          59662,
+          59663
+        ]
+      },
+      "setIdx": 0,
+      "setId": 4,
+      "iconIdx": 1
+    },
+    {
+      "icon": {
+        "paths": [
+          "M0 128h821.728v128l-316.049 320.006v447.994l-189.63-128v-319.994l-316.049-320.006v-128zM0 0h821.728v63.994h-821.728v-63.994z"
+        ],
+        "attrs": [
+          {
+            "fill": "rgb(255, 255, 255)"
+          }
+        ],
+        "width": 822,
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": [
+          "StrollerFilterSvg"
+        ]
+      },
+      "attrs": [
+        {
+          "fill": "rgb(255, 255, 255)"
+        }
+      ],
+      "properties": {
+        "order": 166,
+        "id": 0,
+        "name": "StrollerFilterSvg",
+        "prevSize": 32,
+        "code": 59730
+      },
+      "setIdx": 1,
+      "setId": 3,
+      "iconIdx": 0
+    },
+    {
+      "icon": {
+        "paths": [
           "M355.556 0h312.889v1024h-312.889v-1024z"
         ],
         "attrs": [
@@ -16,7 +160,7 @@
           "ActivePost"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -25,13 +169,13 @@
         {}
       ],
       "properties": {
-        "order": 103,
-        "id": 24,
+        "order": 167,
+        "id": 34,
         "name": "ActivePost",
         "prevSize": 32,
         "code": 59648
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
       "iconIdx": 0
     },
@@ -52,9 +196,9 @@
           "BackArrow"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 2
+              "f": 8
             }
           ]
         }
@@ -65,13 +209,13 @@
         }
       ],
       "properties": {
-        "order": 104,
-        "id": 23,
+        "order": 131,
+        "id": 33,
         "name": "BackArrow",
         "prevSize": 32,
         "code": 59649
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
       "iconIdx": 1
     },
@@ -90,7 +234,7 @@
           "CategoriesSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -99,13 +243,13 @@
         {}
       ],
       "properties": {
-        "order": 105,
-        "id": 22,
+        "order": 132,
+        "id": 32,
         "name": "CategoriesSvg",
         "prevSize": 32,
         "code": 59650
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
       "iconIdx": 2
     },
@@ -126,9 +270,9 @@
           "CategoryIcon"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 2
+              "f": 8
             }
           ]
         }
@@ -139,13 +283,13 @@
         }
       ],
       "properties": {
-        "order": 106,
-        "id": 21,
+        "order": 133,
+        "id": 31,
         "name": "CategoryIcon",
         "prevSize": 32,
         "code": 59651
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
       "iconIdx": 3
     },
@@ -164,7 +308,7 @@
           "Chat"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -173,15 +317,55 @@
         {}
       ],
       "properties": {
-        "order": 107,
-        "id": 20,
+        "order": 134,
+        "id": 30,
         "name": "Chat",
         "prevSize": 32,
         "code": 59652
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
       "iconIdx": 4
+    },
+    {
+      "icon": {
+        "paths": [
+          "M868.546 1024h-712.777c-85.92 0-155.769-69.849-155.769-155.664v-712.567c0-85.92 69.849-155.769 155.769-155.769h712.777c85.92 0 155.874 69.849 155.874 155.769v712.567c0 85.815-69.954 155.664-155.874 155.664zM155.769 52.518c-56.93 0-103.251 46.321-103.251 103.251v712.567c0 56.93 46.321 103.146 103.251 103.146h712.777c57.035 0 103.356-46.216 103.356-103.146v-712.567c0-56.93-46.321-103.251-103.356-103.251h-712.777z"
+        ],
+        "attrs": [
+          {
+            "fill": "rgb(200, 200, 200)"
+          }
+        ],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": [
+          "checkbox-blank"
+        ],
+        "colorPermutations": {
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
+            {
+              "f": 7
+            }
+          ]
+        }
+      },
+      "attrs": [
+        {
+          "fill": "rgb(200, 200, 200)"
+        }
+      ],
+      "properties": {
+        "order": 135,
+        "id": 29,
+        "name": "checkbox-blank",
+        "prevSize": 32,
+        "code": 59653
+      },
+      "setIdx": 2,
+      "setId": 2,
+      "iconIdx": 5
     },
     {
       "icon": {
@@ -198,7 +382,7 @@
           "DateTimeSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -207,15 +391,55 @@
         {}
       ],
       "properties": {
-        "order": 108,
-        "id": 19,
+        "order": 137,
+        "id": 27,
         "name": "DateTimeSvg",
         "prevSize": 32,
-        "code": 59653
+        "code": 59656
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 5
+      "iconIdx": 7
+    },
+    {
+      "icon": {
+        "paths": [
+          "M804.512 120.937c-79.844-67.634-170.056-120.865-282.965-120.865s-219.075 53.231-298.942 120.865c-147.731 125.154-166.097 408.559-39.743 551.22l307.591 350.742 31.094-0.308 322.224-349.834c126.866-143.261 108.5-426.667-39.259-551.82z"
+        ],
+        "attrs": [
+          {
+            "fill": "rgb(15, 157, 88)"
+          }
+        ],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": [
+          "DistanceSliderSvg"
+        ],
+        "colorPermutations": {
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
+            {
+              "f": 2
+            }
+          ]
+        }
+      },
+      "attrs": [
+        {
+          "fill": "rgb(15, 157, 88)"
+        }
+      ],
+      "properties": {
+        "order": 138,
+        "id": 26,
+        "name": "DistanceSliderSvg",
+        "prevSize": 32,
+        "code": 59657
+      },
+      "setIdx": 2,
+      "setId": 2,
+      "iconIdx": 8
     },
     {
       "icon": {
@@ -232,7 +456,7 @@
           "DistanceSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -241,15 +465,15 @@
         {}
       ],
       "properties": {
-        "order": 109,
-        "id": 18,
+        "order": 139,
+        "id": 25,
         "name": "DistanceSvg",
         "prevSize": 32,
-        "code": 59654
+        "code": 59658
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 6
+      "iconIdx": 9
     },
     {
       "icon": {
@@ -268,9 +492,9 @@
           "Favorite"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 2
+              "f": 8
             }
           ]
         }
@@ -281,15 +505,15 @@
         }
       ],
       "properties": {
-        "order": 110,
-        "id": 17,
+        "order": 140,
+        "id": 24,
         "name": "Favorite",
         "prevSize": 32,
-        "code": 59655
+        "code": 59659
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 7
+      "iconIdx": 10
     },
     {
       "icon": {
@@ -306,7 +530,7 @@
           "Home"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -315,15 +539,15 @@
         {}
       ],
       "properties": {
-        "order": 111,
-        "id": 16,
+        "order": 141,
+        "id": 23,
         "name": "Home",
         "prevSize": 32,
-        "code": 59656
+        "code": 59660
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 8
+      "iconIdx": 11
     },
     {
       "icon": {
@@ -340,7 +564,7 @@
           "IdentitySvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -349,15 +573,15 @@
         {}
       ],
       "properties": {
-        "order": 112,
-        "id": 15,
+        "order": 142,
+        "id": 22,
         "name": "IdentitySvg",
         "prevSize": 32,
-        "code": 59657
+        "code": 59661
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 9
+      "iconIdx": 12
     },
     {
       "icon": {
@@ -376,9 +600,9 @@
           "Line"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 2
+              "f": 8
             }
           ]
         }
@@ -389,15 +613,15 @@
         }
       ],
       "properties": {
-        "order": 113,
-        "id": 14,
+        "order": 164,
+        "id": 16,
         "name": "Line",
         "prevSize": 32,
-        "code": 59658
+        "code": 59712
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 10
+      "iconIdx": 18
     },
     {
       "icon": {
@@ -414,7 +638,7 @@
           "Logout"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -423,15 +647,15 @@
         {}
       ],
       "properties": {
-        "order": 114,
-        "id": 13,
+        "order": 163,
+        "id": 15,
         "name": "Logout",
         "prevSize": 32,
-        "code": 59659
+        "code": 59713
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 11
+      "iconIdx": 19
     },
     {
       "icon": {
@@ -450,9 +674,9 @@
           "Menu"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 2
+              "f": 8
             }
           ]
         }
@@ -463,15 +687,15 @@
         }
       ],
       "properties": {
-        "order": 115,
-        "id": 12,
+        "order": 162,
+        "id": 14,
         "name": "Menu",
         "prevSize": 32,
-        "code": 59660
+        "code": 59714
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 12
+      "iconIdx": 20
     },
     {
       "icon": {
@@ -488,7 +712,7 @@
           "ModeSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -497,15 +721,15 @@
         {}
       ],
       "properties": {
-        "order": 116,
-        "id": 11,
+        "order": 161,
+        "id": 13,
         "name": "ModeSvg",
         "prevSize": 32,
-        "code": 59661
+        "code": 59715
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 13
+      "iconIdx": 21
     },
     {
       "icon": {
@@ -522,7 +746,7 @@
           "Notification"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -531,15 +755,15 @@
         {}
       ],
       "properties": {
-        "order": 117,
-        "id": 10,
+        "order": 160,
+        "id": 12,
         "name": "Notification",
         "prevSize": 32,
-        "code": 59662
+        "code": 59716
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 14
+      "iconIdx": 22
     },
     {
       "icon": {
@@ -556,7 +780,7 @@
           "OfferSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -565,15 +789,15 @@
         {}
       ],
       "properties": {
-        "order": 118,
-        "id": 9,
+        "order": 159,
+        "id": 11,
         "name": "OfferSvg",
         "prevSize": 32,
-        "code": 59663
+        "code": 59717
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 15
+      "iconIdx": 23
     },
     {
       "icon": {
@@ -586,20 +810,61 @@
           "PlusSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": []
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": []
         }
       },
       "attrs": [],
       "properties": {
-        "order": 119,
-        "id": 8,
+        "order": 158,
+        "id": 10,
         "name": "PlusSvg",
         "prevSize": 32,
-        "code": 59664
+        "code": 59718
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 16
+      "iconIdx": 24
+    },
+    {
+      "icon": {
+        "paths": [
+          "M447.297 1438.862c-444.814 0-806.723-362.074-806.723-806.723s361.908-806.723 806.723-806.723 806.723 361.908 806.723 806.723-361.908 806.723-806.723 806.723zM447.297-91.842c-399.307 0-723.982 324.675-723.982 723.982s324.675 723.982 723.982 723.982 723.982-324.84 723.982-723.982-324.84-723.982-723.982-723.982z"
+        ],
+        "attrs": [
+          {
+            "fill": "rgb(200, 200, 200)"
+          }
+        ],
+        "width": 1065,
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "grid": 0,
+        "tags": [
+          "Redio-unselect"
+        ],
+        "colorPermutations": {
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
+            {
+              "f": 7
+            }
+          ]
+        }
+      },
+      "attrs": [
+        {
+          "fill": "rgb(200, 200, 200)"
+        }
+      ],
+      "properties": {
+        "order": 129,
+        "id": 8,
+        "name": "Redio-unselect",
+        "prevSize": 32,
+        "code": 59721
+      },
+      "setIdx": 2,
+      "setId": 2,
+      "iconIdx": 26
     },
     {
       "icon": {
@@ -618,9 +883,9 @@
           "RightArrow"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 0
+              "f": 3
             }
           ]
         }
@@ -631,15 +896,15 @@
         }
       ],
       "properties": {
-        "order": 120,
+        "order": 156,
         "id": 7,
         "name": "RightArrow",
         "prevSize": 32,
-        "code": 59665
+        "code": 59722
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 17
+      "iconIdx": 27
     },
     {
       "icon": {
@@ -658,9 +923,9 @@
           "Search"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 2
+              "f": 8
             }
           ]
         }
@@ -671,15 +936,15 @@
         }
       ],
       "properties": {
-        "order": 127,
+        "order": 155,
         "id": 6,
         "name": "Search",
         "prevSize": 32,
-        "code": 59666
+        "code": 59723
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 18
+      "iconIdx": 28
     },
     {
       "icon": {
@@ -696,7 +961,7 @@
           "Settings"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -705,15 +970,15 @@
         {}
       ],
       "properties": {
-        "order": 126,
+        "order": 154,
         "id": 5,
         "name": "Settings",
         "prevSize": 32,
-        "code": 59667
+        "code": 59724
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 19
+      "iconIdx": 29
     },
     {
       "icon": {
@@ -732,9 +997,9 @@
           "Star"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {
-              "f": 1
+              "f": 5
             }
           ]
         }
@@ -745,15 +1010,15 @@
         }
       ],
       "properties": {
-        "order": 125,
+        "order": 153,
         "id": 4,
         "name": "Star",
         "prevSize": 32,
-        "code": 59668
+        "code": 59725
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 20
+      "iconIdx": 30
     },
     {
       "icon": {
@@ -770,7 +1035,7 @@
           "StarSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -779,15 +1044,15 @@
         {}
       ],
       "properties": {
-        "order": 124,
+        "order": 152,
         "id": 3,
         "name": "StarSvg",
         "prevSize": 32,
-        "code": 59669
+        "code": 59726
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 21
+      "iconIdx": 31
     },
     {
       "icon": {
@@ -804,7 +1069,7 @@
           "Support"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -813,15 +1078,15 @@
         {}
       ],
       "properties": {
-        "order": 122,
+        "order": 151,
         "id": 2,
         "name": "Support",
         "prevSize": 32,
-        "code": 59670
+        "code": 59727
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 22
+      "iconIdx": 32
     },
     {
       "icon": {
@@ -838,7 +1103,7 @@
           "TagsSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -847,15 +1112,15 @@
         {}
       ],
       "properties": {
-        "order": 123,
+        "order": 150,
         "id": 1,
         "name": "TagsSvg",
         "prevSize": 32,
-        "code": 59671
+        "code": 59728
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 23
+      "iconIdx": 33
     },
     {
       "icon": {
@@ -872,7 +1137,7 @@
           "TemplateSvg"
         ],
         "colorPermutations": {
-          "2541815012552552551311661641": [
+          "111115157881193193192120020020012541815012552552551311661641454545165182731": [
             {}
           ]
         }
@@ -881,15 +1146,15 @@
         {}
       ],
       "properties": {
-        "order": 121,
+        "order": 149,
         "id": 0,
         "name": "TemplateSvg",
         "prevSize": 32,
-        "code": 59672
+        "code": 59729
       },
-      "setIdx": 0,
+      "setIdx": 2,
       "setId": 2,
-      "iconIdx": 24
+      "iconIdx": 34
     }
   ],
   "height": 1024,
@@ -904,14 +1169,20 @@
     "fontPref": {
       "prefix": "icon-",
       "metadata": {
-        "fontFamily": "icomoon"
+        "fontFamily": "icomoon",
+        "majorVersion": 1,
+        "minorVersion": 0
       },
       "metrics": {
         "emSize": 1024,
         "baseline": 6.25,
         "whitespace": 50
       },
-      "embed": false
+      "embed": false,
+      "showSelector": false,
+      "showMetrics": false,
+      "showMetadata": false,
+      "showVersion": true
     },
     "imagePref": {
       "prefix": "icon-",

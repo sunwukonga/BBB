@@ -1,11 +1,11 @@
 import { StyleSheet, Platform } from 'react-native';
-
+import { Layout, Colors, Images } from '../../../constants/';
 export default StyleSheet.create({
   accessory: {
-    width: 24,
-    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: 'transparent'
   },
 
   triangle: {

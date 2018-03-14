@@ -17,15 +17,15 @@ import styles from './styles';
 
 export default class DrawerContainer extends React.Component {
 	logout = () => {
-		alert('logout');
+		// alert('logout');
 		// This will reset back to loginStack
 		// https://github.com/react-community/react-navigation/issues/1127
-		// const actionToDispatch = NavigationActions.reset({
-		//   index: 0,
-		//   key: null,  // black magic
-		//   actions: [NavigationActions.navigate({ routeName: 'loginStack' })]
-		// })
-		// this.props.navigation.dispatch(actionToDispatch)
+		const actionToDispatch = NavigationActions.reset({
+			index: 0,
+			key: null, // black magic
+			actions: [NavigationActions.navigate({ routeName: 'loginScreen' })],
+		});
+		this.props.navigation.dispatch(actionToDispatch);
 	};
 
 	render() {

@@ -5,33 +5,21 @@ import { StackNavigator } from 'react-navigation';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 
 // screens
-import MainTabNavigator from './MainTabNavigator';
 import MainDrawerNavigator from './MainDrawerNavigator';
 
 import LoginScreen from '../screens/LoginScreen';
 import CounrtyScreen from '../screens/CountryScreen';
-import FilterScreen from '../screens/FilterScreen';
-import ProductDetailsScreen from '../screens/ProductDetailsScreen';
-// import ChatScreen from '../screens/ChatScreen';
-import StrollersScreen from '../screens/StrollersScreen';
-import ChatListScreen from '../screens/ChatListScreen';
-import CreateNewItemScreen from '../screens/CreateNewItemScreen';
 
 const RootStackNavigator = StackNavigator(
 	{
 		mainScreen: { screen: MainDrawerNavigator },
 		loginScreen: { screen: LoginScreen },
 		counrtyScreen: { screen: CounrtyScreen },
-		filterScreen: { screen: FilterScreen },
-		productDetailsScreen: { screen: ProductDetailsScreen },
-		// chatScreen: { screen: ChatScreen },
-		strollersScreen: { screen: StrollersScreen },
-		chatListScreen: { screen: ChatListScreen },
-		createNewItemScreen: { screen: CreateNewItemScreen },
 	},
 	{
 		headerMode: 'none',
 		initialRouteName: 'counrtyScreen',
+		gesturesEnabled: true,
 	}
 );
 

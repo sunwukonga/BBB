@@ -1,18 +1,11 @@
 import React from 'react';
 import { Text, Animated, Easing, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import {
-	TabNavigator,
-	TabBarBottom,
-	StackNavigator,
-	DrawerNavigator,
-} from 'react-navigation';
+import { StackNavigator, DrawerNavigator } from 'react-navigation';
 
 import { Colors, Layout } from '../constants/';
 
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
-// import ChatScreen from '../screens/ChatScreen';
 import FavoriteScreen from '../screens/FavoriteScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 import SettingScreen from '../screens/SettingScreen';
@@ -28,19 +21,10 @@ import CreateNewItemScreen from '../screens/CreateNewItemScreen';
 
 import DrawerContainer from '../screens/DrawerContainer/';
 
-// const noTransitionConfig = () => ({
-//   transitionSpec: {
-//     duration: 0,
-//     timing: Animated.timing,
-//     easing: Easing.step0
-//   }
-// })
-
 // drawer stack
 const DrawerStack = DrawerNavigator(
 	{
 		homeScreen: { screen: HomeScreen },
-		// chatScreen: { screen: ChatScreen },
 		favoriteScreen: { screen: FavoriteScreen },
 		notificationScreen: { screen: NotificationScreen },
 		settingScreen: { screen: SettingScreen },
@@ -52,10 +36,10 @@ const DrawerStack = DrawerNavigator(
 		chatDetailScreen: { screen: ChatDetailScreen },
 		strollersScreen: { screen: StrollersScreen },
 		chatListScreen: { screen: ChatListScreen },
-		CreateNewItemScreen: { screen: CreateNewItemScreen },
+		createNewItemScreen: { screen: CreateNewItemScreen },
 	},
 	{
-		gesturesEnabled: false,
+		gesturesEnabled: true,
 		drawerWidth: Layout.WIDTH * 0.82,
 		contentComponent: props => <DrawerContainer {...props} />,
 	}
@@ -68,30 +52,7 @@ export default StackNavigator(
 	{
 		headerMode: 'none',
 		navigationOptions: ({ navigation }) => ({
-			gesturesEnabled: false,
+			gesturesEnabled: true,
 		}),
 	}
 );
-
-// // login stack
-// const LoginStack = StackNavigator({
-//   loginScreen: { screen: LoginScreen },
-// }, {
-//   headerMode: 'float',
-//   navigationOptions: {
-//     headerStyle: {backgroundColor: 'red'},
-//     title: 'You are not logged in'
-//   }
-// })
-
-// Manifest of possible screens
-// const PrimaryNav = StackNavigator({
-//   loginStack: { screen: LoginStack },
-//   drawerStack: { screen: DrawerNavigation }
-// }, {
-//   // Default config for all screens
-//   headerMode: 'none',
-//   title: 'Main',
-//   initialRouteName: 'loginStack',
-//   transitionConfig: noTransitionConfig
-// })

@@ -1,121 +1,151 @@
 import React from 'react';
-import { Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View, FlatList } from 'react-native';
-import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Button, Icon, Title } from 'native-base';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Baby from '../../components/Baby'
-import BBBHeader from '../../components/BBBHeader'
-import styles from './styles'
-import { Layout, Colors,Images } from '../../constants/'
+import {
+	Image,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+	FlatList,
+} from 'react-native';
+import {
+	Container,
+	Header,
+	Content,
+	List,
+	ListItem,
+	Left,
+	Body,
+	Right,
+	Thumbnail,
+	Text,
+	Button,
+	Icon,
+	Title,
+} from 'native-base';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+//custom components
+import BBBHeader from '../../components/BBBHeader';
+import Baby from '../../components/Baby';
+import BBBIcon from '../../components/BBBIcon';
+
+import styles from './styles';
+import { Layout, Colors, Images } from '../../constants/';
+
 export default class ChatListScreen extends React.Component {
+	_renderItem = ({ item }) => (
+		<List
+			style={item.counts == '0' ? styles.mainlist : styles.mainlists}
+			key={item.id}>
+			<ListItem
+				avatar
+				onPress={() => this.props.navigation.navigate('chatDetailScreen')}>
+				<Left style={styles.left}>
+					<View style={styles.bebyview}>
+						<Baby height={Layout.HEIGHT * 0.07} width={Layout.HEIGHT * 0.07} />
+					</View>
+				</Left>
+				<Body style={styles.bodys}>
+					<View style={styles.titleview}>
+						<Image source={Images.trollie} style={styles.rowImage} />
+						<Text style={styles.title}>{item.title}</Text>
+					</View>
+					<View style={styles.bottomline} />
+					<View style={styles.namecount}>
+						<Text style={styles.name}>{item.name}</Text>
+						{item.counts == '0' ? null : (
+							<Text style={styles.count}>{item.counts}</Text>
+						)}
+					</View>
+				</Body>
+			</ListItem>
+		</List>
+	);
 
-
-  _renderItem = ({ item }) =>  (
-    <List style={(item.counts=='0')? styles.mainlist : styles.mainlists} key={item.id} onPress={()=>alert('testScreen')}>
-      <ListItem avatar>
-        <Left style={styles.left}>
-          <View style={styles.bebyview}>
-            <Baby height= {Layout.HEIGHT*0.07} width= {Layout.HEIGHT*0.07} />
-          </View>
-        </Left>
-        <Body style={styles.bodys} >
-          <View style={styles.titleview}>
-            <Image source={Images.trollie} style={styles.rowImage}/>
-            <Text style={styles.title}>{item.title}</Text>
-          </View>
-          <View style={styles.bottomline}></View>
-          <View style={styles.namecount}>
-            <Text style={styles.name}>{item.name}</Text>
-            { (item.counts=='0')?
-              null  :  <Text style={styles.count}>{item.counts}</Text>
-            }
-
-          </View>
-        </Body>
-
-      </ListItem>
-    </List>
-	)
-
-  render() {
-    var listItemData = [
-      {
-        id: 1,
-        name: 'Leza  Klenk',
-        counts:'4',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 2,
-        name: 'Leza  Klenk',
-        counts:'4',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 3,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 4,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 5,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 6,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 7,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 8,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 9,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-      {
-        id: 10,
-        name: 'Leza  Klenk',
-        counts:'0',
-        title:'Pre-loved stoller. Used twise and kept in storage'
-      },
-
-    ];
-    var leftComponent = <Button transparent onPress={()=>this.props.navigation.goBack()}>
-								          <Icon name="md-arrow-back" size={Layout.moderateScale(20)} style={{color: '#ffffff'}}/>
-												</Button>
-
-    return (
-      <Container style={styles.container}>
-        <BBBHeader title="Chats" leftComponent={ leftComponent } />
-        <Content>
-          <FlatList
-            data={listItemData}
-            keyExtractor={listItemData => listItemData.id}
-            renderItem={this._renderItem}
-          />
-        </Content>
-      </Container>
-    );
-  }
-
+	render() {
+		var listItemData = [
+			{
+				id: 1,
+				name: 'Leza  Klenk',
+				counts: '4',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 2,
+				name: 'Leza  Klenk',
+				counts: '4',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 3,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 4,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 5,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 6,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 7,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 8,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 9,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+			{
+				id: 10,
+				name: 'Leza  Klenk',
+				counts: '0',
+				title: 'Pre-loved stoller. Used twise and kept in storage',
+			},
+		];
+		var leftComponent = (
+			<Button transparent onPress={() => this.props.navigation.goBack()}>
+				<BBBIcon
+					name="BackArrow"
+					size={Layout.moderateScale(18)}
+					color={Colors.white}
+				/>
+			</Button>
+		);
+		return (
+			<Container style={styles.container}>
+				<BBBHeader title="Chats" leftComponent={leftComponent} />
+				<Content>
+					<FlatList
+						data={listItemData}
+						keyExtractor={listItemData => listItemData.id}
+						renderItem={this._renderItem}
+					/>
+				</Content>
+			</Container>
+		);
+	}
 }

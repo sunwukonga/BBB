@@ -1,95 +1,144 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { TouchableOpacity, View, Text, StyleSheet, Image } from 'react-native'
+/**
+ * react-native-check-box
+ * Checkbox component for react native, it works on iOS and Android
+ * https://github.com/crazycodeboy/react-native-check-box
+ * Email:crazycodeboy@gmail.com
+ * Blog:http://www.devio.org
+ * @flow
+ */
 
-class CheckBox extends Component {
-  state = {
-    checked: false
-  }
+import React, { Component } from 'react';
+import {
+	StyleSheet,
+	View,
+	ViewPropTypes,
+	Image,
+	Text,
+	TouchableHighlight,
+} from 'react-native';
+import PropTypes from 'prop-types';
 
-  componentDidMount () {
-    this.setState({ checked: this.props.checked })
-  }
+export default class CheckBox extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			isChecked: this.props.isChecked,
+		};
+	}
+	static propTypes = {
+		...(ViewPropTypes || View.PropTypes),
+		leftText: PropTypes.string,
+		leftTextView: PropTypes.element,
+		rightText: PropTypes.string,
+		leftTextStyle: PropTypes.object,
+		rightTextView: PropTypes.element,
+		rightTextStyle: PropTypes.object,
+		checkedImage: PropTypes.element,
+		unCheckedImage: PropTypes.element,
+		onClick: PropTypes.func.isRequired,
+		isChecked: PropTypes.bool.isRequired,
+		isIndeterminate: PropTypes.bool.isRequired,
+		checkBoxColor: PropTypes.string,
+		disabled: PropTypes.bool,
+	};
+	static defaultProps = {
+		isChecked: false,
+		isIndeterminate: false,
+		leftTextStyle: {},
+		rightTextStyle: {},
+	};
 
-  render () {
-    return (
-      <TouchableOpacity onPress={this._handleToggleChecked} underlayColor={this.props.underlayColor} style={styles.flexContainer}>
-        <View style={this.props.containerStyle || styles.container}>
-          {this.props.labelBefore ? <Label labelStyle={this.props.labelStyle} numberOfLabelLines={this.props.numberOfLabelLines} label={this.props.label} /> : null }
+	static getDerivedStateFromProps(nextProps, prevState) {
+		if (prevState.isChecked !== nextProps.isChecked) {
+			return {
+				isChecked: nextProps.isChecked,
+			};
+		}
+		return null;
+	}
+	onClick() {
+		this.setState({
+			isChecked: !this.state.isChecked,
+		});
+		this.props.onClick();
+	}
+	_renderLeft() {
+		if (this.props.leftTextView) return this.props.leftTextView;
+		if (!this.props.leftText) return null;
+		return (
+			<Text style={[styles.leftText, this.props.leftTextStyle]}>
+				{this.props.leftText}
+			</Text>
+		);
+	}
+	_renderRight() {
+		if (this.props.rightTextView) return this.props.rightTextView;
+		if (!this.props.rightText) return null;
+		return (
+			<Text style={[styles.rightText, this.props.rightTextStyle]}>
+				{this.props.rightText}
+			</Text>
+		);
+	}
 
-          {this.props.custom
-            ? this.state.checked
-              ? this.props.checkedComponent : this.props.uncheckedComponent
-            : <Image style={this.props.checkBoxStyle || styles.checkbox} source={this.state.checked ? this.props.checkedImage : this.props.uncheckedImage} />
-        }
+	_renderImage() {
+		if (this.props.isIndeterminate) {
+			return this.props.indeterminateImage
+				? this.props.indeterminateImage
+				: this.genCheckedImage();
+		}
+		if (this.state.isChecked) {
+			return this.props.checkedImage
+				? this.props.checkedImage
+				: this.genCheckedImage();
+		} else {
+			return this.props.unCheckedImage
+				? this.props.unCheckedImage
+				: this.genCheckedImage();
+		}
+	}
 
-          {this.props.labelBefore ? null : <Label labelStyle={this.props.labelStyle} numberOfLabelLines={this.props.numberOfLabelLines} label={this.props.label} /> }
-        </View>
-      </TouchableOpacity>
-    )
-  }
+	genCheckedImage() {
+		var source;
+		if (this.props.isIndeterminate) {
+			source = require('./checked.png');
+		} else {
+			source = this.state.isChecked
+				? require('./checked.png')
+				: require('./unchecked.png');
+		}
 
-  _handleToggleChecked = () => {
-    const checked = !this.state.checked
-    const name = this.props.label
+		return (
+			<Image source={source} style={{ tintColor: this.props.checkBoxColor }} />
+		);
+	}
 
-    this.setState({checked})
-    this.props.onChange && this.props.onChange({name, checked})
-  }
+	render() {
+		return (
+			<TouchableHighlight
+				style={this.props.style}
+				onPress={() => this.onClick()}
+				underlayColor="transparent"
+				disabled={this.props.disabled}>
+				<View style={styles.container}>
+					{this._renderLeft()}
+					{this._renderImage()}
+					{this._renderRight()}
+				</View>
+			</TouchableHighlight>
+		);
+	}
 }
-
-const Label = (props) => (
-  <View style={styles.labelContainer}>
-    <Text style={[styles.label, props.labelStyle]} numberOfLines={props.numberOfLabelLines}>
-      {props.label}
-    </Text>
-  </View>
-)
-
-var styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  checkbox: {
-    width: 30,
-    height: 30
-  },
-  labelContainer: {
-    marginLeft: 10,
-    marginRight: 10
-  },
-  label: {
-    fontSize: 16,
-    color: '#222'
-  }
-})
-
-CheckBox.defaultProps = {
-  custom: false,
-  label: 'Label',
-  numberOfLabelLines: 1,
-  labelBefore: false,
-  checked: false,
-  checkedImage: require('./checked.png'),
-  uncheckedImage: require('./unchecked.png'),
-  checkedComponent: (<Text>Checked</Text>),
-  uncheckedComponent: (<Text>Unchecked</Text>)
-}
-
-CheckBox.propTypes = {
-  custom: PropTypes.bool,
-  checkedComponent: PropTypes.element,
-  uncheckedComponent: PropTypes.element,
-  checked: PropTypes.bool,
-  checkBoxStyle: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  containerStyle: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  label: PropTypes.string,
-  labelBefore: PropTypes.bool,
-  labelStyle: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  numberOfLabelLines: PropTypes.number,
-  onChange: PropTypes.func
-}
-
-export default CheckBox
+const styles = StyleSheet.create({
+	container: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	leftText: {
+		flex: 1,
+	},
+	rightText: {
+		flex: 1,
+		marginLeft: 10,
+	},
+});

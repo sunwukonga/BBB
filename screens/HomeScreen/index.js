@@ -16,6 +16,7 @@ import {
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
+import IdentityVerification2 from '../../components/IdentityVerification2';
 import BBBIcon from '../../components/BBBIcon';
 
 // style
@@ -52,14 +53,14 @@ export default class HomeScreen extends React.Component {
 						<BBBIcon
 							name="Favorite"
 							size={Layout.moderateScale(18)}
-							color="#ffffff"
+							color={Colors.white}
 						/>
 					</View>
 					<View style={styles.chatIconSec}>
 						<BBBIcon
 							name="Chat"
 							size={Layout.moderateScale(18)}
-							color="#ffffff"
+							color={Colors.white}
 						/>
 					</View>
 				</View>
@@ -73,31 +74,9 @@ export default class HomeScreen extends React.Component {
 						<Text style={styles.userName}>Best Buys</Text>
 					</View>
 					<View style={styles.activeuserSec}>
-						{/* <Image source={Images.trollie} style={styles.activeuser}/> */}
-						<BBBIcon
-							name="ActivePost"
-							size={Layout.moderateScale(12)}
-							style={{ color: '#3eb722' }}
-						/>
-						<BBBIcon
-							name="ActivePost"
-							size={Layout.moderateScale(12)}
-							style={{ color: '#3eb722' }}
-						/>
-						<BBBIcon
-							name="ActivePost"
-							size={Layout.moderateScale(12)}
-							style={{ color: '#3eb722' }}
-						/>
-						<BBBIcon
-							name="ActivePost"
-							size={Layout.moderateScale(12)}
-							style={{ color: '#3eb722' }}
-						/>
-						<BBBIcon
-							name="ActivePost"
-							size={Layout.moderateScale(12)}
-							style={{ color: '#3eb722' }}
+						<IdentityVerification2
+							width={Layout.moderateScale(30)}
+							height={Layout.moderateScale(30)}
 						/>
 					</View>
 				</Item>
@@ -184,7 +163,7 @@ export default class HomeScreen extends React.Component {
 									keyboardType="default"
 									returnKeyType="search"
 									onSubmitEditing={() =>
-										this.props.navigation.navigate('searchResultScreen')
+										this.props.navigation.navigate('strollersScreen')
 									}
 								/>
 								<BBBIcon name="Search" style={styles.searchicon} />
@@ -232,14 +211,10 @@ export default class HomeScreen extends React.Component {
 				<Fab
 					active={this.state.active}
 					direction="up"
-					containerStyle={{}}
-					style={{ backgroundColor: '#1fa6a4' }}
+					style={styles.fabStyle}
 					position="bottomRight"
-					onPress={() => this.props.navigation.navigate('CreateNewItemScreen')}>
-					<Icon name="ios-add" />
-					<Button disabled style={{ backgroundColor: '#DD5144' }}>
-						<Icon name="share" />
-					</Button>
+					onPress={() => this.props.navigation.navigate('createNewItemScreen')}>
+					<Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
 				</Fab>
 			</Container>
 		);

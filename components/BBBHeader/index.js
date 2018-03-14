@@ -1,128 +1,130 @@
-
-import React, { Component } from 'react'
-import { Container, Content, Header, Item, Left, Body, Right, Title, Button, Icon } from 'native-base'
-import { Text, Platform, View, InteractionManager } from 'react-native'
-import EvilIcons from 'react-native-vector-icons/EvilIcons'
+import React, { Component } from 'react';
+import {
+	Container,
+	Content,
+	Header,
+	Item,
+	Left,
+	Body,
+	Right,
+	Title,
+	Button,
+	Icon,
+} from 'native-base';
+import { Text, Platform, View, InteractionManager } from 'react-native';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 // Styles and Theme
-import { Layout, Colors } from '../../constants/'
-import styles from './styles'
+import { Layout, Colors } from '../../constants/';
+import styles from './styles';
 
 // Custom Components
-import BBBIcon from '../BBBIcon'
+import BBBIcon from '../BBBIcon';
 /**
  *  BBB Header Component
  */
 class BBBHeader extends Component {
+	// Handle Back Press
+	_handleBack = () => {
+		const { onBack } = this.props;
 
-  // Handle Back Press
-  _handleBack = () => {
+		if (onBack) {
+			return requestAnimationFrame(() => {
+				this.props.onBack();
+			});
+		}
 
-    const { onBack } = this.props;
+		// universal back action
+		this.props.navigation.goBack();
+	};
 
-    if(onBack) {
-      return requestAnimationFrame(() => {
-        this.props.onBack();
-      });
-    }
+	// Handle Search Icon Press
+	_handleSearchPress = () => {
+		// if(this.props.onSearch) {
+		//   requestAnimationFrame(() => {
+		//     this.props.onSearch();
+		//   });
+		// }
+		alert('Search Clicked');
+	};
 
-    // universal back action
-    this.props.navigation.goBack();
+	shouldComponentUpdate() {
+		return false;
+	}
 
-  }
+	_renderRightComponent = () => {
+		const { rightComponent, enableSearch } = this.props;
 
-  // Handle Search Icon Press
-  _handleSearchPress = () => {
-    if(this.props.onSearch) {
-      requestAnimationFrame(() => {
-        this.props.onSearch();
-      });
-    }
-  }
+		// Render Custom Right Component
+		if (rightComponent) {
+			return rightComponent;
+		}
 
-  shouldComponentUpdate() {
-    return false;
-  }
+		// Render Search Icon
+		if (enableSearch) {
+			return (
+				<Button transparent onPress={this._handleSearchPress}>
+					<BBBIcon
+						name="Search"
+						style={{ color: '#ffffff' }}
+						size={Layout.moderateScale(18)}
+					/>
+				</Button>
+			);
+		}
 
-  _renderRightComponent = () => {
+		return undefined;
+	};
 
-    const { rightComponent, enableSearch } = this.props;
+	_renderLeftComponent() {
+		const { leftComponent, enableBack } = this.props;
 
-    // Render Custom Right Component
-    if(rightComponent) {
-      return rightComponent;
-    }
+		// if given custom left component
+		if (leftComponent) {
+			return leftComponent;
+		}
 
-    // Render Search Icon
-    if(enableSearch) {
-      return (
-        <Button transparent onPress={this._handleSearchPress}>
-          <BBBIcon name='Search' style={{color: '#ffffff'}} size={Layout.moderateScale(18)}/>
-        </Button>
-      );
-    }
+		// if back button enabled
+		if (enableBack) {
+			return (
+				<Button transparent onPress={this._handleBack}>
+					<EvilIcons
+						name="chevron-left"
+						size={Layout.moderateScale(20)}
+						color="#fff"
+						style={{ marginLeft: -(Layout.WIDTH * 0.03) }}
+					/>
+				</Button>
+			);
+		}
 
-    return undefined;
+		// if nothing given
+		return undefined;
+	}
 
-  }
+	render() {
+		var headerStyle = this.props.headerStyle;
+		if (this.props.search) {
+			return this._renderSearchHeader();
+		}
 
-  _renderLeftComponent() {
+		return (
+			<Header
+				androidStatusBarColor={Colors.mainheaderbg}
+				style={[styles.header, headerStyle]}>
+				{/* Take up the space */}
+				<Left style={styles.left}>{this._renderLeftComponent()}</Left>
 
-    const { leftComponent, enableBack } = this.props;
+				{/* Title */}
+				<Body style={styles.body}>
+					<Title style={styles.headerTitle}>{this.props.title}</Title>
+				</Body>
 
-    // if given custom left component
-    if(leftComponent) {
-      return leftComponent;
-    }
-
-    // if back button enabled
-    if(enableBack) {
-      return (
-        <Button transparent onPress={this._handleBack}>
-          <EvilIcons name="chevron-left" size={Layout.moderateScale(20)} color="#fff"  style={{marginLeft: -(Layout.WIDTH * 0.03)}}/>
-        </Button>
-      );
-    }
-
-    // if nothing given
-    return undefined;
-
-  }
-
-  render() {
-    var headerStyle = this.props.headerStyle;
-    if(this.props.search) {
-      return this._renderSearchHeader();
-    }
-
-    return (
-      <Header
-        androidStatusBarColor={Colors.mainheaderbg}
-        style={[styles.header, headerStyle]}
-      >
-
-          {/* Take up the space */}
-          <Left style={styles.left}>
-            {this._renderLeftComponent()}
-          </Left>
-
-          {/* Title */}
-          <Body style={styles.body}>
-            <Title style={styles.headerTitle}>
-              {this.props.title}
-            </Title>
-          </Body>
-
-          {/* Right Icon */}
-          <Right style={styles.right}>
-            {this._renderRightComponent()}
-          </Right>
-
-      </Header>
-    );
-  }
-
+				{/* Right Icon */}
+				<Right style={styles.right}>{this._renderRightComponent()}</Right>
+			</Header>
+		);
+	}
 }
-
 
 export default BBBHeader;

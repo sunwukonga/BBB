@@ -21,13 +21,17 @@ import {
 import { MapView } from 'expo';
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
+import RedioSelected from '../../components/RedioSelected';
+import RedioUnselect from '../../components/RedioUnselect';
 import Add from '../../components/Add';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Feather from 'react-native-vector-icons/Feather';
 import Dropdown from '../../components/Dropdown/dropdown';
-// import Dropdown from '../../components/Dropdown/dropw';
+
 import styles from './styles';
+import BBBIcon from '../../components/BBBIcon';
 import CheckBox from 'react-native-check-box';
 import { Layout, Colors, Images } from '../../constants/';
 // import { Dropdown } from 'react-native-material-dropdown';
@@ -56,7 +60,7 @@ export default class CreateNewItemScreen extends React.Component {
 			dataSourceCates: dsCates.cloneWithRows(dataObjectsCates),
 			dataSourceTags: dsTags.cloneWithRows(dataObjectsTags),
 			texts: '',
-			isCollapsedSale: true,
+			isCollapsedSale: false,
 			isCollapsedBarter: true,
 			isCollapsedDonate: true,
 			isCollapsedDnS: true,
@@ -94,7 +98,7 @@ export default class CreateNewItemScreen extends React.Component {
 							}> */}
 						<View style={styles.addIcon}>
 							<Add width={Layout.HEIGHT * 0.03} height={Layout.HEIGHT * 0.03} />
-							<Text>Add Image</Text>
+							<Text style={styles.addimage}>Add Image</Text>
 						</View>
 						{/* </TouchableOpacity> */}
 					</View>
@@ -125,7 +129,7 @@ export default class CreateNewItemScreen extends React.Component {
 	}
 
 	onPressAdd = () => {
-		console.log(this.state.texts);
+		// console.log(this.state.texts);
 		var idss = dataObjectsCates.length + 1;
 		dataObjectsCates.push({ id: idss.toString(), text: this.state.text });
 		const ds = new ListView.DataSource({
@@ -321,16 +325,19 @@ export default class CreateNewItemScreen extends React.Component {
 							<TouchableOpacity onPress={this.onPressHeadSale}>
 								<View style={styles.saleHeader}>
 									{this.state.isCollapsedSale ? (
-										<FontAwesome
-											name="circle-o"
-											color="black"
-											style={styles.redioDot}
+										<Feather
+											name="circle"
+											style={{
+												width: Layout.moderateScale(30),
+												height: Layout.moderateScale(30),
+												fontSize: Layout.moderateScale(30),
+												color: '#c8c8c8',
+											}}
 										/>
 									) : (
-										<FontAwesome
-											name="dot-circle-o"
-											color="black"
-											style={styles.redioDot}
+										<RedioSelected
+											width={Layout.moderateScale(30)}
+											height={Layout.moderateScale(30)}
 										/>
 									)}
 									<Text style={styles.txtfacetoFace}>Sale</Text>
@@ -372,6 +379,7 @@ export default class CreateNewItemScreen extends React.Component {
 											color: 'black',
 											fontSize: 20,
 											marginLeft: 20,
+											fontFamily: 'roboto-reguler',
 										}}
 										unCheckedImage={
 											<Ionicons
@@ -397,16 +405,19 @@ export default class CreateNewItemScreen extends React.Component {
 							<TouchableOpacity onPress={this.onPressHeadBarter}>
 								<View style={styles.saleHeader}>
 									{this.state.isCollapsedBarter ? (
-										<FontAwesome
-											name="circle-o"
-											color="black"
-											style={styles.redioDot}
+										<Feather
+											name="circle"
+											style={{
+												width: Layout.moderateScale(30),
+												height: Layout.moderateScale(30),
+												fontSize: Layout.moderateScale(30),
+												color: '#c8c8c8',
+											}}
 										/>
 									) : (
-										<FontAwesome
-											name="dot-circle-o"
-											color="black"
-											style={styles.redioDot}
+										<RedioSelected
+											width={Layout.moderateScale(30)}
+											height={Layout.moderateScale(30)}
 										/>
 									)}
 									<Text style={styles.txtfacetoFace}>Barter</Text>
@@ -445,16 +456,19 @@ export default class CreateNewItemScreen extends React.Component {
 							<TouchableOpacity onPress={this.onPressHeadDonate}>
 								<View style={styles.saleHeader}>
 									{this.state.isCollapsedDonate ? (
-										<FontAwesome
-											name="circle-o"
-											color="black"
-											style={styles.redioDot}
+										<Feather
+											name="circle"
+											style={{
+												width: Layout.moderateScale(30),
+												height: Layout.moderateScale(30),
+												fontSize: Layout.moderateScale(30),
+												color: '#c8c8c8',
+											}}
 										/>
 									) : (
-										<FontAwesome
-											name="dot-circle-o"
-											color="black"
-											style={styles.redioDot}
+										<RedioSelected
+											width={Layout.moderateScale(30)}
+											height={Layout.moderateScale(30)}
 										/>
 									)}
 									<Text style={styles.txtfacetoFace}>Donate</Text>
@@ -479,16 +493,19 @@ export default class CreateNewItemScreen extends React.Component {
 							<TouchableOpacity onPress={this.onPressHeadDnS}>
 								<View style={styles.saleHeader}>
 									{this.state.isCollapsedDnS ? (
-										<FontAwesome
-											name="circle-o"
-											color="black"
-											style={styles.redioDot}
+										<Feather
+											name="circle"
+											style={{
+												width: Layout.moderateScale(30),
+												height: Layout.moderateScale(30),
+												fontSize: Layout.moderateScale(30),
+												color: '#c8c8c8',
+											}}
 										/>
 									) : (
-										<FontAwesome
-											name="dot-circle-o"
-											color="black"
-											style={styles.redioDot}
+										<RedioSelected
+											width={Layout.moderateScale(30)}
+											height={Layout.moderateScale(30)}
 										/>
 									)}
 									<Text style={styles.txtfacetoFace}>Sale & Barter</Text>
@@ -666,20 +683,21 @@ export default class CreateNewItemScreen extends React.Component {
 					<View style={styles.categoty}>
 						<View style={styles.dataFacetoFace}>
 							<Text style={styles.txtTitle}>Category</Text>
-							<View style={{ height: Layout.HEIGHT * 0.1 }}>
+							<View>
 								<Dropdown
 									data={dataCate}
 									labelHeight={0}
 									dropdownPosition={0}
 									baseColor="rgba(0, 0, 0, .00)"
 									containerStyle={styles.dateDropDown}
+									backgroundColor={'white'}
 								/>
 								{/* <Dropdown containerStyle={styles.dropcontainer}
                    data={data}
                 /> */}
 							</View>
-							<Text style={styles.txtTitle}>Templates</Text>
-							<View style={{ flexDirection: 'row' }}>
+							<Text style={styles.txtTitles}>Templates</Text>
+							<View style={styles.templateSec}>
 								<Item style={styles.txtInputsmall} regular>
 									<Input
 										onChangeText={text => {
@@ -687,7 +705,9 @@ export default class CreateNewItemScreen extends React.Component {
 										}}
 									/>
 								</Item>
-								<TouchableOpacity onPress={this.onPressAdd}>
+								<TouchableOpacity
+									style={styles.addButton}
+									onPress={this.onPressAdd}>
 									<View style={styles.addButton}>
 										<Add
 											width={Layout.WIDTH * 0.08}
@@ -706,8 +726,8 @@ export default class CreateNewItemScreen extends React.Component {
 									pageSize={parseInt(this.state.pageSize)}
 								/>
 							</View>
-							<Text style={styles.txtTitle}>Tags</Text>
-							<View style={{ flexDirection: 'row' }}>
+							<Text style={styles.txtTitles}>Tags</Text>
+							<View style={styles.templateSec}>
 								<Item style={styles.txtInputsmall} regular>
 									<Input
 										onChangeText={text => {
@@ -715,7 +735,9 @@ export default class CreateNewItemScreen extends React.Component {
 										}}
 									/>
 								</Item>
-								<TouchableOpacity onPress={this.onPressAddTag}>
+								<TouchableOpacity
+									style={styles.addButton}
+									onPress={this.onPressAddTag}>
 									<View style={styles.addButton}>
 										<Add
 											width={Layout.WIDTH * 0.08}

@@ -13,10 +13,10 @@ import {
 } from 'react-native';
 import Ripple from 'react-native-material-ripple';
 import { TextField } from 'react-native-material-textfield';
-
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import DropdownItem from '../item';
 import styles from './styles';
-
+import { Layout, Colors, Images } from '../../../constants/';
 const minMargin = 8;
 const maxMargin = 16;
 
@@ -401,6 +401,7 @@ export default class Dropdown extends PureComponent {
 
 		return (
 			<View style={styles.accessory}>
+			<FontAwesome name="angle-down"  size={Layout.moderateScale(20)} style={{marginTop:5 ,backgroundColor: 'transparent',justifyContent: 'center', alignSelf: 'center', bottom: 0}} />
 				<View style={styles.triangleContainer}>
 					<View style={[styles.triangle, triangleStyle]} />
 				</View>
