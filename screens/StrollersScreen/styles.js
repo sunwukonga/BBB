@@ -22,15 +22,16 @@ export default StyleSheet.create({
 		marginRight: Layout.moderateScale(10),
 	},
 	imagesSubView: {
-		width: Layout.WIDTH * 0.92,
+		width: Layout.WIDTH * 0.9,
 		backgroundColor: Colors.white,
 		borderRadius: Layout.HEIGHT * 0.015,
 		borderColor: '#cfcfcf',
 		borderWidth: 0.5,
 		overflow: 'hidden',
 		flexDirection: 'row',
-		marginVertical: Layout.HEIGHT * 0.01,
-		padding: Layout.moderateScale(5),
+		marginTop: Layout.WIDTH * 0.05,
+		marginRight: Layout.WIDTH * 0.05,
+		marginLeft: Layout.WIDTH * 0.05,
 	},
 	rowImage: {
 		height: Layout.WIDTH * 0.35,
@@ -67,6 +68,7 @@ export default StyleSheet.create({
 	},
 	userdetailSec: {
 		height: Layout.WIDTH * 0.35,
+		marginTop: Layout.moderateScale(3),
 	},
 	userItemDetailsSec: {
 		flexDirection: 'row',
@@ -77,7 +79,7 @@ export default StyleSheet.create({
 		width: Layout.WIDTH * 0.52,
 	},
 	userProfileSec: {
-		width: Layout.WIDTH * 0.08,
+		width: Layout.moderateScale(32),
 	},
 	userProfile: {
 		width: Layout.moderateScale(25),
@@ -94,7 +96,7 @@ export default StyleSheet.create({
 		right: Layout.moderateScale(8),
 	},
 	userNameSec: {
-		width: Layout.WIDTH * 0.26,
+		width: Layout.WIDTH * 0.28,
 	},
 	userName: {
 		color: Colors.menuuserNameandTokenColor,
@@ -108,14 +110,16 @@ export default StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'flex-end',
 		alignItems: 'flex-end',
+		right: 0,
+		position: 'absolute',
 	},
 	activeuser: {
 		width: Layout.WIDTH * 0.12,
-		height: Layout.moderateScale(20),
-		paddingRight: Layout.moderateScale(5),
+		height: Layout.WIDTH * 0.12,
+		paddingRight: Layout.WIDTH * 0.6,
 	},
 	postDesc: {
-		fontSize: Layout.moderateScale(12),
+		fontSize: Layout.moderateScale(10),
 		color: Colors.menuuserNameandTokenColor,
 		fontFamily: 'roboto-reguler',
 		width: Layout.WIDTH * 0.52,
@@ -135,7 +139,7 @@ export default StyleSheet.create({
 	},
 	ratingmsgct: {
 		color: '#7c7c7c',
-		fontSize: Layout.moderateScale(14),
+		fontSize: Layout.moderateScale(12),
 		fontFamily: 'roboto-reguler',
 	},
 	priceSec: {
@@ -145,7 +149,7 @@ export default StyleSheet.create({
 		textAlign: 'right',
 		paddingRight: Layout.moderateScale(10),
 		color: Colors.primaryColor,
-		fontSize: Layout.moderateScale(14),
+		fontSize: Layout.moderateScale(12),
 		fontFamily: 'roboto-bold',
 	},
 	adSec: {
@@ -159,7 +163,7 @@ export default StyleSheet.create({
 	mainadText: {
 		marginBottom: Layout.moderateScale(5),
 		color: Colors.white,
-		fontSize: Layout.moderateScale(16),
+		fontSize: Layout.moderateScale(14),
 		fontFamily: 'roboto-bold',
 		alignSelf: 'center',
 		textAlign: 'center',
@@ -192,26 +196,25 @@ export default StyleSheet.create({
 		borderRadius: 5,
 	},
 	bartedTxt: {
-		fontSize: Layout.moderateScale(10),
+		fontSize: Layout.moderateScale(8),
 		textAlign: 'center',
 		margin: Layout.moderateScale(5),
 		fontFamily: 'roboto-reguler',
 	},
 	counterTxt: {
-		fontSize: Layout.moderateScale(10),
+		fontSize: Layout.moderateScale(8),
 		textAlign: 'center',
 		margin: Layout.moderateScale(5),
 		fontFamily: 'roboto-reguler',
 	},
 	saleTxt: {
-		fontSize: Layout.moderateScale(10),
+		fontSize: Layout.moderateScale(8),
 		textAlign: 'center',
 		margin: Layout.moderateScale(5),
 		fontFamily: 'roboto-reguler',
 	},
 	liststyle: {
-		alignItems: 'center',
-		justifyContent: 'center',
 		backgroundColor: 'white',
+		width: Layout.WIDTH,
 	},
 });

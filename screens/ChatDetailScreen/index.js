@@ -1,7 +1,6 @@
 import React from 'react';
 import {
 	Image,
-	StyleSheet,
 	Platform,
 	Text,
 	TouchableOpacity,
@@ -20,12 +19,15 @@ import {
 	Icon,
 	Input,
 } from 'native-base';
-import { Layout, Images, Colors } from '../../constants/';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
+//custom components
+import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 
 // screen style
 import styles from './styles';
+import { Layout, Images, Colors } from '../../constants/';
 
 export default class ChatDetailScreen extends React.Component {
 	constructor(props) {
@@ -34,10 +36,6 @@ export default class ChatDetailScreen extends React.Component {
 			newPost: '',
 		};
 	}
-
-	static navigationOptions = {
-		header: null,
-	};
 
 	render() {
 		var data = [
@@ -60,30 +58,27 @@ export default class ChatDetailScreen extends React.Component {
 				time: 'Feb 27, 10:28 AM',
 			},
 		];
-
+		var titleComponent = (
+			<View style={styles.body}>
+				<Image source={Images.tempUser} style={styles.profileImage} />
+				<Title style={styles.headerTitle}>Leza Klenk</Title>
+			</View>
+		);
+		var leftComponent = (
+			<Button transparent onPress={() => this.props.navigation.goBack()}>
+				<BBBIcon
+					name="BackArrow"
+					size={Layout.moderateScale(18)}
+					style={styles.backarrow}
+				/>
+			</Button>
+		);
 		return (
 			<Container style={styles.container}>
-				<Header style={styles.header}>
-					{/* Take up the space */}
-					<Left style={styles.left}>
-						<Button transparent onPress={() => this.props.navigation.goBack()}>
-							<Icon
-								name="md-arrow-back"
-								size={Layout.moderateScale(20)}
-								style={{ color: '#ffffff' }}
-							/>
-						</Button>
-					</Left>
-
-					{/* Title */}
-					<Body style={styles.body}>
-						<Image source={Images.tempUser} style={styles.profileImage} />
-						<Title style={styles.headerTitle}>Leza Klenk</Title>
-					</Body>
-
-					{/* Take up the space */}
-					<Right style={styles.right} />
-				</Header>
+				<BBBHeader
+					titleComponent={titleComponent}
+					leftComponent={leftComponent}
+				/>
 				<View style={styles.notifyContainer}>
 					<Image source={Images.trollie} style={styles.notifyImage} />
 					<Text style={styles.regularSmall}>
@@ -93,29 +88,31 @@ export default class ChatDetailScreen extends React.Component {
 				<Content style={styles.contentStyle}>
 					{data.map((item, index) => {
 						return (
-							<View key={index}>
-								{item.user_id == 1 ? (
-									<BBBIcon
-										name="MsgRightSvg"
-										color="#e0eaea"
-										style={{
-											position: 'absolute',
-											right: Layout.moderateScale(-7),
-											top: Layout.moderateScale(6),
-										}}
-									/>
-								) : (
-									<BBBIcon
-										name="MsgLeftSvg"
-										color="#f5f5f5"
-										style={{
-											position: 'absolute',
-											left: Layout.moderateScale(-7),
-											top: Layout.moderateScale(6),
-										}}
-									/>
-								)}
+							<View
+								key={index}
+								style={{ marginHorizontal: Layout.moderateScale(10) }}>
 								<View style={item.user_id == 1 ? styles.chat : styles.response}>
+									{item.user_id == 1 ? (
+										<BBBIcon
+											name="MsgRightSvg"
+											color={Colors.avtarBorder}
+											size={Layout.moderateScale(15)}
+											style={{
+												position: 'absolute',
+												right: Layout.moderateScale(-10),
+											}}
+										/>
+									) : (
+										<BBBIcon
+											name="MsgLeftSvg"
+											color="#f5f5f5"
+											size={Layout.moderateScale(15)}
+											style={{
+												position: 'absolute',
+												left: Layout.moderateScale(-12.5),
+											}}
+										/>
+									)}
 									<Text style={styles.regularSmall}>{item.text}</Text>
 									<Text style={styles.timeStyle}>{item.time}</Text>
 								</View>
@@ -124,8 +121,7 @@ export default class ChatDetailScreen extends React.Component {
 					})}
 				</Content>
 
-				<KeyboardAvoidingView
-					behavior={Platform.OS == 'ios' ? 'padding' : null}>
+				<KeyboardAvoidingView behavior="padding">
 					{/*Second Section START*/}
 					<View style={styles.footerStyle}>
 						<Input
@@ -148,7 +144,7 @@ export default class ChatDetailScreen extends React.Component {
 							<Ionicons
 								name="md-send"
 								size={Layout.moderateScale(30)}
-								color="#fff"
+								color={Colors.white}
 							/>
 						</TouchableOpacity>
 					</View>

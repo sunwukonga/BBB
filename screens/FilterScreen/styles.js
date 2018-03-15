@@ -8,6 +8,8 @@ export default StyleSheet.create({
 	mainContent: {
 		flexDirection: 'row',
 		width: Layout.WIDTH,
+		height:
+			Platform.OS === 'ios' ? Layout.HEIGHT * 0.91 : Layout.HEIGHT * 0.875,
 	},
 	contents: {
 		width: Layout.WIDTH * 0.15,

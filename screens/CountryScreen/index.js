@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Image, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, View } from 'react-native';
 import {
 	Container,
 	Content,
@@ -10,13 +10,10 @@ import {
 	Right,
 	Text,
 	Button,
-	Icon,
-	CheckBox,
 } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // custom components
-import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader/';
 import BBBIcon from '../../components/BBBIcon';
 
@@ -43,21 +40,23 @@ export default class CountryScreen extends React.Component {
 			<List
 				style={[
 					styles.mainlist,
-					{ backgroundColor: ischecked ? '#e8f2f2' : Colors.white },
+					{ backgroundColor: ischecked ? Colors.selectedRow : Colors.white },
 				]}>
 				<ListItem
 					onPress={() => this.selectCountry(item.countryName)}
 					style={styles.countryList}>
-					<Image source={item.flag} style={styles.flagStyle} />
-					<Body>
+					<Left style={styles.left}>
+						<Image source={item.flag} style={styles.flagStyle} />
+					</Left>
+					<Body style={styles.body}>
 						<Text style={styles.countryNameTxt}>{item.countryName}</Text>
 					</Body>
-					<Right>
+					<Right style={styles.right}>
 						{this.state.countryName == item.countryName ? (
 							<Ionicons
 								name="ios-checkmark-circle"
 								size={Layout.moderateScale(20)}
-								color="#1fa6a4"
+								color={Colors.primaryColor}
 							/>
 						) : null}
 					</Right>
@@ -67,10 +66,12 @@ export default class CountryScreen extends React.Component {
 	}
 
 	selectCountry(countryName) {
-		this.setState({ countryName: countryName });
+		this.setState({
+			countryName: countryName,
+		});
 		setTimeout(() => {
 			this.props.navigation.navigate('mainScreen');
-		}, 500);
+		}, 300);
 	}
 
 	render() {
@@ -115,8 +116,8 @@ export default class CountryScreen extends React.Component {
 			<Button
 				transparent
 				onPress={() => this.props.navigation.navigate('mainScreen')}>
-				<Icon
-					name="md-arrow-back"
+				<BBBIcon
+					name="BackArrow"
 					size={Layout.moderateScale(18)}
 					style={styles.backarrow}
 				/>

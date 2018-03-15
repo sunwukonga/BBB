@@ -10,7 +10,6 @@ import {
 	Right,
 	Text,
 	Button,
-	Icon,
 } from 'native-base';
 
 // custom components

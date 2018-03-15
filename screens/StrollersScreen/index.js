@@ -34,7 +34,7 @@ import { Layout, Colors, Images } from '../../constants/';
 
 export default class StrollersScreen extends React.Component {
 	_renderItem = ({ item }) => (
-		<ListItem
+		<View
 			style={styles.imagesSubView}
 			onPress={() => this.props.navigation.navigate('productDetailsScreen')}>
 			<View>
@@ -117,27 +117,27 @@ export default class StrollersScreen extends React.Component {
 					<View style={styles.ratingSec}>
 						<BBBIcon
 							name="Star"
-							size={Layout.moderateScale(14)}
+							size={Layout.moderateScale(12)}
 							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
 						/>
 						<BBBIcon
 							name="Star"
-							size={Layout.moderateScale(14)}
+							size={Layout.moderateScale(12)}
 							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
 						/>
 						<BBBIcon
 							name="Star"
-							size={Layout.moderateScale(14)}
+							size={Layout.moderateScale(12)}
 							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
 						/>
 						<BBBIcon
 							name="Star"
-							size={Layout.moderateScale(14)}
+							size={Layout.moderateScale(12)}
 							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
 						/>
 						<BBBIcon
 							name="Star"
-							size={Layout.moderateScale(14)}
+							size={Layout.moderateScale(12)}
 							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
 						/>
 						<Text style={styles.ratingmsgct}> (52) </Text>
@@ -165,7 +165,7 @@ export default class StrollersScreen extends React.Component {
 					) : null}
 				</View>
 			</View>
-		</ListItem>
+		</View>
 	);
 
 	render() {

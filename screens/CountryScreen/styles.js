@@ -8,32 +8,21 @@ export default StyleSheet.create({
 	mainlist: {
 		backgroundColor: Colors.white,
 		borderBottomWidth: 0.5,
-		borderBottomColor: Colors.categorylistBorder,
+		borderBottomColor: Colors.mainBottomBorderColor,
 		marginLeft: 0,
 		marginRight: 0,
 	},
+	left: {
+		flex: 1,
+	},
 	body: {
+		flex: 9,
 		borderBottomWidth: 0,
-		alignItems: 'center',
-		justifyContent: 'center',
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
 	},
-	bodys: {
-		borderBottomWidth: 0,
-	},
-	bebyview: {
-		margin: Layout.HEIGHT * 0.01,
-		borderRadius: Layout.HEIGHT * 0.035,
-		height: Layout.HEIGHT * 0.07,
-		width: Layout.HEIGHT * 0.07,
-		borderWidth: 1,
-		borderColor: Colors.categoryAvtarBorder,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	nextarrow: {
-		color: Colors.primaryColor,
-		fontSize: Layout.moderateScale(20),
-		alignSelf: 'center',
+	right: {
+		flex: 1,
 	},
 	backarrow: {
 		color: Colors.white,
@@ -45,14 +34,6 @@ export default StyleSheet.create({
 	flagStyle: {
 		height: Layout.HEIGHT * 0.05,
 		width: Layout.HEIGHT * 0.05,
-	},
-	selectCountryCheck: {
-		paddingTop: Platform.OS === 'ios' ? null : Layout.moderateScale(3),
-		justifyContent: 'center',
-		marginRight: Layout.moderateScale(10),
-		width: Layout.moderateScale(20),
-		height: Layout.moderateScale(20),
-		borderRadius: Layout.moderateScale(10),
 	},
 	countryNameTxt: {
 		color: Colors.secondaryColor,

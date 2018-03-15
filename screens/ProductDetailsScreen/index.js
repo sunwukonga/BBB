@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-	Image,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-	ListView,
-} from 'react-native';
+import { Image, TouchableOpacity, View, ListView } from 'react-native';
 import {
 	Container,
 	Content,
@@ -34,7 +28,8 @@ export default class ProductDetailsScreen extends React.Component {
 		const rowHasChanged = (r1, r2) => r1 !== r2;
 		const dataObjects = [
 			{ id: 'aimg0001', source: Images.trollie, flag: false },
-			{ id: 'aimg0001', source: Images.trollie, flag: false },
+			{ id: 'aimg0002', source: Images.trollie, flag: false },
+			{ id: 'aimg0003', source: Images.trollie, flag: false },
 		];
 		// DataSource configured
 		const ds = new ListView.DataSource({ rowHasChanged });
@@ -97,29 +92,28 @@ export default class ProductDetailsScreen extends React.Component {
 						<BBBIcon
 							name="Star"
 							size={Layout.moderateScale(14)}
-							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
+							style={styles.starstyle}
 						/>
 						<BBBIcon
 							name="Star"
 							size={Layout.moderateScale(14)}
-							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
+							style={styles.starstyle}
 						/>
 						<BBBIcon
 							name="Star"
 							size={Layout.moderateScale(14)}
-							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
+							style={styles.starstyle}
 						/>
 						<BBBIcon
 							name="Star"
 							size={Layout.moderateScale(14)}
-							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
+							style={styles.starstyle}
 						/>
 						<BBBIcon
 							name="Star"
 							size={Layout.moderateScale(14)}
-							style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
+							style={styles.starstyle}
 						/>
-						{/* <Image source={Images.trollie} style={styles.ratingstyle}/> */}
 						<Text style={styles.ratingmsgct}> (52) </Text>
 					</View>
 					<View style={styles.priceSec}>
@@ -128,6 +122,20 @@ export default class ProductDetailsScreen extends React.Component {
 				</View>
 			</View>
 		);
+	}
+
+	starRating() {
+		var temp = [];
+		for (var i = 0; i < 5; i++) {
+			temp.push(
+				<BBBIcon
+					name="Star"
+					size={Layout.moderateScale(14)}
+					style={styles.starstyle}
+				/>
+			);
+		}
+		return temp;
 	}
 
 	render() {
@@ -177,8 +185,9 @@ export default class ProductDetailsScreen extends React.Component {
 					rightComponent={rightComponent}
 				/>
 				<Content style={styles.contentStyle}>
-					<View style={styles.wrapper}>
+					<Content style={styles.contentSwiper}>
 						<Swiper
+							style={styles.swiperSec}
 							dot={<View style={styles.dotStyle} />}
 							activeDot={<View style={styles.activeDotStyle} />}>
 							{data.map((item, index) => {
@@ -189,21 +198,21 @@ export default class ProductDetailsScreen extends React.Component {
 											<BBBIcon
 												name="Favorite"
 												size={Layout.moderateScale(18)}
-												color="#ffffff"
+												color={Colors.white}
 											/>
 										</View>
 										<View style={styles.chatIconSec}>
 											<BBBIcon
 												name="Chat"
 												size={Layout.moderateScale(18)}
-												color="#ffffff"
+												color={Colors.white}
 											/>
 										</View>
 									</View>
 								);
 							})}
 						</Swiper>
-					</View>
+					</Content>
 					<View style={styles.profileContainer}>
 						<View style={styles.alignment}>
 							<View style={styles.ImageContainer}>
@@ -227,31 +236,7 @@ export default class ProductDetailsScreen extends React.Component {
 					</Text>
 					<View style={styles.profileContainer}>
 						<View style={styles.alignment}>
-							<BBBIcon
-								name="Star"
-								size={Layout.moderateScale(14)}
-								style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-							/>
-							<BBBIcon
-								name="Star"
-								size={Layout.moderateScale(14)}
-								style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-							/>
-							<BBBIcon
-								name="Star"
-								size={Layout.moderateScale(14)}
-								style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-							/>
-							<BBBIcon
-								name="Star"
-								size={Layout.moderateScale(14)}
-								style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-							/>
-							<BBBIcon
-								name="Star"
-								size={Layout.moderateScale(14)}
-								style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-							/>
+							{this.starRating()}
 							<Text style={styles.rateCount}>(52)</Text>
 						</View>
 						<Text style={styles.skyFontBold}>$250</Text>

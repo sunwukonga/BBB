@@ -102,6 +102,23 @@ class BBBHeader extends Component {
 		return undefined;
 	}
 
+	_renderTitleComponent() {
+		const { titleComponent, title } = this.props;
+
+		// if given custom title component
+		if (titleComponent) {
+			return titleComponent;
+		}
+
+		// if button enabled
+		if (title) {
+			return <Title style={styles.headerTitle}>{this.props.title}</Title>;
+		}
+
+		// if nothing given
+		return undefined;
+	}
+
 	render() {
 		var headerStyle = this.props.headerStyle;
 		if (this.props.search) {
@@ -116,9 +133,7 @@ class BBBHeader extends Component {
 				<Left style={styles.left}>{this._renderLeftComponent()}</Left>
 
 				{/* Title */}
-				<Body style={styles.body}>
-					<Title style={styles.headerTitle}>{this.props.title}</Title>
-				</Body>
+				<Body style={styles.body}>{this._renderTitleComponent()}</Body>
 
 				{/* Right Icon */}
 				<Right style={styles.right}>{this._renderRightComponent()}</Right>

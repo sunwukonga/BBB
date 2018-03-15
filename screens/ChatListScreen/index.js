@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-	Image,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-	FlatList,
-} from 'react-native';
+import { Image, View, FlatList } from 'react-native';
 import {
 	Container,
 	Header,
@@ -16,12 +8,8 @@ import {
 	ListItem,
 	Left,
 	Body,
-	Right,
-	Thumbnail,
 	Text,
 	Button,
-	Icon,
-	Title,
 } from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -30,6 +18,7 @@ import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
 import BBBIcon from '../../components/BBBIcon';
 
+//style
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
@@ -43,7 +32,7 @@ export default class ChatListScreen extends React.Component {
 				onPress={() => this.props.navigation.navigate('chatDetailScreen')}>
 				<Left style={styles.left}>
 					<View style={styles.bebyview}>
-						<Baby height={Layout.HEIGHT * 0.07} width={Layout.HEIGHT * 0.07} />
+						<Image source={Images.tempUser} style={styles.userImage} />
 					</View>
 				</Left>
 				<Body style={styles.bodys}>
@@ -127,9 +116,11 @@ export default class ChatListScreen extends React.Component {
 			},
 		];
 		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.goBack()}>
+			<Button
+				transparent
+				onPress={() => this.props.navigation.navigate('DrawerOpen')}>
 				<BBBIcon
-					name="BackArrow"
+					name="Menu"
 					size={Layout.moderateScale(18)}
 					color={Colors.white}
 				/>

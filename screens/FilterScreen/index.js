@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-	FlatList,
-	Image,
-	TouchableOpacity,
-	View,
-	ScrollView,
-} from 'react-native';
+import { FlatList, Image, TouchableOpacity, View } from 'react-native';
 import {
 	Container,
 	Content,

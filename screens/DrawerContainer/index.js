@@ -1,25 +1,17 @@
 import React from 'react';
 import { View, Image } from 'react-native';
 import { NavigationActions } from 'react-navigation';
-import {
-	Container,
-	Header,
-	Content,
-	Button,
-	Text,
-	Item,
-	Icon,
-} from 'native-base';
+import { Container, Content, Text, Item } from 'native-base';
+
+// custom components
 import BBBIcon from '../../components/BBBIcon';
 
-import { Layout, Images, Colors } from '../../constants/';
+// screen style
 import styles from './styles';
+import { Layout, Images, Colors } from '../../constants/';
 
 export default class DrawerContainer extends React.Component {
 	logout = () => {
-		// alert('logout');
-		// This will reset back to loginStack
-		// https://github.com/react-community/react-navigation/issues/1127
 		const actionToDispatch = NavigationActions.reset({
 			index: 0,
 			key: null, // black magic
@@ -33,9 +25,7 @@ export default class DrawerContainer extends React.Component {
 		return (
 			<Container style={styles.container}>
 				<View style={styles.usersDetailsSec}>
-					<View>
-						<Image style={styles.userImage} source={Images.tempUser} />
-					</View>
+					<Image style={styles.userImage} source={Images.tempUser} />
 					<View style={styles.usersDetails}>
 						<Text style={styles.userName}>Leza Klenk</Text>
 						<Text style={styles.tokenText}>
@@ -50,7 +40,7 @@ export default class DrawerContainer extends React.Component {
 						<BBBIcon
 							name="Home"
 							size={Layout.moderateScale(20)}
-							color="#272727"
+							color={Colors.secondaryColor}
 							style={styles.menuIcon}
 						/>
 						<Text style={styles.uglyDrawerItem}>Home</Text>
@@ -61,7 +51,7 @@ export default class DrawerContainer extends React.Component {
 						<BBBIcon
 							name="Chat"
 							size={Layout.moderateScale(20)}
-							color="#272727"
+							color={Colors.secondaryColor}
 							style={styles.menuIcon}
 						/>
 						<Text style={styles.uglyDrawerItem}>Chat</Text>
@@ -72,7 +62,7 @@ export default class DrawerContainer extends React.Component {
 						<BBBIcon
 							name="Notification"
 							size={Layout.moderateScale(20)}
-							color="#272727"
+							color={Colors.secondaryColor}
 							style={styles.menuIcon}
 						/>
 						<Text style={styles.uglyDrawerItem}>Notifications</Text>
@@ -83,7 +73,7 @@ export default class DrawerContainer extends React.Component {
 						<BBBIcon
 							name="Favorite"
 							size={Layout.moderateScale(20)}
-							color="#272727"
+							color={Colors.secondaryColor}
 							style={styles.menuIcon}
 						/>
 						<Text style={styles.uglyDrawerItem}>Favorites</Text>
@@ -94,7 +84,7 @@ export default class DrawerContainer extends React.Component {
 						<BBBIcon
 							name="Settings"
 							size={Layout.moderateScale(20)}
-							color="#272727"
+							color={Colors.secondaryColor}
 							style={styles.menuIcon}
 						/>
 						<Text style={styles.uglyDrawerItem}>Settings</Text>
@@ -105,7 +95,7 @@ export default class DrawerContainer extends React.Component {
 						<BBBIcon
 							name="Support"
 							size={Layout.moderateScale(20)}
-							color="#272727"
+							color={Colors.secondaryColor}
 							style={styles.menuIcon}
 						/>
 						<Text style={styles.uglyDrawerItem}>Support</Text>
@@ -122,7 +112,7 @@ export default class DrawerContainer extends React.Component {
 						<BBBIcon
 							name="Logout"
 							size={Layout.moderateScale(20)}
-							color="#272727"
+							color={Colors.secondaryColor}
 							style={styles.menuIcon}
 						/>
 						<Text style={styles.uglyDrawerItem}>Log Out</Text>

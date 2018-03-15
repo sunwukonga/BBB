@@ -673,7 +673,6 @@ export default class CreateNewItemScreen extends React.Component {
 								multiline={true}
 								style={{
 									height: Layout.HEIGHT * 0.1,
-									backgroundColor: 'transparent',
 									marginBottom: Layout.HEIGHT * 0.015,
 								}}
 							/>
@@ -689,8 +688,7 @@ export default class CreateNewItemScreen extends React.Component {
 									labelHeight={0}
 									dropdownPosition={0}
 									baseColor="rgba(0, 0, 0, .00)"
-									containerStyle={styles.dateDropDown}
-									backgroundColor={'white'}
+									containerStyle={styles.dateDropDown} 
 								/>
 								{/* <Dropdown containerStyle={styles.dropcontainer}
                    data={data}

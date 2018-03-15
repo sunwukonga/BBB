@@ -1,25 +1,10 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, ImageBackground } from 'react-native';
-import {
-	Container,
-	Header,
-	Content,
-	List,
-	ListItem,
-	Left,
-	Body,
-	Right,
-	Thumbnail,
-	Text,
-	Button,
-	Title,
-	Icon,
-} from 'native-base';
+import { Image, View, ImageBackground } from 'react-native';
+import { Container, Content, Left, Text, Button } from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // custom components
-import Baby from '../../components/Baby';
 import BebeBARGAINS from '../../components/BebeBARGAINS';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
@@ -47,8 +32,10 @@ export default class LoginScreen extends React.Component {
 					<ImageBackground source={Images.bg} style={styles.mainimgbg}>
 						<BBBHeader title="Login" leftComponent={leftComponent} />
 						<View style={styles.welcomeContainer}>
-							<Image source={Images.logo} style={styles.mainlogo} />
-							{/* <BebeBARGAINS width={200} height={200} /> */}
+							<BebeBARGAINS
+								width={Layout.WIDTH * 0.4}
+								height={Layout.WIDTH * 0.8}
+							/>
 							<Text style={styles.connectSec}>
 								<Ionicons
 									name="ios-remove-outline"
@@ -70,18 +57,18 @@ export default class LoginScreen extends React.Component {
 								<View style={styles.facebookSec}>
 									<FontAwesome
 										name="facebook"
+										size={Layout.moderateScale(25)}
 										style={{
-											color: '#6485ca',
-											fontSize: Layout.moderateScale(22),
+											color: Colors.fbbgicon,
 										}}
 									/>
 								</View>
 								<View style={styles.googleSec}>
 									<FontAwesome
 										name="google-plus"
+										size={Layout.moderateScale(25)}
 										style={{
-											color: '#fb5f3b',
-											fontSize: Layout.moderateScale(22),
+											color: Colors.googlebgicon,
 										}}
 									/>
 								</View>
