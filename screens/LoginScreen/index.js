@@ -54,22 +54,25 @@ export default class LoginScreen extends React.Component {
 								/>
 							</Text>
 							<View style={styles.socialSec}>
-								<View style={styles.facebookSec}>
+								<View style={styles.facebookSec}
+								>
 									<FontAwesome
 										name="facebook"
 										size={Layout.moderateScale(25)}
 										style={{
 											color: Colors.fbbgicon,
 										}}
+										onPress={() => this.props.navigation.navigate('createNewItemScreen')}
 									/>
 								</View>
-								<View style={styles.googleSec}>
+								<View style={styles.googleSec} >
 									<FontAwesome
 										name="google-plus"
 										size={Layout.moderateScale(25)}
 										style={{
 											color: Colors.googlebgicon,
 										}}
+										onPress={() => this.props.navigation.navigate('createNewItemScreen')}
 									/>
 								</View>
 							</View>

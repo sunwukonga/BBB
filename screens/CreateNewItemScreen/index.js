@@ -298,13 +298,22 @@ export default class CreateNewItemScreen extends React.Component {
 				/>
 			</Button>
 		);
+		var rightComponent = (
+			<Button transparent onPress={() => this.props.navigation.goBack()}>
+				<Ionicons
+					name="md-checkmark"
+					size={Layout.moderateScale(25)}
+					style={{ color: '#ffffff' }}
+				/>
+			</Button>
+		);
 		var _this = this;
 		return (
 			<View style={styles.container}>
 				<BBBHeader
 					title="Create A New Item"
 					leftComponent={leftComponent}
-					enableSearch
+					rightComponent={rightComponent}
 				/>
 				<ScrollView
 					style={styles.container}
@@ -688,7 +697,7 @@ export default class CreateNewItemScreen extends React.Component {
 									labelHeight={0}
 									dropdownPosition={0}
 									baseColor="rgba(0, 0, 0, .00)"
-									containerStyle={styles.dateDropDown} 
+									containerStyle={styles.dateDropDown}
 								/>
 								{/* <Dropdown containerStyle={styles.dropcontainer}
                    data={data}

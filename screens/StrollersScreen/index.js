@@ -34,25 +34,32 @@ import { Layout, Colors, Images } from '../../constants/';
 
 export default class StrollersScreen extends React.Component {
 	_renderItem = ({ item }) => (
-		<View
+		<TouchableOpacity
 			style={styles.imagesSubView}
 			onPress={() => this.props.navigation.navigate('productDetailsScreen')}>
 			<View>
 				<Image source={Images.trollie} style={styles.rowImage} />
-				<View style={styles.favoriteIconSec}>
-					<BBBIcon
-						name="Favorite"
-						size={Layout.moderateScale(13)}
-						color={Colors.white}
-					/>
-				</View>
-				<View style={styles.chatIconSec}>
-					<BBBIcon
-						name="Chat"
-						size={Layout.moderateScale(13)}
-						color={Colors.white}
-					/>
-				</View>
+
+				<TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
+					<View >
+						<BBBIcon
+							name="Favorite"
+							size={Layout.moderateScale(13)}
+							color={Colors.white}
+							style={styles.icons}
+						/>
+					</View>
+				</TouchableOpacity>
+				<TouchableOpacity style={styles.chatIconSec} onPress={() => alert('Chat Clicked')}>
+					<View >
+						<BBBIcon
+							name="Chat"
+							size={Layout.moderateScale(13)}
+							color={Colors.white}
+							style={styles.icons}
+						/>
+					</View>
+				</TouchableOpacity>
 			</View>
 			<View style={styles.userdetailSec}>
 				<Item style={styles.userItemDetailsSec}>
@@ -101,7 +108,6 @@ export default class StrollersScreen extends React.Component {
 							size={Layout.moderateScale(12)}
 							style={{
 								color: '#3eb722',
-								marginRight: Layout.moderateScale(-5),
 							}}
 						/>
 					</View>
@@ -165,7 +171,7 @@ export default class StrollersScreen extends React.Component {
 					) : null}
 				</View>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 
 	render() {

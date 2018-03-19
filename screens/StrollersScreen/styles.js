@@ -96,7 +96,7 @@ export default StyleSheet.create({
 		right: Layout.moderateScale(8),
 	},
 	userNameSec: {
-		width: Layout.WIDTH * 0.28,
+		width: Layout.WIDTH * 0.25,
 	},
 	userName: {
 		color: Colors.menuuserNameandTokenColor,
@@ -106,7 +106,6 @@ export default StyleSheet.create({
 		top: 0,
 	},
 	activeuserSec: {
-		width: Layout.WIDTH * 0.15,
 		flexDirection: 'row',
 		justifyContent: 'flex-end',
 		alignItems: 'flex-end',
@@ -217,4 +216,11 @@ export default StyleSheet.create({
 		backgroundColor: 'white',
 		width: Layout.WIDTH,
 	},
+	icons:{
+		alignSelf: 'center',
+		justifyContent: 'center',
+		backgroundColor: 'transparent',
+		marginTop: Platform.OS === 'ios' ? 0 : Layout.moderateScale(3) ,
+
+	}
 });

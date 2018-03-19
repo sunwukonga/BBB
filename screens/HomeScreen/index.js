@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, ListView } from 'react-native';
+import { Image, TouchableOpacity, View, ListView, FlatList } from 'react-native';
 import {
 	Container,
 	Content,
@@ -12,7 +12,6 @@ import {
 	Input,
 	Fab,
 } from 'native-base';
-
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
@@ -44,25 +43,37 @@ export default class HomeScreen extends React.Component {
 		this.props.navigation.navigate(menuitem);
 	}
 
-	_renderRow(rowData) {
-		return (
+	navigatess = () => {
+		this.props.navigation.navigate('productDetailsScreen')
+	}
+
+_renderItem = ({ item }) => (
+			<TouchableOpacity
+				onPress={ ()=>this.navigatess()}>
 			<View style={styles.imagesSubView}>
+
 				<View>
 					<Image source={Images.trollie} style={styles.rowImage} />
-					<View style={styles.favoriteIconSec}>
+					<TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
+					<View >
 						<BBBIcon
 							name="Favorite"
 							size={Layout.moderateScale(18)}
 							color={Colors.white}
+							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 						/>
 					</View>
-					<View style={styles.chatIconSec}>
+					</TouchableOpacity>
+					<TouchableOpacity style={styles.chatIconSec} onPress={() => alert('Favorite Clicked')}>
+					<View >
 						<BBBIcon
 							name="Chat"
 							size={Layout.moderateScale(18)}
 							color={Colors.white}
-						/>
+							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+					/>
 					</View>
+					</TouchableOpacity>
 				</View>
 
 				<Item style={styles.userItemDetailsSec}>
@@ -121,11 +132,16 @@ export default class HomeScreen extends React.Component {
 						<Text style={styles.pricetext}>$250</Text>
 					</View>
 				</View>
+
 			</View>
+							</TouchableOpacity>
 		);
-	}
 
 	render() {
+		var listItemData = [
+			{ id: '1', source: Images.trollie, flag: false },
+			{ id: '2', source: Images.trollie, flag: false },
+		];
 		var leftComponent = (
 			<Button transparent onPress={() => this._handleMenu('DrawerOpen')}>
 				<BBBIcon
@@ -174,13 +190,22 @@ export default class HomeScreen extends React.Component {
 							<View style={styles.populerSec}>
 								<Text style={styles.populerText}>Most Populer Items</Text>
 							</View>
-							<ListView
+							<FlatList
+								horizontal={true}
+								data={listItemData}
+								keyExtractor={listItemData => listItemData.id}
+								renderItem={this._renderItem}
+								contentContainerStyle={styles.listContent}
+							/>
+{/*
+								<ListView
 								horizontal={true}
 								contentContainerStyle={styles.listContent}
 								dataSource={this.state.dataSource}
 								renderRow={this._renderRow}
 								enableEmptySections
 							/>
+*/}
 						</View>
 
 						<View style={styles.adSec}>
@@ -188,7 +213,7 @@ export default class HomeScreen extends React.Component {
 								Do you have something to sell or give away?
 							</Text>
 							<Text style={styles.subtitle}>
-								Post it with us and we'll give you an audience.
+								Post it with us and well give you an audience.
 							</Text>
 						</View>
 
@@ -198,13 +223,22 @@ export default class HomeScreen extends React.Component {
 									Your Recently Visited Items
 								</Text>
 							</View>
-							<ListView
+							<FlatList
+								horizontal={true}
+								data={listItemData}
+								keyExtractor={listItemData => listItemData.id}
+								renderItem={this._renderItem}
+								contentContainerStyle={styles.listContent}
+							/>
+							{/*
+								<ListView
 								horizontal={true}
 								contentContainerStyle={styles.listContent}
 								dataSource={this.state.dataSource}
 								renderRow={this._renderRow}
 								enableEmptySections
 							/>
+							*/}
 						</View>
 					</View>
 				</Content>
@@ -213,7 +247,7 @@ export default class HomeScreen extends React.Component {
 					direction="up"
 					style={styles.fabStyle}
 					position="bottomRight"
-					onPress={() => this.props.navigation.navigate('createNewItemScreen')}>
+					onPress={() => this.props.navigation.navigate('loginScreen')}>
 					<Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
 				</Fab>
 			</Container>

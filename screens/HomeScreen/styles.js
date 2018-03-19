@@ -74,6 +74,7 @@ export default StyleSheet.create({
 		borderColor: '#7f7f7f',
 		justifyContent: 'center',
 		alignItems: 'center',
+		alignSelf: 'center'
 	},
 	chatIconSec: {
 		position: 'absolute',

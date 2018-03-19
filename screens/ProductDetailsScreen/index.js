@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, ListView } from 'react-native';
+import { Image, TouchableOpacity, View, ListView ,FlatList} from 'react-native';
 import {
 	Container,
 	Content,
@@ -43,9 +43,13 @@ export default class ProductDetailsScreen extends React.Component {
 	_handleMenu(menuName) {
 		this.props.navigation.navigate(menuName);
 	}
+	navigatess = () => {
+		this.props.navigation.navigate('productDetailsScreen')
+	}
 
-	_renderRow(rowData) {
-		return (
+	_renderItem = ({ item }) => (
+				<TouchableOpacity
+					onPress={ ()=>this.navigatess()}>
 			<View style={styles.imagesSubView}>
 				<View>
 					<Image source={Images.trollie} style={styles.rowImageProd} />
@@ -54,6 +58,7 @@ export default class ProductDetailsScreen extends React.Component {
 							name="Favorite"
 							size={Layout.moderateScale(18)}
 							color={Colors.white}
+							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 						/>
 					</View>
 					<View style={styles.chatIconSec}>
@@ -61,6 +66,7 @@ export default class ProductDetailsScreen extends React.Component {
 							name="Chat"
 							size={Layout.moderateScale(18)}
 							color={Colors.white}
+							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 						/>
 					</View>
 				</View>
@@ -121,8 +127,8 @@ export default class ProductDetailsScreen extends React.Component {
 					</View>
 				</View>
 			</View>
-		);
-	}
+			</TouchableOpacity>
+);
 
 	starRating() {
 		var temp = [];
@@ -177,6 +183,10 @@ export default class ProductDetailsScreen extends React.Component {
 				/>
 			</Button>
 		);
+		var listItemData = [
+			{ id: '1', source: Images.trollie, flag: false },
+			{ id: '2', source: Images.trollie, flag: false },
+		];
 		return (
 			<Container style={styles.container}>
 				<BBBHeader
@@ -199,6 +209,7 @@ export default class ProductDetailsScreen extends React.Component {
 												name="Favorite"
 												size={Layout.moderateScale(18)}
 												color={Colors.white}
+												style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 											/>
 										</View>
 										<View style={styles.chatIconSec}>
@@ -206,6 +217,7 @@ export default class ProductDetailsScreen extends React.Component {
 												name="Chat"
 												size={Layout.moderateScale(18)}
 												color={Colors.white}
+												style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 											/>
 										</View>
 									</View>
@@ -339,6 +351,22 @@ export default class ProductDetailsScreen extends React.Component {
 						<View style={styles.populerSec}>
 							<Text style={styles.populerText}>Related Products</Text>
 						</View>
+						<FlatList
+							horizontal={true}
+							data={listItemData}
+							keyExtractor={listItemData => listItemData.id}
+							renderItem={this._renderItem}
+							contentContainerStyle={styles.listContent}
+						/>
+						{/*
+							<ListView
+							horizontal={true}
+							contentContainerStyle={styles.listContent}
+							dataSource={this.state.dataSource}
+							renderRow={this._renderRow}
+							enableEmptySections
+						/>
+
 						<ListView
 							horizontal={true}
 							contentContainerStyle={styles.listContent}
@@ -346,6 +374,7 @@ export default class ProductDetailsScreen extends React.Component {
 							renderRow={this._renderRow}
 							enableEmptySections
 						/>
+						*/}
 					</View>
 				</Content>
 			</Container>
