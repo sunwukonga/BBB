@@ -15,8 +15,9 @@ import {
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
-import IdentityVerification2 from '../../components/IdentityVerification2';
+import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
+import Stars from '../../components/Stars';
 
 // style
 import styles from './styles';
@@ -25,16 +26,43 @@ import { Layout, Colors, Images } from '../../constants/';
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
-    const rowHasChanged = (r1, r2) => r1 !== r2;
     const dataObjects = [
-      { id: 'aimg0001', source: Images.trollie, flag: false },
-      { id: 'aimg0001', source: Images.trollie, flag: false },
+      {
+          id: 'aimg0001'
+        , source: Images.trollie
+        , flag: false
+        , liked: true
+        , chatting: true
+        , profile_pic: Images.tempUser
+        , profile_name: 'Best Buyz'
+        , description: 'Pre-loved stroller. Used twice and kept in stoage.'
+        , online: false
+        , id_level: 2
+        , rating: 4
+        , num_ratings: 32
+        , currency_symbol: '$'
+        , sale_price: 250
+      },
+      {
+          id: 'aimg0002'
+        , source: Images.trollie
+        , flag: false
+        , liked: false
+        , chatting: false
+        , profile_pic: Images.tempUser
+        , profile_name: 'Best Buyz'
+        , description: 'Pre-loved stroller. Used twice and kept in stoage.'
+        , online: true
+        , id_level: 4
+        , rating: 5
+        , num_ratings: 52
+        , currency_symbol: '$'
+        , sale_price: 250
+      },
     ];
-    // DataSource configured
-    const ds = new ListView.DataSource({ rowHasChanged });
 
     this.state = {
-      dataSource: ds.cloneWithRows(dataObjects),
+      data: dataObjects,
       active: false,
     };
   }
@@ -45,8 +73,7 @@ export default class HomeScreen extends React.Component {
 
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')
-  }
-
+  } 
 _renderItem = ({ item }) => (
       <TouchableOpacity
         onPress={ ()=>this.navigatess()}>
@@ -59,7 +86,8 @@ _renderItem = ({ item }) => (
             <BBBIcon
               name="Favorite"
               size={Layout.moderateScale(18)}
-              color={Colors.white}
+              //color={Colors.tintColor}
+              color={item.liked ? Colors.tintColor : Colors.white}
               style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
             />
           </View>
@@ -69,7 +97,7 @@ _renderItem = ({ item }) => (
             <BBBIcon
               name="Chat"
               size={Layout.moderateScale(18)}
-              color={Colors.white}
+              color={item.chatting ? Colors.tintColor : Colors.white}
               style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
           />
           </View>
@@ -78,58 +106,37 @@ _renderItem = ({ item }) => (
 
         <Item style={styles.userItemDetailsSec}>
           <View style={styles.userProfileSec}>
-            <Image source={Images.tempUser} style={styles.userProfile} />
-            <View style={styles.userOnlineOffline} />
+            <Image source={item.profile_pic} style={styles.userProfile} />
+            <View style={item.online ? styles.userOnline : styles.userOffline} />
           </View>
           <View style={styles.userNameSec}>
-            <Text style={styles.userName}>Best Buys</Text>
+            <Text style={styles.userName}>{item.profile_name}</Text>
           </View>
           <View style={styles.activeuserSec}>
-            <IdentityVerification2
+            <IdentityVerification
               width={Layout.moderateScale(30)}
               height={Layout.moderateScale(30)}
+              level={item.id_level}
             />
           </View>
         </Item>
 
         <View>
-          <Text style={styles.postDesc}>
-            Pre-loved stroller. Used twice and kept in stoage.
-          </Text>
+          <Text style={styles.postDesc}>{item.description}</Text>
         </View>
 
         <View style={styles.productreviewSec}>
           <View style={styles.ratingSec}>
-            <BBBIcon
-              name="Star"
+            <Stars
               size={Layout.moderateScale(14)}
-              style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
+              styleOn={{ color: Colors.starcolor, marginTop: Layout.moderateScale(2) }}
+              styleOff={{ color: Colors.lightGray, marginTop: Layout.moderateScale(2) }}
+              repeats={item.rating}
             />
-            <BBBIcon
-              name="Star"
-              size={Layout.moderateScale(14)}
-              style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-            />
-            <BBBIcon
-              name="Star"
-              size={Layout.moderateScale(14)}
-              style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-            />
-            <BBBIcon
-              name="Star"
-              size={Layout.moderateScale(14)}
-              style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-            />
-            <BBBIcon
-              name="Star"
-              size={Layout.moderateScale(14)}
-              style={{ color: '#feb532', marginTop: Layout.moderateScale(2) }}
-            />
-            {/* <Image source={Images.trollie} style={styles.ratingstyle}/> */}
-            <Text style={styles.ratingmsgct}> (52) </Text>
+            <Text style={styles.ratingmsgct}> ({item.num_ratings}) </Text>
           </View>
           <View style={styles.priceSec}>
-            <Text style={styles.pricetext}>$250</Text>
+            <Text style={styles.pricetext}>{item.currency_symbol}{item.sale_price}</Text>
           </View>
         </View>
 
@@ -138,17 +145,13 @@ _renderItem = ({ item }) => (
     );
 
   render() {
-    var listItemData = [
-      { id: '1', source: Images.trollie, flag: false },
-      { id: '2', source: Images.trollie, flag: false },
-    ];
     var leftComponent = (
       <Button transparent onPress={() => this._handleMenu('DrawerOpen')}>
         <BBBIcon
           name="Menu"
           size={Layout.moderateScale(18)}
-          color="#fff"
-          style={{ color: '#ffffff' }}
+          color={Colors.white}
+          style={{ color: Colors.white }}
         />
       </Button>
     );
@@ -158,10 +161,12 @@ _renderItem = ({ item }) => (
         <BBBIcon
           name="CategoryIcon"
           size={Layout.moderateScale(18)}
-          style={{ color: '#ffffff' }}
+          style={{ color: Colors.white }}
         />
       </Button>
     );
+    //console.log(this.state.data);
+    //console.log(listItemData);
     return (
       <Container>
         <BBBHeader
@@ -188,24 +193,15 @@ _renderItem = ({ item }) => (
 
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
-                <Text style={styles.populerText}>Most Populer Items</Text>
+                <Text style={styles.populerText}>Most Popular Items</Text>
               </View>
               <FlatList
                 horizontal={true}
-                data={listItemData}
-                keyExtractor={listItemData => listItemData.id}
+                data={this.state.data}
+                keyExtractor={data => data.id}
                 renderItem={this._renderItem}
                 contentContainerStyle={styles.listContent}
               />
-{/*
-                <ListView
-                horizontal={true}
-                contentContainerStyle={styles.listContent}
-                dataSource={this.state.dataSource}
-                renderRow={this._renderRow}
-                enableEmptySections
-              />
-*/}
             </View>
 
             <View style={styles.adSec}>
@@ -225,20 +221,11 @@ _renderItem = ({ item }) => (
               </View>
               <FlatList
                 horizontal={true}
-                data={listItemData}
-                keyExtractor={listItemData => listItemData.id}
+                data={this.state.data}
+                keyExtractor={data => data.id}
                 renderItem={this._renderItem}
                 contentContainerStyle={styles.listContent}
               />
-              {/*
-                <ListView
-                horizontal={true}
-                contentContainerStyle={styles.listContent}
-                dataSource={this.state.dataSource}
-                renderRow={this._renderRow}
-                enableEmptySections
-              />
-              */}
             </View>
           </View>
         </Content>
