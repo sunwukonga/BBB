@@ -23,36 +23,36 @@ import DrawerContainer from '../screens/DrawerContainer/';
 
 // drawer stack
 const DrawerStack = DrawerNavigator(
-	{
-		homeScreen: { screen: HomeScreen },
-		favoriteScreen: { screen: FavoriteScreen },
-		notificationScreen: { screen: NotificationScreen },
-		settingScreen: { screen: SettingScreen },
-		supportScreen: { screen: SupportScreen },
-		categoryScreen: { screen: CategoryScreen },
-		searchResultScreen: { screen: SearchResultScreen },
-		filterScreen: { screen: FilterScreen },
-		productDetailsScreen: { screen: ProductDetailsScreen },
-		chatDetailScreen: { screen: ChatDetailScreen },
-		strollersScreen: { screen: StrollersScreen },
-		chatListScreen: { screen: ChatListScreen },
-		createNewItemScreen: { screen: CreateNewItemScreen },
-	},
-	{
-		gesturesEnabled: true,
-		drawerWidth: Layout.WIDTH * 0.82,
-		contentComponent: props => <DrawerContainer {...props} />,
-	}
+  {
+    homeScreen: { screen: HomeScreen },
+    favoriteScreen: { screen: FavoriteScreen },
+    notificationScreen: { screen: NotificationScreen },
+    settingScreen: { screen: SettingScreen },
+    supportScreen: { screen: SupportScreen },
+    categoryScreen: { screen: CategoryScreen },
+    searchResultScreen: { screen: SearchResultScreen },
+    filterScreen: { screen: FilterScreen },
+    productDetailsScreen: { screen: ProductDetailsScreen },
+    chatDetailScreen: { screen: ChatDetailScreen },
+    strollersScreen: { screen: StrollersScreen },
+    chatListScreen: { screen: ChatListScreen },
+    createNewItemScreen: { screen: CreateNewItemScreen },
+  },
+  {
+    gesturesEnabled: true,
+    drawerWidth: Layout.WIDTH * 0.82,
+    contentComponent: props => <DrawerContainer {...props} />,
+  }
 );
 
 export default StackNavigator(
-	{
-		DrawerStack: { screen: DrawerStack },
-	},
-	{
-		headerMode: 'none',
-		navigationOptions: ({ navigation }) => ({
-			gesturesEnabled: true,
-		}),
-	}
+  {
+    DrawerStack: { screen: DrawerStack },
+  },
+  {
+    headerMode: 'none',
+    navigationOptions: ({ navigation }) => ({
+      gesturesEnabled: true,
+    }),
+  }
 );
