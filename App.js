@@ -3,6 +3,10 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import RootNavigation from './navigation/RootNavigation';
+import { ApolloProvider } from 'react-apollo';
+import ApolloClient from 'apollo-boost';
+
+const client = new ApolloClient({ uri: 'http://notify.parker.sg:3000/graphql' })
 console.disableYellowBox = true;
 
 export default class App extends React.Component {
@@ -26,7 +30,9 @@ export default class App extends React.Component {
           {Platform.OS === 'android' && (
             <View style={styles.statusBarUnderlay} />
           )}
-          <RootNavigation />
+          <ApolloProvider client={client}>
+            <RootNavigation />
+          </ApolloProvider>
         </View>
       );
     }
