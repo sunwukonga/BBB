@@ -4,9 +4,10 @@ import { AppLoading, Asset, Font } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
 import RootNavigation from './navigation/RootNavigation';
 import { ApolloProvider } from 'react-apollo';
-import ApolloClient from 'apollo-boost';
+import client from './config/Client';
+//import ApolloClient from 'apollo-boost';
 
-const client = new ApolloClient({ uri: 'http://notify.parker.sg:3000/graphql' })
+//const client = new ApolloClient({ uri: 'http://notify.parker.sg:3000/graphql' })
 console.disableYellowBox = true;
 
 export default class App extends React.Component {
@@ -56,6 +57,7 @@ export default class App extends React.Component {
         Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
         icomoon: require('./assets/fonts/icomoon.ttf'),
       }),
+      Expo.SecureStore.setItemAsync('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTIyOTg0NDUzfQ.GK3Mrk1CQmcdEnvlFopzS2dnK88c2kOx6PXkm31IkOU'),
     ]);
   };
 
