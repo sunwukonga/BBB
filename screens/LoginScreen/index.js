@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, View, ImageBackground } from 'react-native';
-import { Mutation } from 'react-apollo';
-import gql from 'graphql-tag';
+//import { Mutation } from 'react-apollo';
+//import gql from 'graphql-tag';
 import { Container, Content, Left, Text, Button } from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -15,11 +15,13 @@ import BBBIcon from '../../components/BBBIcon';
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
+import FacebookLogin from './Facebook';
+/*
 const FACEBOOK_LOGIN = gql`
   mutation loginFacebook($token: String!) {
     loginFacebook(token: $token)
   }
-`;
+`; */
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -71,6 +73,28 @@ export default class LoginScreen extends React.Component {
               </Text>
               <View style={styles.socialSec}>
                 <View style={styles.facebookSec}>
+                  <FacebookLogin />
+                </View>
+                <View style={styles.googleSec} >
+                  <FontAwesome
+                    name="google-plus"
+                    size={Layout.moderateScale(25)}
+                    style={{
+                      color: Colors.googlebgicon,
+                    }}
+                    onPress={() => this.props.navigation.navigate('createNewItemScreen')}
+                  />
+                </View>
+              </View>
+            </View>
+          </ImageBackground>
+        </View>
+      </Container>
+    );
+  }
+}
+
+      /*
                   <Mutation mutation={FACEBOOK_LOGIN}>
                     {(loginFacebook, { data }) => (
                       <FontAwesome
@@ -94,22 +118,4 @@ export default class LoginScreen extends React.Component {
                       />
                     )}
                   </Mutation>
-                </View>
-                <View style={styles.googleSec} >
-                  <FontAwesome
-                    name="google-plus"
-                    size={Layout.moderateScale(25)}
-                    style={{
-                      color: Colors.googlebgicon,
-                    }}
-                    onPress={() => this.props.navigation.navigate('createNewItemScreen')}
-                  />
-                </View>
-              </View>
-            </View>
-          </ImageBackground>
-        </View>
-      </Container>
-    );
-  }
-}
+                  */
