@@ -25,14 +25,16 @@ export default class FacebookLogin extends React.Component {
             }}
             onPress={async () => {
               const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('279793089219775', {
-                permissions: ['public_profile', 'email'],
-              });
+                  permissions: ['public_profile', 'email'],
+                });
               if (type === 'success') {
                 console.log(token);
                 const data = await loginFacebook({
                   variables: { token: token },
                 })
                 console.log(data);
+                // TODO: Add this returned token to securestore and then navigate on.
+                Expo.SecureStore.setItemAsync('token', data.data.loginFacebook)
               }
             }}
           />

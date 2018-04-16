@@ -31,6 +31,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import Dropdown from '../../components/Dropdown/dropdown';
 import { create } from 'apisauce';
+import getSignedUrl from './SignedUrl';
 
 import styles from './styles';
 import BBBIcon from '../../components/BBBIcon';
@@ -110,14 +111,14 @@ export default class CreateNewItemScreen extends React.Component {
 //      contentContainerStyle={styles.listContents}
 //      dataSource={this.state.dataSource}
 //      renderRow={this._renderRow.bind(this)}
-//      enableEmptySections
-//      pageSize={parseInt(this.state.pageSize)}
-//      />
-  _renderRow(rowData) {
-    console.log(rowData);
+  //      enableEmptySections
+  //      pageSize={parseInt(this.state.pageSize)}
+  //      />
+  _renderRow( {item} ) {
+    console.log(item);
     return (
       <View style={styles.imagesSubView}>
-        {rowData.item.inputFlag ? (
+        {item.inputFlag ? (
           <View>
             <ActionSheet
               ref={c => {
@@ -133,7 +134,7 @@ export default class CreateNewItemScreen extends React.Component {
           </View>
         ) : (
           <View>
-            <Image source={rowData.item.source} style={styles.rowImage} />
+            <Image source={item.source} style={styles.rowImage} />
             {/*<Icon name="ios-close-circle" style={styles.rowFlagImage} onPress={()=>this._handleRemoveImage(rowData.id)}/>*/}
           </View>
         )}
@@ -159,14 +160,16 @@ export default class CreateNewItemScreen extends React.Component {
       allowsEditing: false,
       //quality: 0.2,
       exif: false,
+      base64: false,
     })
 
     if ( ! pickerResult.cancelled ) {
       // https://docs.expo.io/versions/latest/sdk/filesystem#expofilesystemgetinfoasyncfileuri-options
       let fileinfo = await Expo.FileSystem.getInfoAsync(pickerResult.uri, {size: true})
       let resized
-      let compressed
+      let compressed = pickerResult
       // If filesize is below 150kb don't attempt to reduce it further.
+      console.log("Filesize: ", fileinfo.size)
       if ( fileinfo.size > 153600 ) {
         // #######################################
         // Resize any dimension greater than 1024
@@ -282,31 +285,48 @@ export default class CreateNewItemScreen extends React.Component {
       baseURL: 'https://bbb-app-images.s3.amazonaws.com',
     })
 
+
     // create formdata
-    const data = new FormData();
-    data.append('key', 'somerandomlygeneratedalphanumeric');
-    data.append('bucket', 'bbb-app-images');
-    data.append('Policy', 'eyJleHBpcmF0aW9uIjoiMjAxOC0wNC0xMVQwNzoyMzoxN1oiLCJjb25kaXRpb25zIjpbWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsMCw1MjQyODhdLHsia2V5Ijoic29tZXJhbmRvbWx5Z2VuZXJhdGVkYWxwaGFudW1lcmljIn0seyJidWNrZXQiOiJiYmItYXBwLWltYWdlcyJ9LHsiWC1BbXotQWxnb3JpdGhtIjoiQVdTNC1ITUFDLVNIQTI1NiJ9LHsiWC1BbXotQ3JlZGVudGlhbCI6IkFLSUFKRUpDT01MQjZGSTVFVkVRLzIwMTgwNDExL2FwLXNvdXRoZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LHsiWC1BbXotRGF0ZSI6IjIwMTgwNDExVDA2MjMxN1oifV19');
-    data.append('X-Amz-Algorithm', 'AWS4-HMAC-SHA256');
-    data.append('X-Amz-Credential', 'AKIAJEJCOMLB6FI5EVEQ/20180411/ap-southeast-1/s3/aws4_request');
-    data.append('X-Amz-Date', '20180411T062317Z');
-    data.append('X-Amz-Signature', '961d824489016a261bab234bb227fdc20de12c67a1724d819ffcba19e69de44c');
+    //const instanceSignedUrl = new SignedUrl();
+    //let signedUrl = getSignedUrl( 'image/jpeg' )
+    getSignedUrl( 'image/jpeg' )
+      .then( ({ data }) => {
+        console.log("Signed Url from server: ", getSignedUrl);
+        const formData = new FormData();
+        formData.append('key', data.getSignedUrl.key);
+        formData.append('bucket', data.getSignedUrl.bucket);
+        formData.append('Policy', data.getSignedUrl.policy);
+        formData.append('X-Amz-Algorithm', data.getSignedUrl.X_Amz_Algorithm);
+        formData.append('X-Amz-Credential', data.getSignedUrl.X_Amz_Credential);
+        formData.append('X-Amz-Date', data.getSignedUrl.X_Amz_Date);
+        formData.append('X-Amz-Signature', data.getSignedUrl.X_Amz_Signature);
+        formData.append('file', {uri: uri, type: 'multipart/form-data'} );
+        console.log("Data Signed Url: ", data.getSignedUrl);
+        return formData
+//    data.append('key', 'somerandomlygeneratedalphanumeric');
+//    data.append('bucket', 'bbb-app-images');
+//    data.append('Policy', 'eyJleHBpcmF0aW9uIjoiMjAxOC0wNC0xMVQwNzoyMzoxN1oiLCJjb25kaXRpb25zIjpbWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsMCw1MjQyODhdLHsia2V5Ijoic29tZXJhbmRvbWx5Z2VuZXJhdGVkYWxwaGFudW1lcmljIn0seyJidWNrZXQiOiJiYmItYXBwLWltYWdlcyJ9LHsiWC1BbXotQWxnb3JpdGhtIjoiQVdTNC1ITUFDLVNIQTI1NiJ9LHsiWC1BbXotQ3JlZGVudGlhbCI6IkFLSUFKRUpDT01MQjZGSTVFVkVRLzIwMTgwNDExL2FwLXNvdXRoZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LHsiWC1BbXotRGF0ZSI6IjIwMTgwNDExVDA2MjMxN1oifV19');
+//    data.append('X-Amz-Algorithm', 'AWS4-HMAC-SHA256');
+//    data.append('X-Amz-Credential', 'AKIAJEJCOMLB6FI5EVEQ/20180411/ap-southeast-1/s3/aws4_request');
+//    data.append('X-Amz-Date', '20180411T062317Z');
+//    data.append('X-Amz-Signature', '961d824489016a261bab234bb227fdc20de12c67a1724d819ffcba19e69de44c');
     //data.append('Content-Type', 'image/jpeg');
     //{uri: photo.uri, name: 'image.jpg', type: 'multipart/form-data'}
-    data.append('file', {uri: uri, type: 'multipart/form-data'} );
-
-    // post your data.
-    api.post('', data, {
-          onUploadProgress: (e) => {
-            console.log(e)
-            const progress = e.loaded / e.total;
-            console.log(progress);
-            this.setState({
-              progress: progress
-            });
-          }
-        })
-        .then((res) => console.log(res))
+      })
+      .then( (data) => {
+        // post your data.
+        return api.post('', data, {
+              onUploadProgress: (e) => {
+                console.log(e)
+                const progress = e.loaded / e.total;
+                console.log(progress);
+                this.setState({
+                  progress: progress
+                });
+              }
+            })
+      })
+      .then((res) => console.log("Response: ", res))
   }
 
   _renderRowCategory(rowData) {
