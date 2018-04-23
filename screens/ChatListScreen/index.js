@@ -23,6 +23,22 @@ import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
 export default class ChatListScreen extends React.Component {
+
+		componentWillMount = async () => {
+	     console.log('start')
+
+			 let jwtt = '';
+			 jwtt = await Expo.SecureStore.getItemAsync('JWTToken').then();
+			 console.log("Chat Log : " + jwtt);
+
+			 if(jwtt == '' || jwtt == null || jwtt.length == 0)
+			 {
+				 this.props.navigation.navigate('loginscreen');
+			 }
+
+   };
+
+
 	_renderItem = ({ item }) => (
 		<List
 			style={item.counts == '0' ? styles.mainlist : styles.mainlists}

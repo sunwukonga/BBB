@@ -70,7 +70,7 @@ export default class CountryScreen extends React.Component {
 			countryName: countryName,
 		});
 		setTimeout(() => {
-			this.props.navigation.navigate('mainScreen');
+			this.props.navigation.navigate('homeScreen');
 		}, 300);
 	}
 

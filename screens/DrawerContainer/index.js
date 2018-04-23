@@ -11,14 +11,19 @@ import styles from './styles';
 import { Layout, Images, Colors } from '../../constants/';
 
 export default class DrawerContainer extends React.Component {
-	logout = () => {
-		const actionToDispatch = NavigationActions.reset({
-			index: 0,
-			key: null, // black magic
-			actions: [NavigationActions.navigate({ routeName: 'loginScreen' })],
-		});
-		this.props.navigation.dispatch(actionToDispatch);
-	};
+
+  logout = async () => {
+		 console.log('delete')
+     Expo.SecureStore.setItemAsync('JWTToken', '');
+     this.props.navigation.navigate('loginscreen');
+
+    //  const actionToDispatch = NavigationActions.reset({
+ 		// 	index: 0,
+ 		// 	key: null, // black magic
+ 		// 	actions: [NavigationActions.navigate({ routeName: 'loginScreen' })],
+ 		// });
+ 		// this.props.navigation.dispatch(actionToDispatch);
+ };
 
 	render() {
 		const { navigation } = this.props;
