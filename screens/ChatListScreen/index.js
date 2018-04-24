@@ -24,8 +24,8 @@ import { Layout, Colors, Images } from '../../constants/';
 
 export default class ChatListScreen extends React.Component {
 
+   // Check weather user is login or not
 		componentWillMount = async () => {
-	     console.log('start')
 
 			 let jwtt = '';
 			 jwtt = await Expo.SecureStore.getItemAsync('JWTToken').then();
@@ -34,8 +34,8 @@ export default class ChatListScreen extends React.Component {
 			 if(jwtt == '' || jwtt == null || jwtt.length == 0)
 			 {
 				 this.props.navigation.navigate('loginscreen');
+				 Expo.SecureStore.setItemAsync('ArrivedFrom', 'ChatListScreen');
 			 }
-
    };
 
 

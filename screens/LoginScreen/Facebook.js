@@ -5,6 +5,7 @@ import { withApollo, Mutation } from 'react-apollo';
 import gql from "graphql-tag";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Layout, Colors } from '../../constants/';
+import { Image, View, ImageBackground } from 'react-native';
 
 const FACEBOOK_LOGIN = gql`
   mutation loginFacebook($token: String!) {
@@ -14,8 +15,18 @@ const FACEBOOK_LOGIN = gql`
 
 export default class FacebookLogin extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {}
+  }
+
+ loginDone(){
+   console.log('login done');
+ }
+
   render() {
     return (
+      <View>
       <Mutation mutation={FACEBOOK_LOGIN}>
         {(loginFacebook, { data }) => (
           <FontAwesome
@@ -30,13 +41,14 @@ export default class FacebookLogin extends React.Component {
                 });
               if (type === 'success') {
                 console.log(token);
+
                 const data = await loginFacebook({
                   variables: { token: token },
                 })
-                console.log(data);
                 // TODO: Add this returned token to securestore and then navigate on.
-                Expo.SecureStore.setItemAsync('token', data.data.loginFacebook)
-                //Expo.SecureStore.setItemAsync('token', token)
+                Expo.SecureStore.setItemAsync('token', data.data.loginFacebook);
+
+                this.props.navigation.navigate('homeScreen')
                 // console.log(data.data.loginFacebook)
 
               }
@@ -44,9 +56,12 @@ export default class FacebookLogin extends React.Component {
           />
         )}
       </Mutation>
+    </View>
     )
   }
 }
+
+
 /*
 function facebookLogin( token ) {
   console.log('Token value: ' + token );

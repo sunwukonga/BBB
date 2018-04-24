@@ -74,7 +74,8 @@ export default class HomeScreen extends React.Component {
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')
   }
-_renderItem = ({ item }) => (
+
+  _renderItem = ({ item }) => (
       <TouchableOpacity
         onPress={ ()=>this.navigatess()}>
       <View style={styles.imagesSubView}>
@@ -234,7 +235,7 @@ _renderItem = ({ item }) => (
           direction="up"
           style={styles.fabStyle}
           position="bottomRight"
-          onPress={() => this.props.navigation.navigate('loginScreen')}>
+          onPress={() => this.props.navigation.navigate('createNewItemScreen')}>
           <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
         </Fab>
       </Container>

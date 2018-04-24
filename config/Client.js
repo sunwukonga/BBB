@@ -1,30 +1,32 @@
 import ApolloClient from 'apollo-boost';
 
 export default client = new ApolloClient({
+
   uri: 'http://notify.parker.sg:3000/graphql',
   fetchOptions: {
     credentials: 'include'
   },
+
   request: async (operation) => {
     const token = await Expo.SecureStore.getItemAsync('token');
 
     console.log('Bearer ' + token);
-
     Expo.SecureStore.setItemAsync('JWTToken', token);
 
     var jwtt = '';
     jwtt = await Expo.SecureStore.getItemAsync('JWTToken')
-    console.log(jwtt);
-    
+    console.log('token' + jwtt);
+
     //const { cache } = operation.getContext();
     //const { isLogged } = cache.readQuery({ data: { isLogged }});
 /*    if ( isLogged ) { */
+
     operation.setContext({
       headers: {
         authorization: 'Bearer ' + token
       }
     });
-/*    } else {
+/*  } else {
       operation.setContext({
         headers: {
           authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTIyOTg0NDUzfQ.GK3Mrk1CQmcdEnvlFopzS2dnK88c2kOx6PXkm31IkOU'
@@ -43,8 +45,9 @@ export default client = new ApolloClient({
   },
   clientState: {
     defaults: {
-        isConnected: true
-      , isLogged: false
+        isConnected: true,
+        isLogged: false,
+        logged_in: false,
     },
     resolvers: {
       Mutation: {

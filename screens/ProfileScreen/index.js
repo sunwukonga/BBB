@@ -12,29 +12,31 @@ import BBBIcon from '../../components/BBBIcon'
 import styles from './styles'
 import { Layout, Colors } from '../../constants/'
 
-export default class NotificationScreen extends React.Component {
+export default class ProfileScreen extends React.Component {
+
+  // Check weather user is login or not
+   componentWillMount = async () => {
+      let jwtt = '';
+      jwtt = await Expo.SecureStore.getItemAsync('JWTToken').then();
+      console.log("Chat Log : " + jwtt);
+
+      if(jwtt == '' || jwtt == null || jwtt.length == 0)
+      {
+        this.props.navigation.navigate('loginscreen');
+        Expo.SecureStore.setItemAsync('ArrivedFrom', 'ProfileScreen');
+      }
+  };
 
   render() {
-    var leftComponent = (
-			<Button
-				transparent
-				onPress={() => this.props.navigation.navigate('DrawerOpen')}>
-				<BBBIcon
-					name="Menu"
-					size={Layout.moderateScale(18)}
-					color={Colors.white}
-				/>
-			</Button>
-		);
-
+    var leftComponent = <Button transparent onPress={()=>this.props.navigation.navigate('homeScreen')}>
+								          <BBBIcon name="BackArrow" size={Layout.moderateScale(18)} style={styles.backarrow}/>
+												</Button>
     return (
       <Container style={styles.container}>
-        <BBBHeader title="Notifications" leftComponent={ leftComponent } />
+        <BBBHeader title="Profile" leftComponent={ leftComponent } />
         <Content>
           <View style={styles.getStartedContainer}>
-
-            <Text style={styles.getStartedText}>NotificationScreen</Text>
-
+            <Text style={styles.getStartedText}>ProfileScreen</Text>
             <Text style={styles.getStartedText}>
               Change this text and your app will automatically reload.
             </Text>

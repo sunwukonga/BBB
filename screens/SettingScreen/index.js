@@ -15,9 +15,17 @@ import { Layout, Colors } from '../../constants/'
 export default class SettingScreen extends React.Component {
 
   render() {
-    var leftComponent = <Button transparent onPress={()=>this.props.navigation.goBack()}>
-								          <BBBIcon name="BackArrow" size={Layout.moderateScale(18)} style={styles.backarrow}/>
-												</Button>
+    var leftComponent = (
+			<Button
+				transparent
+				onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+				<BBBIcon
+					name="Menu"
+					size={Layout.moderateScale(18)}
+					color={Colors.white}
+				/>
+			</Button>
+		);
 
     return (
       <Container style={styles.container}>

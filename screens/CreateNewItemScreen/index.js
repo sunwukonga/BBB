@@ -98,6 +98,23 @@ export default class CreateNewItemScreen extends React.Component {
       // End data for mutation
     };
   }
+
+  // Check weather user is login or not
+  componentWillMount = async () => {
+     console.log('start')
+
+     let jwtt = '';
+     jwtt = await Expo.SecureStore.getItemAsync('JWTToken').then();
+     console.log("Chat Log : " + jwtt);
+
+     if(jwtt == '' || jwtt == null || jwtt.length == 0)
+     {
+       this.props.navigation.navigate('loginscreen');
+       Expo.SecureStore.setItemAsync('ArrivedFrom', 'CreateNewItemScreen');
+     }
+
+ };
+
   onClick(data) {
     data.checked = !data.checked;
     let msg = data.checked ? 'you checked ' : 'you unchecked ';
@@ -125,7 +142,7 @@ export default class CreateNewItemScreen extends React.Component {
                 ActionSheet.actionsheetInstance = c;
               }}
             />
-            <TouchableOpacity onPress={ () => this._pickImage() }>
+            <TouchableOpacity onPress={() => this._pickImage()}>
               <View style={styles.addIcon}>
                 <Add width={Layout.HEIGHT * 0.03} height={Layout.HEIGHT * 0.03} />
                 <Text style={styles.addimage}>Add Image</Text>
@@ -146,7 +163,7 @@ export default class CreateNewItemScreen extends React.Component {
     // At some point I'd like to Hash an image before sending a request for a signed url to upload it.
     // getBase64ForTag(uri, success, failure) will get the Base64 representation of a uri, where the uri comes
     // from a call to imageEditor.cropImage . I presume success is a callback that takes the Base64 info.
-    // According to https://stackoverflow.com/questions/44687594/what-uri-format-does-imagestore-getbase64fortag-expect?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa 
+    // According to https://stackoverflow.com/questions/44687594/what-uri-format-does-imagestore-getbase64fortag-expect?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
     // this is not very efficient, but I cannot find a better way.
     // Hash could be done with https://github.com/pierrec/js-xxhash
     // I have posted a stackexchange question related to this at: https://stackoverflow.com/questions/49725746/how-to-hash-image-data-in-react-native-expo
@@ -180,7 +197,7 @@ export default class CreateNewItemScreen extends React.Component {
             console.log("resize width")
             resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: 1024}}])
           } else {
-            // Height needs reduction to 1024 
+            // Height needs reduction to 1024
             console.log("resize height")
             resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {height: 1024}}])
           }
@@ -255,7 +272,7 @@ export default class CreateNewItemScreen extends React.Component {
     }
   }
 
-  // Copied from: https://github.com/expo/image-upload-example/blob/master/frontend/App.js 
+  // Copied from: https://github.com/expo/image-upload-example/blob/master/frontend/App.js
   _uploadImageAsync = async (uri) => {
     /*
     let apiUrl = 'https://s3-ap-southeast-1.amazonaws.com/bbb-app-images';
@@ -507,16 +524,16 @@ export default class CreateNewItemScreen extends React.Component {
       },
     ];
     var leftComponent = (
-      <Button transparent onPress={() => this.props.navigation.goBack()}>
+      <Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
       <Icon
       name="md-arrow-back"
-      size={Layout.moderateScale(20)}
+      size={Layout.moderateScale(18)}
       style={{ color: '#ffffff' }}
       />
       </Button>
     );
     var rightComponent = (
-      <Button transparent onPress={() => this.props.navigation.goBack()}>
+      <Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
       <Ionicons
       name="md-checkmark"
       size={Layout.moderateScale(25)}

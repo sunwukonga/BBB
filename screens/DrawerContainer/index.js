@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image } from 'react-native';
+import { View, Image, TouchableOpacity } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Container, Content, Text, Item } from 'native-base';
 
@@ -13,9 +13,9 @@ import { Layout, Images, Colors } from '../../constants/';
 export default class DrawerContainer extends React.Component {
 
   logout = async () => {
-		 console.log('delete')
+
      Expo.SecureStore.setItemAsync('JWTToken', '');
-     this.props.navigation.navigate('loginscreen');
+     this.props.navigation.navigate('homeScreen');
 
     //  const actionToDispatch = NavigationActions.reset({
  		// 	index: 0,
@@ -30,7 +30,10 @@ export default class DrawerContainer extends React.Component {
 		return (
 			<Container style={styles.container}>
 				<View style={styles.usersDetailsSec}>
-					<Image style={styles.userImage} source={Images.tempUser} />
+          <TouchableOpacity onPress={() => navigation.navigate('profileScreen')}>
+					  <Image style={styles.userImage}
+                 source={Images.tempUser} />
+          </TouchableOpacity>
 					<View style={styles.usersDetails}>
 						<Text style={styles.userName}>Leza Klenk</Text>
 						<Text style={styles.tokenText}>

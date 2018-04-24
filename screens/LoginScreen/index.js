@@ -28,9 +28,62 @@ export default class LoginScreen extends React.Component {
     super(props)
     this.state = {
       type: '',
-      token: ''
+      token: '',
+      ArriverFrom: '',
     }
   }
+
+  componentDidMount = async () => {
+
+    let jwtt = '';
+    jwtt = await Expo.SecureStore.getItemAsync('JWTToken').then();
+    console.log("Chat Log : " + jwtt);
+
+    if(jwtt == '' || jwtt == null || jwtt.length == 0)
+    {
+      let arriveFrom = '';
+      arriveFrom = await Expo.SecureStore.getItemAsync('ArrivedFrom').then();
+      this.setState({ArriverFrom: arriveFrom})
+      console.log("Chat Log : " + this.state.ArriverFrom);
+
+      if(this.state.ArriverFrom == 'ChatListScreen')
+      {
+        this.props.navigation.navigate('ChatListScreen');
+      }
+      if(this.state.ArriverFrom == 'ProfileScreen')
+      {
+        this.props.navigation.navigate('ProfileScreen');
+      }
+      if(this.state.ArriverFrom == 'CreateNewItemScreen')
+      {
+        this.props.navigation.navigate('CreateNewItemScreen');
+      }
+    }
+
+
+    // let arriveFrom = '';
+    // arriveFrom = await Expo.SecureStore.getItemAsync('ArrivedFrom').then();
+    // this.setState({ArriverFrom: arriveFrom})
+    // console.log("Chat Log : " + this.state.ArriverFrom);
+    //
+    // if(this.state.ArriverFrom == 'ChatListScreen')
+    // {
+    //   this.props.navigation.navigate('ChatListScreen');
+    // }
+    // if(this.state.ArriverFrom == 'ProfileScreen')
+    // {
+    //   this.props.navigation.navigate('ProfileScreen');
+    // }
+    // if(this.state.ArriverFrom == 'CreateNewItemScreen')
+    // {
+    //   this.props.navigation.navigate('CreateNewItemScreen');
+    // }
+
+  }
+
+  componentWillMount() {
+     var that = this;
+ };
 
   render() {
     var leftComponent = (
