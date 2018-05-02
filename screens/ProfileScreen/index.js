@@ -22,12 +22,13 @@ export default class ProfileScreen extends React.Component {
 
       if(jwtt == '' || jwtt == null || jwtt.length == 0)
       {
-        this.props.navigation.navigate('loginscreen');
+        this.props.navigation.navigate('loginScreen');
         Expo.SecureStore.setItemAsync('ArrivedFrom', 'ProfileScreen');
       }
   };
 
-  render() {
+
+render() {
     var leftComponent = <Button transparent onPress={()=>this.props.navigation.navigate('homeScreen')}>
 								          <BBBIcon name="BackArrow" size={Layout.moderateScale(18)} style={styles.backarrow}/>
 												</Button>

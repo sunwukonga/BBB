@@ -5,6 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 import RootNavigation from './navigation/RootNavigation';
 import { ApolloProvider } from 'react-apollo';
 import client from './config/Client';
+
+
+
 //import ApolloClient from 'apollo-boost';
 
 //const client = new ApolloClient({ uri: 'http://notify.parker.sg:3000/graphql' })

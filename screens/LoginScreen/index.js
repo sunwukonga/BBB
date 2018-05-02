@@ -33,16 +33,17 @@ export default class LoginScreen extends React.Component {
     }
   }
 
-  componentDidMount = async () => {
+  // Check weather user is login or not
+  componentWillMount = async () => {
 
     let jwtt = '';
-    jwtt = await Expo.SecureStore.getItemAsync('JWTToken').then();
+    jwtt = Expo.SecureStore.getItemAsync('JWTToken').then();
     console.log("Chat Log : " + jwtt);
 
     if(jwtt == '' || jwtt == null || jwtt.length == 0)
     {
       let arriveFrom = '';
-      arriveFrom = await Expo.SecureStore.getItemAsync('ArrivedFrom').then();
+      arriveFrom = Expo.SecureStore.getItemAsync('ArrivedFrom').then();
       this.setState({ArriverFrom: arriveFrom})
       console.log("Chat Log : " + this.state.ArriverFrom);
 
@@ -60,32 +61,13 @@ export default class LoginScreen extends React.Component {
       }
     }
 
-
-    // let arriveFrom = '';
-    // arriveFrom = await Expo.SecureStore.getItemAsync('ArrivedFrom').then();
-    // this.setState({ArriverFrom: arriveFrom})
-    // console.log("Chat Log : " + this.state.ArriverFrom);
-    //
-    // if(this.state.ArriverFrom == 'ChatListScreen')
-    // {
-    //   this.props.navigation.navigate('ChatListScreen');
-    // }
-    // if(this.state.ArriverFrom == 'ProfileScreen')
-    // {
-    //   this.props.navigation.navigate('ProfileScreen');
-    // }
-    // if(this.state.ArriverFrom == 'CreateNewItemScreen')
-    // {
-    //   this.props.navigation.navigate('CreateNewItemScreen');
-    // }
-
   }
 
-  componentWillMount() {
-     var that = this;
- };
+  // componentDidMount() {
+  //    var that = this;
+  // };
 
-  render() {
+render() {
     var leftComponent = (
       <Button
         transparent
@@ -125,10 +107,13 @@ export default class LoginScreen extends React.Component {
                 />
               </Text>
               <View style={styles.socialSec}>
+                {/*facebook login start*/}
                 <View style={styles.facebookSec}>
-                  <FacebookLogin />
+                  <FacebookLogin {...this.props}/>
                 </View>
-                {/*
+                {/*facebook login start*/}
+
+                {/* google login start*/}
                 <View style={styles.googleSec} >
                   <FontAwesome
                     name="google-plus"
@@ -139,7 +124,8 @@ export default class LoginScreen extends React.Component {
                     onPress={() => this.props.navigation.navigate('createNewItemScreen')}
                   />
                 </View>
-                */}
+                {/*facebook login end*/}
+
               </View>
             </View>
           </ImageBackground>

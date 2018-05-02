@@ -22,21 +22,61 @@ import BBBIcon from '../../components/BBBIcon';
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
+import ApolloClient from 'apollo-boost';
+import withClientState from 'apollo-boost';
+import { InMemoryCache } from 'apollo-boost';
+import { gql } from 'apollo-boost';
+import { Query } from 'apollo-boost';
+import { ApolloProvider, graphql,Mutation } from "react-apollo";
+
 export default class ChatListScreen extends React.Component {
 
-   // Check weather user is login or not
-		componentWillMount = async () => {
+	constructor(props) {
+		super(props)
+		this.state = {
+			LOGIN_STATUS: false,
+		}
+	}
 
-			 let jwtt = '';
-			 jwtt = await Expo.SecureStore.getItemAsync('JWTToken').then();
-			 console.log("Chat Log : " + jwtt);
+	fetchdata(){
 
-			 if(jwtt == '' || jwtt == null || jwtt.length == 0)
-			 {
-				 this.props.navigation.navigate('loginscreen');
-				 Expo.SecureStore.setItemAsync('ArrivedFrom', 'ChatListScreen');
-			 }
-   };
+		const GET_LOGIN_STATE = gql`
+     query {
+			 log @client {
+					 logged_in
+     }
+  }`
+
+  const WrappedComponent = graphql(GET_LOGIN_STATE, {
+  props: ({ data: { logged_in } }) => {
+     return {
+       logged_in
+    	};
+  	},
+	})(ChatListScreen);
+
+   console.log(LOGIN_STATUS);
+
+}
+
+// Check weather user is login or not
+componentWillMount = async () => {
+
+		console.log('start getting login status');
+
+		let jwtt = '';
+		jwtt = await Expo.SecureStore.setItemAsync('JWTToken').then();
+		console.log("Chat Log : " + jwtt);
+
+		if(jwtt == '' || jwtt == null || jwtt.length == 0){
+			this.props.navigation.navigate('loginscreen');
+			Expo.SecureStore.setItemAsync('ArrivedFrom', 'ChatListScreen');
+		}
+		else{
+			this.fetchdata();
+		}
+
+	}
 
 
 	_renderItem = ({ item }) => (
