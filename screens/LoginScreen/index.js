@@ -114,7 +114,7 @@ render() {
                 {/*facebook login start*/}
 
                 {/* google login start*/}
-                <View style={styles.googleSec} >
+                {/* <View style={styles.googleSec} >
                   <FontAwesome
                     name="google-plus"
                     size={Layout.moderateScale(25)}
@@ -123,7 +123,7 @@ render() {
                     }}
                     onPress={() => this.props.navigation.navigate('createNewItemScreen')}
                   />
-                </View>
+                </View> */}
                 {/*facebook login end*/}
 
               </View>

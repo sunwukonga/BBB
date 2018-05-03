@@ -15,15 +15,66 @@ import {Alert, Image, ImageBackground } from 'react-native';
 
 import { DrawerNavigator, NavigationActions } from 'react-navigation';
 
+const cache = new InMemoryCache();
 
 var facebook_jwt= null;
-
 const FACEBOOK_LOGIN = gql`
   mutation loginFacebook($token: String!) {
     loginFacebook(token: $token)
   }
 `;
-export default LoggedinState = graphql(gql`
+
+const stateLink = withClientState({
+  cache,
+  resolvers: {
+    Mutation: {
+
+      logstatus: (_, args, { cache }) => {
+        const { log } = cache.readQuery({
+          query: gql`
+            {
+              log {
+                logged_in
+                jwt
+              }
+            }
+          `
+        });
+
+        const data = {
+          log: {
+            __typename: "Log",
+            logged_in:  true,
+            jwt: facebook_jwt,
+          }
+        };
+
+        cache.writeData({ data });
+        //saved logged in variable to cache data
+        console.log(data.log.logged_in);
+        console.log(data.log.jwt);
+        console.log("login successful");
+
+        return null;
+      }
+    }
+  },
+  defaults: {
+    log: {
+      __typename: "Log",
+      logged_in: '',
+      jwt: '',
+    }
+  }
+});
+
+const client = new ApolloClient({
+  cache,
+  link: ApolloLink.from([stateLink, new HttpLink()])
+});
+
+
+const LoggedinState = graphql(gql`
   mutation logstatus {
     logstatus @client
   }
@@ -66,9 +117,9 @@ export default LoggedinState = graphql(gql`
 
                 facebook_jwt = token;
 
-                // const data = await loginFacebook({
+                //const data = await loginFacebook({
                 //   variables: { token: token },
-                // })
+                //})
 
                //TODO: Add this returned token to securestore and then navigate on.
                //Expo.SecureStore.setItemAsync('token', data.data.loginFacebook);
@@ -78,26 +129,8 @@ export default LoggedinState = graphql(gql`
                 await this.onLoggedinState();
 
                 //After Login Complete It Will redirect to
-                let arriveFrom = '';
-                arriveFrom = Expo.SecureStore.getItemAsync('ArrivedFrom').then();
-                this.setState({ArriverFrom: arriveFrom})
-                console.log("Chat Log : " + this.state.ArriverFrom);
-
-                if(this.state.ArriverFrom == 'ChatListScreen')
-                {
-                  this.props.navigation.navigate('ChatListScreen');
-                }
-                if(this.state.ArriverFrom == 'ProfileScreen')
-                {
-                  this.props.navigation.navigate('ProfileScreen');
-                }
-                if(this.state.ArriverFrom == 'CreateNewItemScreen')
-                {
-                  this.props.navigation.navigate('CreateNewItemScreen');
-                }
-                else{
                 this.props.navigation.navigate('homeScreen');
-                }
+
               }
               else{
                 console.log("login failed");
@@ -111,16 +144,16 @@ export default LoggedinState = graphql(gql`
     }
   }
 );
-//
-// export default class Facebook extends Component {
-//
-//   render() {
-//
-//     return (
-//       <ApolloProvider client={client}>
-//         <LoggedinState {...this.props}/>
-//       </ApolloProvider>
-//     );
-//
-//   }
-// }
+
+export default class Facebook extends Component {
+
+  render() {
+
+    return (
+      <ApolloProvider client={client}>
+        <LoggedinState {...this.props}/>
+      </ApolloProvider>
+    );
+
+  }
+}

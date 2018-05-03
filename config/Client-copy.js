@@ -1,27 +1,21 @@
 import ApolloClient from 'apollo-boost';
-import { HttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloProvider, graphql,Mutation } from "react-apollo";
-import { withClientState } from "apollo-link-state";
-import gql from "graphql-tag";
-
-var token = '';
-
-const cache = new InMemoryCache();
-
 
 export default client = new ApolloClient({
-  cache,
+
   uri: 'http://notify.parker.sg:3000/graphql',
   fetchOptions: {
     credentials: 'include'
   },
 
   request: async (operation) => {
-    token = await Expo.SecureStore.getItemAsync('token');
+    const token = await Expo.SecureStore.getItemAsync('token');
 
     console.log('Bearer ' + token);
+    Expo.SecureStore.setItemAsync('JWTToken', token);
 
+    var jwtt = '';
+    jwtt = await Expo.SecureStore.getItemAsync('JWTToken')
+    console.log('token' + jwtt);
 
     //const { cache } = operation.getContext();
     //const { isLogged } = cache.readQuery({ data: { isLogged }});
@@ -41,35 +35,26 @@ export default client = new ApolloClient({
     } */
   },
   onError: ({ operation, graphQLErrors, networkError }) => {
-    cache  = operation.getContext();
+    const { cache } = operation.getContext();
     if (graphQLErrors) {
-      console.log('graphql error query fired');
       console.log( graphQLErrors );
     }
     if (networkError) {
-      console.log('network error query fired');
-      console.log( networkError );
-
+      cache.writeData({ data: { isLogged: true }});
     }
   },
   clientState: {
     defaults: {
         isConnected: true,
+        isLogged: false,
         logged_in: false,
-        jwt_token:'',
     },
     resolvers: {
       Mutation: {
-        logstatus: (_, args, { cache }) => {
-          console.log('logstatus query fired');
-          cache.writeData({ data: { logged_in: true, jwt_token: token }});
+        updateNetworkStatus: (_, { isConnected }, { cache }) => {
+          cache.writeData({ data: { isConnected: isConnected }});
           return null;
-        },
-        logout: (_, args, { cache }) => {
-        console.log('logout query fired');
-        cache.writeData({ data: { logged_in: false, jwt_token:'' }});
-        return null;
-    }
+        }
       }
     }
   },
