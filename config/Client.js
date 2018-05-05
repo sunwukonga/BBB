@@ -55,7 +55,7 @@ export default client = new ApolloClient({
   clientState: {
     defaults: {
         isConnected: true,
-        logged_in: false,
+        logged_in: true,
         jwt_token:'',
     },
     resolvers: {

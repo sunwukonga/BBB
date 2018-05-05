@@ -140,11 +140,11 @@ export default class CreateNewItemScreen extends React.Component {
 
 
   // Check weather user is login or not = async () =>
-  componentWillMount = async () => {
+  componentDidMount = async () => {
 
           console.log("Log Status: " + log_status);
 
-          if(log_status == '' || log_status == false || log_status.length == 0)
+          if( log_status == false )
           {
             Expo.SecureStore.setItemAsync('ArrivedFrom', 'CreateNewItemScreen');
             this.props.navigation.navigate('loginScreen');

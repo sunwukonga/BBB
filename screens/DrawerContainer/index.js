@@ -22,8 +22,6 @@ import client from '../../config/Client';
 
 
 //reset the appolo cache
-
-
 export default LoggedinState = graphql(gql`
   mutation logout {
     logout @client
@@ -38,8 +36,6 @@ export default LoggedinState = graphql(gql`
     };
 
     logout = async () => {
-
-        await Expo.SecureStore.setItemAsync('JWTToken', '');
 
        this.props.navigation.navigate('homeScreen');
        console.log('clicked on logout');

@@ -57,11 +57,11 @@ export default class ProfileScreen extends React.Component {
   }
 
   // Check weather user is login or not
-  componentWillMount = async () => {
+  componentDidMount = async () => {
 
           console.log("Log Status: " + log_status);
 
-          if(log_status == '' || log_status == false || log_status.length == 0)
+          if(log_status == false)
           {
             Expo.SecureStore.setItemAsync('ArrivedFrom', 'ProfileScreen');
             this.props.navigation.navigate('loginScreen');
