@@ -23,6 +23,8 @@ const FACEBOOK_LOGIN = gql`
     loginFacebook(token: $token)
   }
 `;
+
+
 export default LoggedinState = graphql(gql`
   mutation logstatus {
     logstatus @client
@@ -37,7 +39,7 @@ export default LoggedinState = graphql(gql`
     render() {
       return (
         <View {...this.props}>
-        <Mutation mutation={FACEBOOK_LOGIN} {...this.props}>
+        <Mutation mutation={FACEBOOK_LOGIN}>
 
         {(loginFacebook, { data }) => (
           <FontAwesome
@@ -52,28 +54,14 @@ export default LoggedinState = graphql(gql`
                 });
 
               if (type === 'success') {
-                console.log(token);
 
-                const token = await Expo.SecureStore.getItemAsync('token');
+                const data = await loginFacebook({
+                  variables: { token: token },
+                });
+                //TODO: Add this returned token to securestore and then navigate on.
+                Expo.SecureStore.setItemAsync('token', data.data.loginFacebook);
 
-                console.log('Bearer ' + token);
-                Expo.SecureStore.setItemAsync('JWTToken', token);
-
-                var jwtt = '';
-                jwtt = await Expo.SecureStore.getItemAsync('JWTToken')
-                console.log('token' + jwtt);
-
-
-                facebook_jwt = token;
-
-                // const data = await loginFacebook({
-                //   variables: { token: token },
-                // })
-
-               //TODO: Add this returned token to securestore and then navigate on.
-               //Expo.SecureStore.setItemAsync('token', data.data.loginFacebook);
-
-              //  console.log(data.data.loginFacebook);
+                console.log('jwt from data.data.loginFacebook '+JSON.stringify(data.data.loginFacebook));
 
                 await this.onLoggedinState();
 
@@ -111,16 +99,3 @@ export default LoggedinState = graphql(gql`
     }
   }
 );
-//
-// export default class Facebook extends Component {
-//
-//   render() {
-//
-//     return (
-//       <ApolloProvider client={client}>
-//         <LoggedinState {...this.props}/>
-//       </ApolloProvider>
-//     );
-//
-//   }
-// }

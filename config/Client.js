@@ -67,7 +67,7 @@ export default client = new ApolloClient({
         },
         logout: (_, args, { cache }) => {
         console.log('logout query fired');
-        cache.writeData({ data: { logged_in: false, jwt_token:'' }});
+        cache.writeData({ data: { logged_in: false, jwt_token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTI1NTA2MjEyfQ.daamAG6JGC8LnlFRAsN4ppB23HhN_BtiuRA7QnXBqrU' }});
         return null;
     }
       }
