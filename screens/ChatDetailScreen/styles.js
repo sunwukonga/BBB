@@ -1,0 +1,133 @@
+import { Platform, StyleSheet } from 'react-native';
+import { Layout, Colors } from '../../constants/';
+
+export default StyleSheet.create({
+	container: {
+		height: Layout.HEIGHT,
+		width: Layout.WIDTH,
+		backgroundColor: Colors.white,
+	},
+	contentStyle: {
+		// flex: 1,
+		paddingTop: Layout.HEIGHT * 0.01,
+		paddingHorizontal: Layout.moderateScale(10),
+	},
+	backarrow: {
+		color: Colors.white,
+	},
+	header: {
+		backgroundColor: Colors.primaryColor,
+		height: Layout.HEIGHT * 0.09,
+		borderBottomWidth: 0,
+		paddingTop: Layout.HEIGHT * 0.015,
+	},
+	left: {
+		flex: 1,
+		paddingLeft: Layout.moderateScale(5),
+	},
+	body: {
+		flex: 5,
+		alignItems: 'center',
+		justifyContent: 'center',
+		flexDirection: 'row',
+	},
+	right: {
+		flex: 1,
+		paddingTop: Layout.HEIGHT * 0.015,
+		paddingRight: Layout.moderateScale(5),
+	},
+	headerTitle: {
+		color: Colors.white,
+		paddingTop: Layout.HEIGHT * 0.015,
+		fontFamily: 'roboto-reguler',
+		fontSize: Layout.moderateScale(16),
+		letterSpacing: 0.7,
+	},
+	profileImage: {
+		height: Layout.HEIGHT * 0.05,
+		width: Layout.HEIGHT * 0.05,
+		borderRadius: Layout.HEIGHT * 0.025,
+		marginTop: Layout.WIDTH * 0.02,
+		marginRight: Layout.WIDTH * 0.02,
+		resizeMode: 'cover',
+		alignSelf: 'center',
+	},
+	notifyContainer: {
+		paddingVertical: Layout.HEIGHT * 0.01,
+		paddingHorizontal: Layout.WIDTH * 0.05,
+		borderBottomWidth: Layout.moderateScale(1),
+		backgroundColor: Colors.selectedRow,
+		borderColor: Colors.mainBottomBorderColor,
+		flexDirection: 'row',
+	},
+	notifyImage: {
+		height: Layout.HEIGHT * 0.065,
+		width: Layout.HEIGHT * 0.065,
+		marginRight: Layout.WIDTH * 0.03,
+		borderRadius: Layout.moderateScale(3),
+		borderWidth: Layout.moderateScale(0.5),
+		borderColor: Colors.mainBottomBorderColor,
+		resizeMode: 'cover',
+	},
+	regularSmall: {
+		color: Colors.secondaryColor,
+		fontSize: Layout.moderateScale(12),
+		fontFamily: 'roboto-reguler',
+	},
+	chat: {
+		marginVertical: Layout.HEIGHT * 0.01,
+		padding: Layout.HEIGHT * 0.01,
+		backgroundColor: '#e0eaea',
+		alignSelf: 'flex-end',
+		shadowColor: 'rgba(0,0,0,0.6)',
+		shadowOpacity: 0.3,
+		shadowRadius: 1,
+		shadowOffset: {
+			height: Layout.HEIGHT * 0.002,
+			width: 0,
+		},
+		elevation: Layout.moderateScale(5),
+	},
+	response: {
+		marginVertical: Layout.HEIGHT * 0.01,
+		padding: Layout.HEIGHT * 0.01,
+		backgroundColor: Colors.sendinputbg,
+		alignSelf: 'flex-start',
+		shadowColor: 'rgba(0,0,0,0.6)',
+		shadowOpacity: 0.3,
+		shadowRadius: 1,
+		shadowOffset: {
+			height: Layout.HEIGHT * 0.002,
+			width: 0,
+		},
+		elevation: Layout.moderateScale(5),
+	},
+	timeStyle: {
+		color: Colors.subtitlebg,
+		fontSize: Layout.moderateScale(8),
+		fontFamily: 'roboto-reguler',
+		textAlign: 'right',
+	},
+	footerStyle: {
+		width: Layout.WIDTH,
+		height: Layout.HEIGHT * 0.08,
+		borderTopWidth: Layout.moderateScale(1),
+		borderColor: Colors.sendinputborder,
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'row',
+	},
+	newPostStyle: {
+		color: Colors.secondaryColor,
+		fontSize: Layout.moderateScale(12),
+		fontFamily: 'roboto-reguler',
+		marginHorizontal: Layout.WIDTH * 0.03,
+	},
+	postBtn: {
+		height: Layout.HEIGHT * 0.08,
+		width: Layout.HEIGHT * 0.08,
+		backgroundColor: Colors.mainheaderbg,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+});
