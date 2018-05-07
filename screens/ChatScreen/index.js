@@ -14,16 +14,6 @@ import { Layout, Colors } from '../../constants/'
 
 export default class ChatScreen extends React.Component {
 
-
- componentDidMount() {
-
-   console.log('my log');
-   var jwtt = '';
-   jwtt = await Expo.SecureStore.getItemAsync('JWTToken')
-   console.log("Chat Log : " + jwtt);
-
- }
-
   _renderItem = ({ item }) =>  (
     <List style={styles.mainlist}>
       <ListItem avatar onPress={() => this.props.navigation.navigate('ChatDetailScreen')}>

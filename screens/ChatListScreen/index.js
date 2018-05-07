@@ -70,7 +70,6 @@ componentDidMount = async () => {
 
 				if(log_status == false)
 				{
-					Expo.SecureStore.setItemAsync('ArrivedFrom', 'ChatListScreen');
 					this.props.navigation.navigate('loginScreen');
 				}
 }

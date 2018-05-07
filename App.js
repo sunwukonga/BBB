@@ -6,13 +6,9 @@ import RootNavigation from './navigation/RootNavigation';
 import { ApolloProvider } from 'react-apollo';
 import client from './config/Client';
 
-
-
-//import ApolloClient from 'apollo-boost';
-
-//const client = new ApolloClient({ uri: 'http://notify.parker.sg:3000/graphql' })
 console.disableYellowBox = true;
 
+const default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTI1NTA2MjEyfQ.daamAG6JGC8LnlFRAsN4ppB23HhN_BtiuRA7QnXBqrU';
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
@@ -60,7 +56,8 @@ export default class App extends React.Component {
         Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
         icomoon: require('./assets/fonts/icomoon.ttf'),
       }),
-      Expo.SecureStore.setItemAsync('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTI1NTA2MjEyfQ.daamAG6JGC8LnlFRAsN4ppB23HhN_BtiuRA7QnXBqrU'),
+      Expo.SecureStore.setItemAsync('defaultToken', default_token),
+      Expo.SecureStore.setItemAsync('token', default_token),
     ]);
   };
 

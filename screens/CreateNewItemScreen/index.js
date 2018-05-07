@@ -44,41 +44,6 @@ const dataObjectsCates = [{ id: '1', text: 'jkhf' }];
 const dataObjectsTags = [{ id: '1', text: 'jsadfkhf' }];
 
 
-//apollo client
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
-import { ApolloClient } from "apollo-client";
-import { HttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloProvider, graphql,Mutation } from "react-apollo";
-import { withClientState } from "apollo-link-state";
-
-
-// Get login status
-var log_status = '';
-const GET_LOGIN_STATUS = gql`
-     query log @client{
-           logged_in
-           jwt_token
-        }`;
-
-const App = () => (
-<Query query={GET_LOGIN_STATUS}>
-  {({ loading, error, data }) => {
-     if (loading) return <Text>{`Loading...`}</Text>;
-     if (error) return <Text>{`Error: ${error}`}</Text>;
-      console.log('get data');
-      console.log('profile_query '+data.logged_in);
-      console.log('profile_query '+data.jwt_token);
-
-      log_status = data.logged_in;
-
-    return (
-      <View/>
-    )
-  }}
-</Query>
-)
 
 export default class CreateNewItemScreen extends React.Component {
   constructor(props) {
@@ -139,17 +104,6 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
 
-  // Check weather user is login or not = async () =>
-  componentDidMount = async () => {
-
-          console.log("Log Status: " + log_status);
-
-          if( log_status == false )
-          {
-            Expo.SecureStore.setItemAsync('ArrivedFrom', 'CreateNewItemScreen');
-            this.props.navigation.navigate('loginScreen');
-          }
-  }
 
 
   onClick(data) {
@@ -581,7 +535,6 @@ export default class CreateNewItemScreen extends React.Component {
     var _this = this;
     return (
       <View style={styles.container}>
-      <App/>
       <BBBHeader
       title="Create A New Item"
       leftComponent={leftComponent}

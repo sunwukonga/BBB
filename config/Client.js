@@ -5,10 +5,10 @@ import { ApolloProvider, graphql,Mutation } from "react-apollo";
 import { withClientState } from "apollo-link-state";
 import gql from "graphql-tag";
 
-var token = '';
-
 const cache = new InMemoryCache();
 
+var token = '';
+const default_token = '';
 
 export default client = new ApolloClient({
   cache,
@@ -19,7 +19,7 @@ export default client = new ApolloClient({
 
   request: async (operation) => {
     token = await Expo.SecureStore.getItemAsync('token');
-
+    default_token = await Expo.SecureStore.getItemAsync('defaultToken');
     console.log('Bearer ' + token);
 
 
@@ -56,7 +56,7 @@ export default client = new ApolloClient({
     defaults: {
         isConnected: true,
         logged_in: false,
-        jwt_token:'',
+        jwt_token: default_token,
     },
     resolvers: {
       Mutation: {
@@ -67,7 +67,7 @@ export default client = new ApolloClient({
         },
         logout: (_, args, { cache }) => {
         console.log('logout query fired');
-        cache.writeData({ data: { logged_in: false, jwt_token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTI1NTA2MjEyfQ.daamAG6JGC8LnlFRAsN4ppB23HhN_BtiuRA7QnXBqrU' }});
+        cache.writeData({ data: { logged_in: false, jwt_token: default_token }});
         return null;
     }
       }

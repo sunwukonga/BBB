@@ -65,27 +65,8 @@ export default LoggedinState = graphql(gql`
 
                 await this.onLoggedinState();
 
-                //After Login Complete It Will redirect to
-                let arriveFrom = '';
-                arriveFrom = Expo.SecureStore.getItemAsync('ArrivedFrom').then();
-                this.setState({ArriverFrom: arriveFrom})
-                console.log("Chat Log : " + this.state.ArriverFrom);
-
-                if(this.state.ArriverFrom == 'ChatListScreen')
-                {
-                  this.props.navigation.navigate('ChatListScreen');
-                }
-                if(this.state.ArriverFrom == 'ProfileScreen')
-                {
-                  this.props.navigation.navigate('ProfileScreen');
-                }
-                if(this.state.ArriverFrom == 'CreateNewItemScreen')
-                {
-                  this.props.navigation.navigate('CreateNewItemScreen');
-                }
-                else{
                 this.props.navigation.navigate('homeScreen');
-                }
+                
               }
               else{
                 console.log("login failed");

@@ -1,5 +1,5 @@
 import React from 'react'
-import { FlatList, Image, TouchableOpacity, View } from 'react-native'
+import { FlatList, Image, TouchableOpacity, View,BackHandler } from 'react-native'
 import { Container, Content, List, ListItem, Body, Left, Right, Text, Button, Icon } from 'native-base'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
@@ -56,6 +56,14 @@ export default class ProfileScreen extends React.Component {
 
   }
 
+    componentWillMount = async () => {
+      var that = this
+      BackHandler.addEventListener('hardwareBackPress', function() {
+        that.props.navigation.navigate('homeScreen')
+        return true;
+      });
+
+    }
   // Check weather user is login or not
   componentDidMount = async () => {
 
@@ -63,7 +71,6 @@ export default class ProfileScreen extends React.Component {
 
           if(log_status == false)
           {
-            Expo.SecureStore.setItemAsync('ArrivedFrom', 'ProfileScreen');
             this.props.navigation.navigate('loginScreen');
           }
   }
