@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, View, ImageBackground,BackHandler } from 'react-native';
+import { Image, View, ImageBackground } from 'react-native';
 //import { Mutation } from 'react-apollo';
 //import gql from 'graphql-tag';
 import { Container, Content, Left, Text, Button } from 'native-base';
@@ -25,15 +25,6 @@ export default class LoginScreen extends React.Component {
       token: '',
       ArriverFrom: '',
     }
-  }
-
-  componentWillMount = async () => {
-    var that = this
-    BackHandler.addEventListener('hardwareBackPress', function() {
-      that.props.navigation.navigate('homeScreen')
-      return true;
-    });
-
   }
 
 

@@ -9,17 +9,43 @@ import BBBIcon from '../../components/BBBIcon';
 // screen style
 import styles from './styles';
 import { Layout, Images, Colors } from '../../constants/';
-import { ApolloProvider, graphql,Mutation } from "react-apollo";
 
+
+//apollo client
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
 import { ApolloClient } from "apollo-client";
-import { withClientState,resolvers,defaults } from "apollo-link-state";
-import { ApolloLink } from "apollo-link";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import gql from "graphql-tag";
+import { ApolloProvider, graphql,Mutation } from "react-apollo";
+import { withClientState } from "apollo-link-state";
 
-import client from '../../config/Client';
 
+// Get login status
+var log_status = '';
+const GET_LOGIN_STATUS = gql`
+     query log @client{
+           logged_in
+           jwt_token
+        }`;
+
+const App = () => (
+<Query query={GET_LOGIN_STATUS}>
+  {({ loading, error, data }) => {
+     if (loading) return <Text>{`Loading...`}</Text>;
+     if (error) return <Text>{`Error: ${error}`}</Text>;
+      console.log('get data');
+      console.log('profile_query '+data.logged_in);
+      console.log('profile_query '+data.jwt_token);
+
+      log_status = data.logged_in;
+
+    return (
+      <View/>
+    )
+  }}
+</Query>
+)
 
 //reset the appolo cache
 export default LoggedinState = graphql(gql`
@@ -42,12 +68,39 @@ export default LoggedinState = graphql(gql`
         this.onLoggedinState();
 
    };
+
+   checkLoginProfile = () =>{
+     console.log("Log Status: " + log_status);
+
+     if( log_status == false )
+     {
+       this.props.navigation.navigate('loginScreen');
+     }
+     else{
+       this.props.navigation.navigate('profileScreen')
+     }
+   }
+
+   checkLoginChat = () =>{
+     console.log("Log Status: " + log_status);
+
+     if( log_status == false )
+     {
+       this.props.navigation.navigate('loginScreen');
+     }
+     else{
+       this.props.navigation.navigate('chatListScreen')
+     }
+   }
+
+
     render() {
       const { navigation } = this.props;
       return (
         <Container style={styles.container} {...this.props}>
+          <App/>
           <View style={styles.usersDetailsSec}>
-            <TouchableOpacity onPress={() => navigation.navigate('profileScreen')}>
+            <TouchableOpacity onPress={() => this.checkLoginProfile()}>
               <Image style={styles.userImage}
                    source={Images.tempUser} />
             </TouchableOpacity>
@@ -72,7 +125,7 @@ export default LoggedinState = graphql(gql`
             </Item>
             <Item
               style={styles.borderView}
-              onPress={() => navigation.navigate('chatListScreen')}>
+              onPress={() => this.checkLoginChat()}>
               <BBBIcon
                 name="Chat"
                 size={Layout.moderateScale(20)}

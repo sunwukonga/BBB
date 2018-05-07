@@ -1,5 +1,5 @@
 import React from 'react'
-import { FlatList, Image, TouchableOpacity, View,BackHandler } from 'react-native'
+import { FlatList, Image, TouchableOpacity, View } from 'react-native'
 import { Container, Content, List, ListItem, Body, Left, Right, Text, Button, Icon } from 'native-base'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
@@ -21,30 +21,7 @@ import { withClientState } from "apollo-link-state";
 import styles from './styles'
 import { Layout, Colors } from '../../constants/'
 
-// Get login status
-var log_status = '';
-const GET_LOGIN_STATUS = gql`
-     query log @client{
-           logged_in
-           jwt_token
-        }`;
 
-const App = () => (
-<Query query={GET_LOGIN_STATUS}>
-  {({ loading, error, data }) => {
-     if (loading) return <Text>{`Loading...`}</Text>;
-     if (error) return <Text>{`Error: ${error}`}</Text>;
-      console.log('get data');
-      console.log('profile_query '+data.logged_in);
-      console.log('profile_query token '+data.jwt_token);
-
-      log_status = data.logged_in;
-    return (
-      <View/>
-    )
-  }}
-</Query>
-)
 
 export default class ProfileScreen extends React.Component {
 
@@ -56,24 +33,6 @@ export default class ProfileScreen extends React.Component {
 
   }
 
-    componentWillMount = async () => {
-      var that = this
-      BackHandler.addEventListener('hardwareBackPress', function() {
-        that.props.navigation.navigate('homeScreen')
-        return true;
-      });
-
-    }
-  // Check weather user is login or not
-  componentDidMount = async () => {
-
-          console.log("Log Status: " + log_status);
-
-          if(log_status == false)
-          {
-            this.props.navigation.navigate('loginScreen');
-          }
-  }
 
 
 render() {
@@ -86,7 +45,7 @@ render() {
       <Container style={styles.container}>
         <BBBHeader title="Profile" leftComponent={ leftComponent } />
         <Content>
-          <App/>
+        
           <View style={styles.getStartedContainer}>
             <Text style={styles.getStartedText}>ProfileScreen</Text>
             <Text style={styles.getStartedText} onPress={this.onPressGetStatus}>  Change this text and your app will automatically reload.</Text>

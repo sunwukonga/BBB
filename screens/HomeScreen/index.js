@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, ListView, FlatList,BackHandler } from 'react-native';
+import { Image, TouchableOpacity, View, ListView, FlatList } from 'react-native';
 import {
   Container,
   Content,
@@ -104,14 +104,6 @@ export default class HomeScreen extends React.Component {
     };
   }
 
-  componentWillMount = async () => {
-    var that = this
-    BackHandler.addEventListener('hardwareBackPress', function() {
-      that.props.navigation.navigate('countryScreen')
-      return true;
-    });
-
-  }
 
   checkLogin = () =>{
     console.log("Log Status: " + log_status);

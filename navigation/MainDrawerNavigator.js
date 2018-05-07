@@ -5,7 +5,6 @@ import { StackNavigator, DrawerNavigator } from 'react-navigation';
 import { Colors, Layout } from '../constants/';
 
 import LoginScreen from '../screens/LoginScreen';
-import CountryScreen from '../screens/CountryScreen';
 import HomeScreen from '../screens/HomeScreen';
 import FavoriteScreen from '../screens/FavoriteScreen';
 import NotificationScreen from '../screens/NotificationScreen';
@@ -28,7 +27,6 @@ import DrawerContainer from '../screens/DrawerContainer/';
 // drawer stack
 const DrawerStack = DrawerNavigator(
   {
-    countryScreen: { screen:CountryScreen },
     loginscreen: { screen:LoginScreen },
     homeScreen: { screen: HomeScreen },
     favoriteScreen: { screen: FavoriteScreen },
@@ -47,7 +45,7 @@ const DrawerStack = DrawerNavigator(
     facebook: { screen:Facebook },
   },
   {
-    gesturesEnabled: true,
+    gesturesEnabled: false,
     drawerWidth: Layout.WIDTH * 0.82,
     contentComponent: props => <DrawerContainer {...props} />,
   }
@@ -60,7 +58,7 @@ export default StackNavigator(
   {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => ({
-      gesturesEnabled: true,
+      gesturesEnabled: false,
     }),
   }
 );
