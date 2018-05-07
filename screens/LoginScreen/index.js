@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, View, ImageBackground } from 'react-native';
+import { Image, View, ImageBackground,BackHandler } from 'react-native';
 //import { Mutation } from 'react-apollo';
 //import gql from 'graphql-tag';
 import { Container, Content, Left, Text, Button } from 'native-base';
@@ -16,27 +16,32 @@ import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
 import FacebookLogin from './Facebook';
-/*
-const FACEBOOK_LOGIN = gql`
-  mutation loginFacebook($token: String!) {
-    loginFacebook(token: $token)
-  }
-`; */
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       type: '',
-      token: ''
+      token: '',
+      ArriverFrom: '',
     }
   }
 
-  render() {
+  componentWillMount = async () => {
+    var that = this
+    BackHandler.addEventListener('hardwareBackPress', function() {
+      that.props.navigation.navigate('homeScreen')
+      return true;
+    });
+
+  }
+
+
+render() {
     var leftComponent = (
       <Button
         transparent
-        onPress={() => this.props.navigation.navigate('mainScreen')}>
+        onPress={() => this.props.navigation.navigate('homeScreen')}>
         <BBBIcon
           name="BackArrow"
           size={Layout.moderateScale(18)}
@@ -72,19 +77,12 @@ export default class LoginScreen extends React.Component {
                 />
               </Text>
               <View style={styles.socialSec}>
+
                 <View style={styles.facebookSec}>
-                  <FacebookLogin />
+                  <FacebookLogin {...this.props}/>
                 </View>
-                <View style={styles.googleSec} >
-                  <FontAwesome
-                    name="google-plus"
-                    size={Layout.moderateScale(25)}
-                    style={{
-                      color: Colors.googlebgicon,
-                    }}
-                    onPress={() => this.props.navigation.navigate('createNewItemScreen')}
-                  />
-                </View>
+
+
               </View>
             </View>
           </ImageBackground>
@@ -93,29 +91,3 @@ export default class LoginScreen extends React.Component {
     );
   }
 }
-
-      /*
-                  <Mutation mutation={FACEBOOK_LOGIN}>
-                    {(loginFacebook, { data }) => (
-                      <FontAwesome
-                        name="facebook"
-                        size={Layout.moderateScale(25)}
-                        style={{
-                          color: Colors.fbbgicon,
-                        }}
-                        onPress={async () => {
-                          const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('279793089219775', {
-                            permissions: ['public_profile', 'email'],
-                          });
-                          if (type === 'success') {
-                            console.log(token);
-                            const data = await loginFacebook({
-                              variables: { token: token },
-                            })
-                            console.log(data);
-                          }
-                        }}
-                      />
-                    )}
-                  </Mutation>
-                  */

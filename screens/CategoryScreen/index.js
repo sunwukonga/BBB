@@ -92,7 +92,7 @@ export default class CategoryScreen extends React.Component {
 			},
 		];
 		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.goBack()}>
+			<Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
 				<BBBIcon
 					name="BackArrow"
 					size={Layout.moderateScale(18)}

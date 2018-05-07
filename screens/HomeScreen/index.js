@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, ListView, FlatList } from 'react-native';
+import { Image, TouchableOpacity, View, ListView, FlatList,BackHandler } from 'react-native';
 import {
   Container,
   Content,
@@ -22,6 +22,43 @@ import Stars from '../../components/Stars';
 // style
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
+
+
+//apollo client
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
+import { ApolloClient } from "apollo-client";
+import { HttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloProvider, graphql,Mutation } from "react-apollo";
+import { withClientState } from "apollo-link-state";
+
+
+// Get login status
+var log_status = '';
+const GET_LOGIN_STATUS = gql`
+     query log @client{
+           logged_in
+           jwt_token
+        }`;
+
+const App = () => (
+<Query query={GET_LOGIN_STATUS}>
+  {({ loading, error, data }) => {
+     if (loading) return <Text>{`Loading...`}</Text>;
+     if (error) return <Text>{`Error: ${error}`}</Text>;
+      console.log('get data');
+      console.log('profile_query '+data.logged_in);
+      console.log('profile_query '+data.jwt_token);
+
+      log_status = data.logged_in;
+
+    return (
+      <View/>
+    )
+  }}
+</Query>
+)
 
 export default class HomeScreen extends React.Component {
   constructor(props) {
@@ -67,14 +104,36 @@ export default class HomeScreen extends React.Component {
     };
   }
 
+  componentWillMount = async () => {
+    var that = this
+    BackHandler.addEventListener('hardwareBackPress', function() {
+      that.props.navigation.navigate('countryScreen')
+      return true;
+    });
+
+  }
+
+  checkLogin = () =>{
+    console.log("Log Status: " + log_status);
+
+    if( log_status == false )
+    {
+      this.props.navigation.navigate('loginScreen');
+    }
+    else{
+      this.props.navigation.navigate('createNewItemScreen')
+    }
+  }
+
   _handleMenu(menuitem) {
     this.props.navigation.navigate(menuitem);
   }
 
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')
-  } 
-_renderItem = ({ item }) => (
+  }
+
+  _renderItem = ({ item }) => (
       <TouchableOpacity
         onPress={ ()=>this.navigatess()}>
       <View style={styles.imagesSubView}>
@@ -169,6 +228,7 @@ _renderItem = ({ item }) => (
     //console.log(listItemData);
     return (
       <Container>
+      <App/>
         <BBBHeader
           title="Bebe Bargains"
           leftComponent={leftComponent}
@@ -234,7 +294,7 @@ _renderItem = ({ item }) => (
           direction="up"
           style={styles.fabStyle}
           position="bottomRight"
-          onPress={() => this.props.navigation.navigate('loginScreen')}>
+          onPress={() => this.checkLogin()}>
           <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
         </Fab>
       </Container>

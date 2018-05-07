@@ -5,6 +5,7 @@ import { StackNavigator, DrawerNavigator } from 'react-navigation';
 import { Colors, Layout } from '../constants/';
 
 import LoginScreen from '../screens/LoginScreen';
+import CountryScreen from '../screens/CountryScreen';
 import HomeScreen from '../screens/HomeScreen';
 import FavoriteScreen from '../screens/FavoriteScreen';
 import NotificationScreen from '../screens/NotificationScreen';
@@ -18,12 +19,17 @@ import ChatDetailScreen from '../screens/ChatDetailScreen';
 import StrollersScreen from '../screens/StrollersScreen';
 import ChatListScreen from '../screens/ChatListScreen';
 import CreateNewItemScreen from '../screens/CreateNewItemScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import Facebook from '../screens/LoginScreen';
+
 
 import DrawerContainer from '../screens/DrawerContainer/';
 
 // drawer stack
 const DrawerStack = DrawerNavigator(
   {
+    countryScreen: { screen:CountryScreen },
+    loginscreen: { screen:LoginScreen },
     homeScreen: { screen: HomeScreen },
     favoriteScreen: { screen: FavoriteScreen },
     notificationScreen: { screen: NotificationScreen },
@@ -37,6 +43,8 @@ const DrawerStack = DrawerNavigator(
     strollersScreen: { screen: StrollersScreen },
     chatListScreen: { screen: ChatListScreen },
     createNewItemScreen: { screen: CreateNewItemScreen },
+    profileScreen: { screen: ProfileScreen },
+    facebook: { screen:Facebook },
   },
   {
     gesturesEnabled: true,

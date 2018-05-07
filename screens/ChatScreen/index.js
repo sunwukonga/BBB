@@ -14,7 +14,6 @@ import { Layout, Colors } from '../../constants/'
 
 export default class ChatScreen extends React.Component {
 
-
   _renderItem = ({ item }) =>  (
     <List style={styles.mainlist}>
       <ListItem avatar onPress={() => this.props.navigation.navigate('ChatDetailScreen')}>
