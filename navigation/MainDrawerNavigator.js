@@ -19,7 +19,6 @@ import StrollersScreen from '../screens/StrollersScreen';
 import ChatListScreen from '../screens/ChatListScreen';
 import CreateNewItemScreen from '../screens/CreateNewItemScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import Facebook from '../screens/LoginScreen';
 
 
 import DrawerContainer from '../screens/DrawerContainer/';
@@ -42,7 +41,6 @@ const DrawerStack = DrawerNavigator(
     chatListScreen: { screen: ChatListScreen },
     createNewItemScreen: { screen: CreateNewItemScreen },
     profileScreen: { screen: ProfileScreen },
-    facebook: { screen:Facebook },
   },
   {
     gesturesEnabled: false,
