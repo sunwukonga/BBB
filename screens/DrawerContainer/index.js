@@ -21,32 +21,6 @@ import { ApolloProvider, graphql,Mutation } from "react-apollo";
 import { withClientState } from "apollo-link-state";
 
 
-// Get login status
-var log_status = '';
-const GET_LOGIN_STATUS = gql`
-     query log @client{
-           logged_in
-           jwt_token
-        }`;
-
-const App = () => (
-<Query query={GET_LOGIN_STATUS}>
-  {({ loading, error, data }) => {
-     if (loading) return <Text>{`Loading...`}</Text>;
-     if (error) return <Text>{`Error: ${error}`}</Text>;
-      console.log('get data');
-      console.log('profile_query '+data.logged_in);
-      console.log('profile_query '+data.jwt_token);
-
-      log_status = data.logged_in;
-
-    return (
-      <View/>
-    )
-  }}
-</Query>
-)
-
 //reset the appolo cache
 export default LoggedinState = graphql(gql`
   mutation logout {
@@ -69,38 +43,12 @@ export default LoggedinState = graphql(gql`
 
    };
 
-   checkLoginProfile = () =>{
-     console.log("Log Status: " + log_status);
-
-     if( log_status == false )
-     {
-       this.props.navigation.navigate('loginScreen');
-     }
-     else{
-       this.props.navigation.navigate('profileScreen')
-     }
-   }
-
-   checkLoginChat = () =>{
-     console.log("Log Status: " + log_status);
-
-     if( log_status == false )
-     {
-       this.props.navigation.navigate('loginScreen');
-     }
-     else{
-       this.props.navigation.navigate('chatListScreen')
-     }
-   }
-
-
     render() {
       const { navigation } = this.props;
       return (
         <Container style={styles.container} {...this.props}>
-          <App/>
-          <View style={styles.usersDetailsSec}>
-            <TouchableOpacity onPress={() => this.checkLoginProfile()}>
+            <View style={styles.usersDetailsSec}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('profileScreen')}>
               <Image style={styles.userImage}
                    source={Images.tempUser} />
             </TouchableOpacity>
@@ -125,7 +73,7 @@ export default LoggedinState = graphql(gql`
             </Item>
             <Item
               style={styles.borderView}
-              onPress={() => this.checkLoginChat()}>
+              onPress={() => this.props.navigation.navigate('chatListScreen')}>
               <BBBIcon
                 name="Chat"
                 size={Layout.moderateScale(20)}

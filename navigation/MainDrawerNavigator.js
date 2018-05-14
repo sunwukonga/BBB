@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{Component} from 'react';
 import { Text, Animated, Easing, Platform } from 'react-native';
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
 
@@ -22,6 +22,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 
 
 import DrawerContainer from '../screens/DrawerContainer/';
+
 
 // drawer stack
 const DrawerStack = DrawerNavigator(

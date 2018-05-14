@@ -42,17 +42,25 @@ const GET_LOGIN_STATUS = gql`
            jwt_token
         }`;
 
+const drawerStatus = 'locked-closed';
+
 const App = () => (
 <Query query={GET_LOGIN_STATUS}>
   {({ loading, error, data }) => {
      if (loading) return <Text>{`Loading...`}</Text>;
      if (error) return <Text>{`Error: ${error}`}</Text>;
       console.log('get data');
-      console.log('profile_query '+data.logged_in);
-      console.log('profile_query '+data.jwt_token);
+      console.log('home_query '+data.logged_in);
+      console.log('home_query '+data.jwt_token);
 
       log_status = data.logged_in;
 
+      if(log_status==true){
+        drawerStatus = 'unlocked';
+      }
+      else{
+      drawerStatus = 'locked-closed';
+      }
     return (
       <View/>
     )
@@ -61,6 +69,11 @@ const App = () => (
 )
 
 export default class HomeScreen extends React.Component {
+
+static navigationOptions = () => ({
+  drawerLockMode: drawerStatus,
+});
+
   constructor(props) {
     super(props);
     const dataObjects = [
@@ -100,6 +113,7 @@ export default class HomeScreen extends React.Component {
 
     this.state = {
       data: dataObjects,
+      LoggedinState:'locked-closed',
       active: false,
     };
   }
@@ -116,7 +130,26 @@ export default class HomeScreen extends React.Component {
       this.props.navigation.navigate('createNewItemScreen')
     }
   }
+  checkLoginChat = () =>{
+    console.log("Log Status: " + log_status);
 
+    if( log_status == false )
+    {
+      this.props.navigation.navigate('loginScreen');
+    }
+    else{
+      this.props.navigation.navigate('chatListScreen')
+    }
+  }
+  checkLoginMenu=() =>{
+    if(log_status==true){
+      this._handleMenu('DrawerOpen');
+    }
+    else{
+      this.props.navigation.navigate('loginScreen');
+
+    }
+  }
   _handleMenu(menuitem) {
     this.props.navigation.navigate(menuitem);
   }
@@ -143,7 +176,7 @@ export default class HomeScreen extends React.Component {
             />
           </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.chatIconSec} onPress={() => alert('Favorite Clicked')}>
+          <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()}>
           <View >
             <BBBIcon
               name="Chat"
@@ -197,7 +230,7 @@ export default class HomeScreen extends React.Component {
 
   render() {
     var leftComponent = (
-      <Button transparent onPress={() => this._handleMenu('DrawerOpen')}>
+      <Button transparent onPress={() => this.checkLoginMenu() }>
         <BBBIcon
           name="Menu"
           size={Layout.moderateScale(18)}
@@ -220,7 +253,7 @@ export default class HomeScreen extends React.Component {
     //console.log(listItemData);
     return (
       <Container>
-      <App/>
+      <App />
         <BBBHeader
           title="Bebe Bargains"
           leftComponent={leftComponent}
