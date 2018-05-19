@@ -22,7 +22,64 @@ import BBBIcon from '../../components/BBBIcon';
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
+//apollo client
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
+import { ApolloClient } from "apollo-client";
+import { HttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloProvider, graphql,Mutation } from "react-apollo";
+import { withClientState } from "apollo-link-state";
+
+
+// Get login status
+var log_status = '';
+const GET_LOGIN_STATUS = gql`
+     query log @client{
+           logged_in
+           jwt_token
+        }`;
+
+const drawerStatus = 'locked-closed';
+
+const App = () => (
+<Query query={GET_LOGIN_STATUS}>
+  {({ loading, error, data }) => {
+     if (loading) return <Text>{`Loading...`}</Text>;
+     if (error) return <Text>{`Error: ${error}`}</Text>;
+      console.log('get data');
+      console.log('home_query '+data.logged_in);
+      console.log('home_query '+data.jwt_token);
+
+      log_status = data.logged_in;
+
+      if(log_status==true){
+        drawerStatus = 'unlocked';
+      // navigation.setParams({ labels: { first: "locked-closed" }})
+      // console.log(navigation.state.params.labels.first);
+
+    }
+    else{
+      drawerStatus = 'locked-closed';
+      // navigation.setParams({ labels: { first: "unlocked" }})
+      // console.log(navigation.state.params.labels.first);
+
+    }
+    return (
+      <View/>
+    )
+  }}
+</Query>
+)
+
+
 export default class ProductDetailsScreen extends React.Component {
+
+	static navigationOptions = () => ({
+	  drawerLockMode: drawerStatus,
+	});
+
+
 	constructor(props) {
 		super(props);
 		const rowHasChanged = (r1, r2) => r1 !== r2;
@@ -39,6 +96,19 @@ export default class ProductDetailsScreen extends React.Component {
 			active: false,
 		};
 	}
+
+	checkLoginChat = () =>{
+		console.log("Log Status: " + log_status);
+
+		if( log_status == false )
+		{
+			this.props.navigation.navigate('loginScreen');
+		}
+		else{
+			this.props.navigation.navigate('chatListScreen')
+		}
+	}
+
 
 	_handleMenu(menuName) {
 		this.props.navigation.navigate(menuName);
@@ -61,7 +131,8 @@ export default class ProductDetailsScreen extends React.Component {
 							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 						/>
 					</View>
-					<View style={styles.chatIconSec}>
+					  <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()}>
+					<View >
 						<BBBIcon
 							name="Chat"
 							size={Layout.moderateScale(18)}
@@ -69,6 +140,7 @@ export default class ProductDetailsScreen extends React.Component {
 							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 						/>
 					</View>
+					</TouchableOpacity>
 				</View>
 
 				<Item style={styles.userItemDetailsSec}>
@@ -165,7 +237,7 @@ export default class ProductDetailsScreen extends React.Component {
 		];
 
 		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.goBack()}>
+			<Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
 				<BBBIcon
 					name="BackArrow"
 					size={Layout.moderateScale(18)}
@@ -189,6 +261,7 @@ export default class ProductDetailsScreen extends React.Component {
 		];
 		return (
 			<Container style={styles.container}>
+			  <App />
 				<BBBHeader
 					title="Bebe Bargains"
 					leftComponent={leftComponent}

@@ -19,7 +19,7 @@ const RootStackNavigator = StackNavigator(
   {
     headerMode: 'none',
     initialRouteName: 'counrtyScreen',
-    gesturesEnabled: true,
+    gesturesEnabled: false,
   }
 );
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{Component} from 'react';
 import { Text, Animated, Easing, Platform } from 'react-native';
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
 
@@ -18,12 +18,16 @@ import ChatDetailScreen from '../screens/ChatDetailScreen';
 import StrollersScreen from '../screens/StrollersScreen';
 import ChatListScreen from '../screens/ChatListScreen';
 import CreateNewItemScreen from '../screens/CreateNewItemScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+
 
 import DrawerContainer from '../screens/DrawerContainer/';
+
 
 // drawer stack
 const DrawerStack = DrawerNavigator(
   {
+    loginscreen: { screen:LoginScreen },
     homeScreen: { screen: HomeScreen },
     favoriteScreen: { screen: FavoriteScreen },
     notificationScreen: { screen: NotificationScreen },
@@ -37,9 +41,10 @@ const DrawerStack = DrawerNavigator(
     strollersScreen: { screen: StrollersScreen },
     chatListScreen: { screen: ChatListScreen },
     createNewItemScreen: { screen: CreateNewItemScreen },
+    profileScreen: { screen: ProfileScreen },
   },
   {
-    gesturesEnabled: true,
+    gesturesEnabled: false,
     drawerWidth: Layout.WIDTH * 0.82,
     contentComponent: props => <DrawerContainer {...props} />,
   }
@@ -52,7 +57,7 @@ export default StackNavigator(
   {
     headerMode: 'none',
     navigationOptions: ({ navigation }) => ({
-      gesturesEnabled: true,
+      gesturesEnabled: false,
     }),
   }
 );

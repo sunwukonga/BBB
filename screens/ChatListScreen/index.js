@@ -22,7 +22,18 @@ import BBBIcon from '../../components/BBBIcon';
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
+
+
 export default class ChatListScreen extends React.Component {
+
+	constructor(props) {
+		super(props)
+		this.state = {
+			data: [],
+		}
+	}
+
+
 	_renderItem = ({ item }) => (
 		<List
 			style={item.counts == '0' ? styles.mainlist : styles.mainlists}
@@ -130,6 +141,7 @@ export default class ChatListScreen extends React.Component {
 			<Container style={styles.container}>
 				<BBBHeader title="Chats" leftComponent={leftComponent} />
 				<Content>
+				
 					<FlatList
 						data={listItemData}
 						keyExtractor={listItemData => listItemData.id}

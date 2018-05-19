@@ -65,7 +65,7 @@ export default class ChatDetailScreen extends React.Component {
 			</View>
 		);
 		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.goBack()}>
+			<Button transparent onPress={() => this.props.navigation.navigate('chatListScreen')}>
 				<BBBIcon
 					name="BackArrow"
 					size={Layout.moderateScale(18)}
