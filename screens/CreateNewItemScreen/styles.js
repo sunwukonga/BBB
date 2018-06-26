@@ -107,6 +107,7 @@ export default StyleSheet.create({
 		marginTop: Layout.HEIGHT * 0.02,
 		marginRight: Layout.HEIGHT * 0.02,
 		marginLeft: Layout.HEIGHT * 0.02,
+		marginBottom: Layout.HEIGHT * 0.02,
 	},
 	dropcontainer: {
 		backgroundColor: 'transparent',
