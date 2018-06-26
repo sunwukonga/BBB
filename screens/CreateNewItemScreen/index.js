@@ -32,17 +32,20 @@ import Feather from 'react-native-vector-icons/Feather';
 import Dropdown from '../../components/Dropdown/dropdown';
 import { create } from 'apisauce';
 import getSignedUrl from './SignedUrl';
-
+import createNewItemUrl from './CreateNewItem';
 import styles from './styles';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from 'react-native-check-box';
 import { Layout, Colors, Images } from '../../constants/';
+import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 // import { Dropdown } from 'react-native-material-dropdown';
 
 import Collapsible from 'react-native-collapsible';
-const dataObjectsCates = [{ id: '1', text: 'jkhf' }];
-const dataObjectsTags = [{ id: '1', text: 'jsadfkhf' }];
-
+const dataObjectsCates = [];
+const dataObjectsTags = [];
+var tagsList = [];
+var imageList=[];
+var imgList=[];
 
 
 export default class CreateNewItemScreen extends React.Component {
@@ -65,8 +68,10 @@ export default class CreateNewItemScreen extends React.Component {
     const BARTER = 'BARTER';
     const DONATE = 'DONATE';
     const SALEDONATE = 'SALEDONATE';
+    imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
 
     this.state = {
+      progressVisible:false,
       dataSource: ds.cloneWithRows(dataObjects),
       dataSourceCates: dsCates.cloneWithRows(dataObjectsCates),
       dataSourceTags: dsTags.cloneWithRows(dataObjectsTags),
@@ -75,12 +80,17 @@ export default class CreateNewItemScreen extends React.Component {
       isCollapsedBarter: true,
       isCollapsedDonate: true,
       isCollapsedDnS: true,
-
+      progressMsg:"Please Wait...",
+      showDialog:false,
+      errorMsg:'',
+      dialogTitle:'',
   //    _pickImage = this._pickImage
 
       // Data for mutation i.e. create item
       mode: SALE,
-      images: [ { id: 'addImageButton', source: Images.trollie, inputFlag: true, deleted: false }],
+
+      imgList: [],
+      images: imageList,
       currency: '',
       cost: 0.0,
       counterOffer: false,
@@ -89,41 +99,153 @@ export default class CreateNewItemScreen extends React.Component {
       address: { lineOne: ''
                , lineTwo: ''
                , postcode: ''
-               , longitude: ''
-               , latitude: ''
+
+               , lat: 0.0
                , directions: ''
       },
       postCost: 0.0,
       postCurrency: '',
       shortDesc: '',
       longDesc: '',
-      category: ''
+      category: '',
+      title:''
       // End data for mutation
     };
 
+    // this.saveToServer = this.saveToServer.bind(this);
   }
 
+  _validateAllRequiredFileds(){
+
+    for(var i=1;i<imageList.length;i++){
+      imgList.push({imageId:imageList[i].imageId,imageKey:imageList[i].imageKey,primary:imageList[i].primary,deleted:imageList[i].deleted})
+    }
+
+    if(imgList.length===0){
+      this.setState({errorMsg:"Please Upload Atleast One Image",showDialog:true,dialogTitle:"Error!"})
+      return false;
+    }
+    if(this.state.title.length===0){
+      this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
+        return false;
+    }
+    if(this.state.mode==="SALE"){
+      if(this.state.currency.length===0){
+        this.setState({errorMsg:"Please Select Currency",showDialog:true,dialogTitle:"Error!"})
+          return false;
+      }
+      if(this.state.cost.length===0){
+        this.setState({errorMsg:"Please Enter Additional Cost",showDialog:true,dialogTitle:"Error!"})
+        return false;
+      }
+    }
+    if(this.state.address.lineOne.length>=1 || this.state.address.lineTwo.length>=1 || this.state.address.postcode.length>=1){
+      if(this.state.address.lineOne.length===0){
+        this.setState({errorMsg:"Please Enter Address Line 1",showDialog:true,dialogTitle:"Error!"})
+        return false;
+      }
+      if(this.state.address.lineTwo.length===0){
+        this.setState({errorMsg:"Please Enter Address Line 2",showDialog:true,dialogTitle:"Error!"})
+          return false;
+      }
+      if(this.state.address.postcode.length===0){
+        this.setState({errorMsg:"Please Enter Postcode",showDialog:true,dialogTitle:"Error!"})
+          return false;
+      }
+    } else if(this.state.postCurrency.length>=1 || this.state.postCost.length>=1 ){
+
+      if(this.state.postCurrency.length===0){
+        this.setState({errorMsg:"Please Select Post Currency",showDialog:true,dialogTitle:"Error!"})
+          return false;
+      }
+      if(this.state.postCost.length===0){
+        this.setState({errorMsg:"Please Enter Post Cost",showDialog:true,dialogTitle:"Error!"})
+          return false;
+      }
+
+    } else {
+        this.setState({errorMsg:"Please Enter Address or Registered Post",showDialog:true,dialogTitle:"Error!"})
+        return false;
+    }
 
 
+    if(tagsList.length===0){
+      this.setState({errorMsg:"Please Enter Atleast One Tag",showDialog:true,dialogTitle:"Error!"})
+        return false;
+    }
+    return true;
+  }
+
+//"barterTemplates":[[{"templateId":"1","quantity":1,"tags":["1","2"]},{"templateId":"2","quantity":2,"tags":["1","2"]}]]
+  saveToServer(){
+
+    if(!this._validateAllRequiredFileds()){
+        return;
+    }
+
+    var variables = { "mode":this.state.mode
+    ,"images":imgList,
+    "currency":this.state.currency,
+    "cost":this.state.cost,
+    "counterOffer":this.state.counterOffer,
+    "barterTemplates":this.state.barterTemplates,
+    "address":this.state.address,
+    "post":{"postCurrency":this.state.postCurrency,"postCost":this.state.postCost},
+    "title":this.state.title,
+    "description":this.state.longDesc,
+    "category":this.state.category,
+    "template":"1",
+    "tags":tagsList
+   }
+
+   console.log("Params",variables);
+
+      this.setState({
+        progressVisible: true,
+        progressMsg:"Please Wait..."
+      });
+
+      createNewItemUrl(variables).then((res)=>{
+      console.log("Response ",res)
+
+        this.setState({
+          progressVisible: false,
+          errorMsg:"New Item Created Successfully",
+          showDialog:true,
+          dialogTitle:"Success"
+        });
+    })
+    .catch(error => {
+        console.log("Error:" + error.message);
+        this.setState({
+          progressVisible: false,
+          errorMsg:error.message,
+          showDialog:true,
+          dialogTitle:"Error!"
+        })
+    });
+
+  }
 
   onClick(data) {
     data.checked = !data.checked;
     let msg = data.checked ? 'you checked ' : 'you unchecked ';
+    console.log("Checked", data.checked);
   }
   static navigationOptions = {
     header: null,
   };
 
-//      <ListView
-//      horizontal={true}
-//      contentContainerStyle={styles.listContents}
-//      dataSource={this.state.dataSource}
-//      renderRow={this._renderRow.bind(this)}
-  //      enableEmptySections
-  //      pageSize={parseInt(this.state.pageSize)}
-  //      />
   _renderRow( {item} ) {
-    console.log(item);
+    //console.log(item.url);
+
+    if (item.deleted) {
+     return (
+       <View>
+
+       </View>
+     );
+   }
     return (
       <View style={styles.imagesSubView}>
         {item.inputFlag ? (
@@ -142,8 +264,8 @@ export default class CreateNewItemScreen extends React.Component {
           </View>
         ) : (
           <View>
-            <Image source={item.source} style={styles.rowImage} />
-            {/*<Icon name="ios-close-circle" style={styles.rowFlagImage} onPress={()=>this._handleRemoveImage(rowData.id)}/>*/}
+            <Image source={{uri: item.url}}style={styles.rowImage} />
+            {<Icon name="ios-close-circle" style={styles.rowFlagImage}  onPress={()=>this.deleteImageDetails(item.imageId)}/>}
           </View>
         )}
       </View>
@@ -172,6 +294,10 @@ export default class CreateNewItemScreen extends React.Component {
     })
 
     if ( ! pickerResult.cancelled ) {
+      this.setState({
+        progressVisible: true,
+        progressMsg:"Image Uploading..."
+      });
       // https://docs.expo.io/versions/latest/sdk/filesystem#expofilesystemgetinfoasyncfileuri-options
       let fileinfo = await Expo.FileSystem.getInfoAsync(pickerResult.uri, {size: true})
       let resized
@@ -289,18 +415,22 @@ export default class CreateNewItemScreen extends React.Component {
 
     return fetch(apiUrl, options);
     */
+    this.setState({
+      progressVisible: true,
+      progressMsg:"Image Uploading..."
+    });
     const api = create({
       baseURL: 'https://bbb-app-images.s3.amazonaws.com',
     })
-
 
     // create formdata
     //const instanceSignedUrl = new SignedUrl();
     //let signedUrl = getSignedUrl( 'image/jpeg' )
     getSignedUrl( 'image/jpeg' )
       .then( ({ data }) => {
-        console.log("Signed Url from server: ", getSignedUrl);
+      //  console.log("Signed Url from server: ", getSignedUrl);
         const formData = new FormData();
+        this.storeImageDetails(data.getSignedUrl.key,uri);
         formData.append('key', data.getSignedUrl.key);
         formData.append('bucket', data.getSignedUrl.bucket);
         formData.append('Policy', data.getSignedUrl.policy);
@@ -309,7 +439,7 @@ export default class CreateNewItemScreen extends React.Component {
         formData.append('X-Amz-Date', data.getSignedUrl.X_Amz_Date);
         formData.append('X-Amz-Signature', data.getSignedUrl.X_Amz_Signature);
         formData.append('file', {uri: uri, type: 'multipart/form-data'} );
-        console.log("Data Signed Url: ", data.getSignedUrl);
+       // console.log("Data Signed Url: ", data.getSignedUrl);
         return formData
 //    data.append('key', 'somerandomlygeneratedalphanumeric');
 //    data.append('bucket', 'bbb-app-images');
@@ -325,16 +455,48 @@ export default class CreateNewItemScreen extends React.Component {
         // post your data.
         return api.post('', data, {
               onUploadProgress: (e) => {
-                console.log(e)
+                //console.log(e)
                 const progress = e.loaded / e.total;
-                console.log(progress);
-                this.setState({
-                  progress: progress
-                });
+
               }
             })
       })
-      .then((res) => console.log("Response: ", res))
+      .then((res) =>{// console.log("Response: ", res)
+
+      this.setState({
+        progressVisible: false,
+        progressMsg:"Please Wait..."
+      });
+    })
+  }
+
+  storeImageDetails(imageKey,uri){
+    var _id=imageList.length+1;
+    var isPrimary=_id===2;
+
+
+    imageList.push({ id: "_"+_id,imageId:_id,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false });
+
+    this.setState({
+      images:imageList
+
+    })
+  //  console.log(this.state.images);
+  }
+
+  deleteImageDetails(imgId){
+
+    for(var i=0;i<imageList.length;i++){
+      if(imgId===imageList[i].imageId){
+         imageList[i].deleted=true;
+        console.log("Image Deleted",i);
+        break;
+      }
+    }
+    this.setState({
+      images:imageList
+    })
+
   }
 
   _renderRowCategory(rowData) {
@@ -353,6 +515,7 @@ export default class CreateNewItemScreen extends React.Component {
     );
   }
 
+
   onPressAdd = () => {
     // console.log(this.state.texts);
     var idss = dataObjectsCates.length + 1;
@@ -370,6 +533,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: true,
         isCollapsedDonate: true,
         isCollapsedDnS: true,
+        Mode:"SALE",
       });
     } else {
       this.setState({ isCollapsedSale: true });
@@ -445,10 +609,17 @@ export default class CreateNewItemScreen extends React.Component {
   onPressAddTag = () => {
     var idss = dataObjectsTags.length + 1;
     dataObjectsTags.push({ id: idss.toString(), text: this.state.textd });
+
     const ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
     });
-    this.setState({ dataSourceTags: ds.cloneWithRows(dataObjectsTags) });
+  let tmp = dataObjectsTags;
+    for (var i = 0; i < tmp.length; i++) {
+      tagsList[i]=tmp[i].text;
+    }
+
+    this.setState({ dataSourceTags: ds.cloneWithRows(dataObjectsTags),textd:"" });
+
   };
 
   _renderDeleteTag(index) {
@@ -463,7 +634,19 @@ export default class CreateNewItemScreen extends React.Component {
       rowHasChanged: (r1, r2) => r1 !== r2,
     });
     this.setState({ dataSourceTags: ds.cloneWithRows(newarray) });
+    tagsList=[];
+    for (var i = 0; i < newarray.length; i++) {
+      tagsList[i]=newarray[i].text;
+    }
   }
+
+  handleCurreny(value){
+    this.setState({currency:value})
+
+  }
+
+
+
 
   render() {
     let data = [
@@ -485,7 +668,7 @@ export default class CreateNewItemScreen extends React.Component {
         value: 'INR',
       },
       {
-        value: 'EUR',
+        value: 'SGD',
       },
     ];
     let dataTime = [
@@ -514,6 +697,9 @@ export default class CreateNewItemScreen extends React.Component {
         checked: true,
       },
     ];
+
+
+
     var leftComponent = (
       <Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
       <Icon
@@ -524,7 +710,7 @@ export default class CreateNewItemScreen extends React.Component {
       </Button>
     );
     var rightComponent = (
-      <Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
+      <Button transparent onPress={() => this.saveToServer()}>
       <Ionicons
       name="md-checkmark"
       size={Layout.moderateScale(25)}
@@ -534,12 +720,14 @@ export default class CreateNewItemScreen extends React.Component {
     );
     var _this = this;
     return (
+
       <View style={styles.container}>
       <BBBHeader
       title="Create A New Item"
       leftComponent={leftComponent}
       rightComponent={rightComponent}
       />
+
       <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}>
@@ -547,12 +735,23 @@ export default class CreateNewItemScreen extends React.Component {
               <FlatList
                 horizontal={true}
                 data={this.state.images}
-                //extraData={this.state}
+                extraData={this.state}
                 keyExtractor={(item, index) => item.id }
                 renderItem={this._renderRow.bind(this)}
                 contentContainerStyle={styles.listContents}
               />
       </View>
+
+      <View style={styles.Descrip}>
+      <Text style={styles.txtTitle}>Title</Text>
+      <Item style={styles.txtInput} regular>
+      <Input  onChangeText={(text) => {
+          console.log("Title",text);
+          this.setState({ title:text});
+      }} />
+      </Item>
+      </View>
+
       <View style={styles.exchangeMode}>
       <Text style={styles.txtExch}>Exchange Mode</Text>
       <View style={styles.saleview}>
@@ -560,13 +759,13 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.saleHeader}>
       {this.state.isCollapsedSale ? (
         <Feather
-        name="circle"
-        style={{
-          width: Layout.moderateScale(30),
+          name="circle"
+          style={{
+            width: Layout.moderateScale(30),
             height: Layout.moderateScale(30),
             fontSize: Layout.moderateScale(30),
             color: '#c8c8c8',
-        }}
+          }}
         />
       ) : (
         <RedioSelected
@@ -586,24 +785,27 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Currency</Text>
       <Dropdown
-      data={dataCurrency}
-      labelHeight={0}
-      dropdownPosition={0}
-      baseColor="rgba(0, 0, 0, .00)"
-      containerStyle={styles.dateDropDown}
+        data={dataCurrency}
+        labelHeight={0}
+        dropdownPosition={0}
+        baseColor="rgba(0, 0, 0, .00)"
+        containerStyle={styles.dateDropDown}
+        onChangeText={(value, index, data) => this.handleCurreny(value)}
+
       />
       </View>
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Additional Cost</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input keyboardType="numeric"  onChangeText={(text) => this.setState({cost: text})} />
       </Item>
       </View>
       </View>
       <CheckBox
       style={styles.chboxRemember}
       onClick={() => _this.onClick(temp)}
-      isChecked={true}
+      onValueChange={() => this.setState({ counterOffer: !this.state.counterOffer })}
+      isChecked={this.state.counterOffer}
       checkBoxColor={'#fff'}
       rightText={'Allow counter offer'}
       rightTextStyle={{
@@ -663,19 +865,10 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Price</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input keyboardType="numeric" />
       </Item>
       </View>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Time</Text>
-      <Dropdown
-      data={dataTime}
-      labelHeight={0}
-      dropdownPosition={0}
-      baseColor="rgba(0, 0, 0, .00)"
-      containerStyle={styles.dateDropDown}
-      />
-      </View>
+
       </View>
       </View>
       </Collapsible>
@@ -710,8 +903,11 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.subFacetoFace}>
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>
-      71 Pilgrim Avenue Chevy Chase, MD 20815
+      Address
       </Text>
+      <Item style={styles.txtInput} regular>
+      <Input />
+      </Item>
       </View>
       </View>
       </View>
@@ -754,12 +950,13 @@ export default class CreateNewItemScreen extends React.Component {
       dropdownPosition={0}
       baseColor="rgba(0, 0, 0, .00)"
       containerStyle={styles.dateDropDown}
+        onChangeText={(value, index, data) => this.setState({postCurrency: text})}
       />
       </View>
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Additional Cost</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input keyboardType="numeric" onChangeText={(text) => this.setState({postCost: text})}  />
       </Item>
       </View>
       </View>
@@ -798,19 +995,10 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Price</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input  keyboardType="numeric"/>
       </Item>
       </View>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Time</Text>
-      <Dropdown
-      data={dataTime}
-      labelHeight={0}
-      dropdownPosition={0}
-      baseColor="rgba(0, 0, 0, .00)"
-      containerStyle={styles.dateDropDown}
-      />
-      </View>
+
       </View>
       </Collapsible>
       </View>
@@ -824,15 +1012,21 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Line 1</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input  onChangeText={(text) => {
+        this.setState({ address: { ...this.state.address, lineOne: text} });
+      }}   />
       </Item>
       <Text style={styles.txtTitle}>Line 2</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input onChangeText={(text) => {
+              this.setState({ address: { ...this.state.address, lineTwo: text} });
+      }} />
       </Item>
       <Text style={styles.txtTitle}>Postcode</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input onChangeText={(text) => {
+        this.setState({ address: { ...this.state.address, postcode: text} });
+      }} />
       </Item>
       </View>
       <View style={styles.mapFacetoFace}>
@@ -848,6 +1042,7 @@ export default class CreateNewItemScreen extends React.Component {
       </View>
       </View>
       </View>
+
       <View style={styles.regPost}>
       <Text style={styles.txtfacetoFace}>Registered Post</Text>
       <View style={styles.bottomline} />
@@ -860,31 +1055,24 @@ export default class CreateNewItemScreen extends React.Component {
       dropdownPosition={0}
       baseColor="rgba(0, 0, 0, .00)"
       containerStyle={styles.dateDropDown}
+        onChangeText={(value, index, data) =>{ this.setState({postCurrency:value}) } }
       />
       </View>
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Additional Cost</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
+      <Input keyboardType="numeric" onChangeText={(text) =>{ this.setState({postCost:text}) } }/>
       </Item>
       </View>
       </View>
       </View>
-      <View style={styles.addmore}>
-      <View style={styles.subAddmore}>
-      <Add
-      width={Layout.HEIGHT * 0.05}
-      height={Layout.HEIGHT * 0.05}
-      />
-      <Text style={styles.txtTitleAdd}>Add More</Text>
       </View>
-      </View>
-      </View>
+
       <View style={styles.Descrip}>
       <Text style={styles.txtTitle}>Short Description</Text>
       <Item style={styles.txtInput} regular>
-      <Input />
-      <Text style={styles.txtcount}>0/64</Text>
+      <Input onChangeText={text => { this.setState({ shortDesc:text }); }} />
+      <Text style={styles.txtcount}>{this.state.shortDesc.length}/64</Text>
       </Item>
       <Text style={styles.txtTitle}>Long Description</Text>
       <Item style={styles.txtInput} regular>
@@ -894,8 +1082,9 @@ export default class CreateNewItemScreen extends React.Component {
         height: Layout.HEIGHT * 0.1,
           marginBottom: Layout.HEIGHT * 0.015,
       }}
+      onChangeText={text => { this.setState({ longDesc:text }); }}
       />
-      <Text style={styles.txtcount}>0/1024</Text>
+      <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
       </Item>
       </View>
       <View style={styles.categoty}>
@@ -908,6 +1097,7 @@ export default class CreateNewItemScreen extends React.Component {
       dropdownPosition={0}
       baseColor="rgba(0, 0, 0, .00)"
       containerStyle={styles.dateDropDown}
+      onChangeText={(value, index, data) => { this.setState({ category:value }); }}
       />
       </View>
       <Text style={styles.txtTitles}>Templates</Text>
@@ -935,8 +1125,10 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.templateSec}>
       <Item style={styles.txtInputsmall} regular>
       <Input
+        value={this.state.textd}
       onChangeText={text => {
         this.setState({ textd: text });
+
       }}
       />
       </Item>
@@ -964,6 +1156,43 @@ export default class CreateNewItemScreen extends React.Component {
             </View>
           </View>
         </ScrollView>
+
+        <ProgressDialog
+            visible={this.state.progressVisible}
+             message={this.state.progressMsg}
+            activityIndicatorSize="large"
+            activityIndicatorColor="blue"
+                       />
+
+       <Dialog
+           visible={this.state.showDialog}
+           title={this.state.dialogTitle}
+           onTouchOutside={() => this.setState({showDialog:false})}
+           contentStyle={{ justifyContent: 'center', alignItems: 'center' }}
+           animationType="fade">
+           <Text style={{ marginBottom: 10,	color: 'black' }}>{this.state.errorMsg}</Text>
+           <TouchableOpacity
+                style={{
+                      marginRight:40,
+                      marginLeft:40,
+                      marginTop:10,
+                      paddingTop:10,
+                      paddingBottom:10,
+                      backgroundColor:'#00A6A4',
+                      borderRadius:10,
+                      borderWidth: 1,
+                      borderColor: '#fff'
+                    }}
+                     onPress={() => this.setState({showDialog:false})}
+                     underlayColor='#fff'>
+                     <Text style={{
+                          color:'#fff',
+                          textAlign:'center',
+                          paddingLeft : 10,
+                          paddingRight : 10
+                        }}>Ok</Text>
+            </TouchableOpacity>
+       </Dialog>
       </View>
     );
   }
