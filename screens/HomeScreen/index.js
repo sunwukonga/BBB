@@ -143,7 +143,9 @@ static navigationOptions = () => ({
   }
   checkLoginMenu=() =>{
     if(log_status==true){
-      this._handleMenu('DrawerOpen');
+      console.log("Log status true, and menu selected.")
+      this.props.navigation.openDrawer();
+      //this._handleMenu('DrawerOpen');
     }
     else{
       this.props.navigation.navigate('loginScreen');

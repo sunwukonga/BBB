@@ -48,7 +48,7 @@ export default LoggedinState = graphql(gql`
       return (
         <Container style={styles.container} {...this.props}>
             <View style={styles.usersDetailsSec}>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('profileScreen')}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('ProfileScreen')}>
               <Image style={styles.userImage}
                    source={Images.tempUser} />
             </TouchableOpacity>

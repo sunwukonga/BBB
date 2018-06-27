@@ -13,7 +13,7 @@ import { Layout, Colors } from '../../constants/';
 import {Alert, Image, ImageBackground } from 'react-native';
 
 
-import { DrawerNavigator, NavigationActions } from 'react-navigation';
+import { NavigationActions } from 'react-navigation';
 
 
 var facebook_jwt= null;
