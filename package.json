@@ -28,7 +28,8 @@
     "react-native-material-textfield": "^0.12.0",
     "react-native-swiper": "^1.5.13",
     "react-native-vector-icons": "^4.5.0",
-    "react-navigation": "^1.0.0-beta.27"
+    "react-navigation": "^1.0.0-beta.27”,
+    "react-native-simple-dialogs":"^0.3.1"
   },
   "devDependencies": {
     "jest-expo": "^25.0.0"
