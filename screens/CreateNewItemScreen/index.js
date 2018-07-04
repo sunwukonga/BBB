@@ -38,6 +38,8 @@ import BBBIcon from '../../components/BBBIcon';
 import CheckBox from 'react-native-check-box';
 import { Layout, Colors, Images } from '../../constants/';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
+import Toast from 'react-native-simple-toast';
+
 // import { Dropdown } from 'react-native-material-dropdown';
 
 import Collapsible from 'react-native-collapsible';
@@ -51,6 +53,9 @@ var imgList=[];
 export default class CreateNewItemScreen extends React.Component {
   constructor(props) {
     super(props);
+
+
+
     const rowHasChanged = (r1, r2) => r1 !== r2;
     const dataObjects = [
       { id: 'aimg0001', source: Images.logo, inputFlag: false },
@@ -108,7 +113,8 @@ export default class CreateNewItemScreen extends React.Component {
       shortDesc: '',
       longDesc: '',
       category: '',
-      title:''
+      title:'',
+      textd:''
       // End data for mutation
     };
 
@@ -122,58 +128,83 @@ export default class CreateNewItemScreen extends React.Component {
     }
 
     if(imgList.length===0){
-      this.setState({errorMsg:"Please Upload Atleast One Image",showDialog:true,dialogTitle:"Error!"})
+      // this.setState({errorMsg:"Please Upload Atleast One Image",showDialog:true,dialogTitle:"Error!"})
+        Toast.show("Please Upload Atleast One Image",Toast.SHORT)
       return false;
     }
     if(this.state.title.length===0){
-      this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
+      // this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
+      Toast.show("Please Enter Title",Toast.SHORT)
         return false;
     }
     if(this.state.mode==="SALE"){
       if(this.state.currency.length===0){
-        this.setState({errorMsg:"Please Select Currency",showDialog:true,dialogTitle:"Error!"})
+        // this.setState({errorMsg:"Please Select Currency",showDialog:true,dialogTitle:"Error!"})
+        Toast.show("Please Select Currency",Toast.SHORT)
+
           return false;
       }
       if(this.state.cost.length===0){
-        this.setState({errorMsg:"Please Enter Additional Cost",showDialog:true,dialogTitle:"Error!"})
+        //this.setState({errorMsg:"Please Enter Additional Cost",showDialog:true,dialogTitle:"Error!"})
+        Toast.show("Please Enter Additional Cost",Toast.SHORT)
         return false;
       }
     }
     if(this.state.address.lineOne.length>=1 || this.state.address.lineTwo.length>=1 || this.state.address.postcode.length>=1){
       if(this.state.address.lineOne.length===0){
-        this.setState({errorMsg:"Please Enter Address Line 1",showDialog:true,dialogTitle:"Error!"})
+        // this.setState({errorMsg:"Please Enter Address Line 1",showDialog:true,dialogTitle:"Error!"})
+          Toast.show("Please Enter Address Line 1",Toast.SHORT)
         return false;
       }
       if(this.state.address.lineTwo.length===0){
-        this.setState({errorMsg:"Please Enter Address Line 2",showDialog:true,dialogTitle:"Error!"})
+        // this.setState({errorMsg:"Please Enter Address Line 2",showDialog:true,dialogTitle:"Error!"})
+          Toast.show("Please Enter Address Line 2",Toast.SHORT)
           return false;
       }
       if(this.state.address.postcode.length===0){
-        this.setState({errorMsg:"Please Enter Postcode",showDialog:true,dialogTitle:"Error!"})
+        // this.setState({errorMsg:"Please Enter Postcode",showDialog:true,dialogTitle:"Error!"})
+          Toast.show("Please Enter Postcode",Toast.SHORT)
           return false;
       }
     } else if(this.state.postCurrency.length>=1 || this.state.postCost.length>=1 ){
 
       if(this.state.postCurrency.length===0){
-        this.setState({errorMsg:"Please Select Post Currency",showDialog:true,dialogTitle:"Error!"})
+        // this.setState({errorMsg:"Please Select Post Currency",showDialog:true,dialogTitle:"Error!"})
+          Toast.show("Please Select Post Currency",Toast.SHORT)
           return false;
       }
       if(this.state.postCost.length===0){
-        this.setState({errorMsg:"Please Enter Post Cost",showDialog:true,dialogTitle:"Error!"})
+        // this.setState({errorMsg:"Please Enter Post Cost",showDialog:true,dialogTitle:"Error!"})
+          Toast.show("Please Enter Post Cost",Toast.SHORT)
           return false;
       }
 
     } else {
-        this.setState({errorMsg:"Please Enter Address or Registered Post",showDialog:true,dialogTitle:"Error!"})
+        // this.setState({errorMsg:"Please Enter Address or Registered Post",showDialog:true,dialogTitle:"Error!"})
+          Toast.show("Please Enter Address or Registered Post",Toast.SHORT)
         return false;
     }
 
 
     if(tagsList.length===0){
-      this.setState({errorMsg:"Please Enter Atleast One Tag",showDialog:true,dialogTitle:"Error!"})
+      // this.setState({errorMsg:"Please Enter Atleast One Tag",showDialog:true,dialogTitle:"Error!"})
+        Toast.show("Please Enter Atleast One Tag",Toast.SHORT)
         return false;
     }
     return true;
+  }
+
+
+  _isImageExits(base64){
+    if(imageList.length===0){
+      return false;
+    }
+    for(var i=1;i<imageList.length;i++){
+      if(imageList[i].base_64===base64){
+        return true;
+      }
+    }
+    return false;
   }
 
 //"barterTemplates":[[{"templateId":"1","quantity":1,"tags":["1","2"]},{"templateId":"2","quantity":2,"tags":["1","2"]}]]
@@ -237,12 +268,16 @@ export default class CreateNewItemScreen extends React.Component {
   };
 
   _renderRow( {item} ) {
-    //console.log(item.url);
 
     if (item.deleted) {
      return (
-       <View>
-
+      <View style={styles.imagesSubView}>
+       <View >
+       <Image source={{uri: item.url}}style={styles.rowImage} />
+          <TouchableOpacity style={styles.imageOverlay} onPress={()=>this.deleteImageDetails(item.imageId)}>
+            <Image source={Images.imgDeleted} style={styles.imageReselect} />
+          </TouchableOpacity>
+       </View>
        </View>
      );
    }
@@ -264,7 +299,7 @@ export default class CreateNewItemScreen extends React.Component {
           </View>
         ) : (
           <View>
-            <Image source={{uri: item.url}}style={styles.rowImage} />
+            <Image source={{uri: item.url}} style={styles.rowImage}  />
             {<Icon name="ios-close-circle" style={styles.rowFlagImage}  onPress={()=>this.deleteImageDetails(item.imageId)}/>}
           </View>
         )}
@@ -290,20 +325,20 @@ export default class CreateNewItemScreen extends React.Component {
       allowsEditing: false,
       //quality: 0.2,
       exif: false,
-      base64: false,
+      base64: true,
     })
 
     if ( ! pickerResult.cancelled ) {
       this.setState({
         progressVisible: true,
-        progressMsg:"Image Uploading..."
+        progressMsg:"Validating Image..."
       });
       // https://docs.expo.io/versions/latest/sdk/filesystem#expofilesystemgetinfoasyncfileuri-options
       let fileinfo = await Expo.FileSystem.getInfoAsync(pickerResult.uri, {size: true})
       let resized
       let compressed = pickerResult
-      // If filesize is below 150kb don't attempt to reduce it further.
-      console.log("Filesize: ", fileinfo.size)
+       // If filesize is below 150kb don't attempt to reduce it further.
+
       if ( fileinfo.size > 153600 ) {
         // #######################################
         // Resize any dimension greater than 1024
@@ -338,8 +373,16 @@ export default class CreateNewItemScreen extends React.Component {
         // #######################################
         compressed = await this._regressiveCompress(resized, resizedFileinfo)
       }
+
+      if(this._isImageExits(compressed.base64)){
+        this.setState({
+          progressVisible: false
+        });
+        Toast.show("This image already exists",Toast.SHORT)
+        retrun;
+      }
       // https://docs.expo.io/versions/v26.0.0/sdk/imagemanipulator
-      await this._uploadImageAsync(compressed.uri);
+      await this._uploadImageAsync(compressed.uri,compressed.base64);
     }
   }
 
@@ -385,12 +428,13 @@ export default class CreateNewItemScreen extends React.Component {
     console.log('PickerResult: ');
     console.log(pickerResult);
     if ( ! pickerResult.cancelled ) {
-      await this._uploadImageAsync(pickerResult.uri);
+      console.log("Uri",pickerResult.uri);
+      await this._uploadImageAsync(pickerResult.uri,pickerResult.base64);
     }
   }
 
   // Copied from: https://github.com/expo/image-upload-example/blob/master/frontend/App.js
-  _uploadImageAsync = async (uri) => {
+  _uploadImageAsync = async (uri,base64) => {
     /*
     let apiUrl = 'https://s3-ap-southeast-1.amazonaws.com/bbb-app-images';
 
@@ -430,7 +474,7 @@ export default class CreateNewItemScreen extends React.Component {
       .then( ({ data }) => {
       //  console.log("Signed Url from server: ", getSignedUrl);
         const formData = new FormData();
-        this.storeImageDetails(data.getSignedUrl.key,uri);
+        this.storeImageDetails(data.getSignedUrl.key,uri,base64);
         formData.append('key', data.getSignedUrl.key);
         formData.append('bucket', data.getSignedUrl.bucket);
         formData.append('Policy', data.getSignedUrl.policy);
@@ -470,26 +514,33 @@ export default class CreateNewItemScreen extends React.Component {
     })
   }
 
-  storeImageDetails(imageKey,uri){
+  storeImageDetails(imageKey,uri,base_64){
     var _id=imageList.length+1;
     var isPrimary=_id===2;
+      console.log("Key",imageKey);
+    imageList.push({ id: "_"+_id,imageId:_id,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false,base_64:base_64 });
 
+  Expo.SecureStore.setItemAsync(imageKey,base_64, Expo.SecureStore.ALWAYS);
 
-    imageList.push({ id: "_"+_id,imageId:_id,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false });
+    console.log("Items",Expo.SecureStore.getItemAsync(imageKey, Expo.SecureStore.ALWAYS));
 
     this.setState({
       images:imageList
 
     })
-  //  console.log(this.state.images);
   }
 
   deleteImageDetails(imgId){
 
     for(var i=0;i<imageList.length;i++){
       if(imgId===imageList[i].imageId){
+        if(imageList[i].deleted){
+          imageList[i].deleted=false;
+         console.log("Image UnDeleted",i);
+        } else{
          imageList[i].deleted=true;
         console.log("Image Deleted",i);
+      }
         break;
       }
     }
@@ -588,6 +639,7 @@ export default class CreateNewItemScreen extends React.Component {
       rowHasChanged: (r1, r2) => r1 !== r2,
     });
     this.setState({ dataSourceCates: ds.cloneWithRows(newarray) });
+    dataObjectsCates=newarray;
   }
 
   _renderRowTags(rowData) {
@@ -607,6 +659,12 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   onPressAddTag = () => {
+
+    if(this.state.textd.length===0){
+      // this.setState({errorMsg:"Please Enter Tag",showDialog:true,dialogTitle:"Error!"})
+      Toast.show("Please Enter Tag",Toast.SHORT)
+      return;
+    }
     var idss = dataObjectsTags.length + 1;
     dataObjectsTags.push({ id: idss.toString(), text: this.state.textd });
 
@@ -638,6 +696,7 @@ export default class CreateNewItemScreen extends React.Component {
     for (var i = 0; i < newarray.length; i++) {
       tagsList[i]=newarray[i].text;
     }
+    dataObjectsTags=newarray;
   }
 
   handleCurreny(value){
@@ -1071,7 +1130,7 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.Descrip}>
       <Text style={styles.txtTitle}>Short Description</Text>
       <Item style={styles.txtInput} regular>
-      <Input onChangeText={text => { this.setState({ shortDesc:text }); }} />
+      <Input  onChangeText={text => { this.setState({ shortDesc:text }); }} maxLength={64} />
       <Text style={styles.txtcount}>{this.state.shortDesc.length}/64</Text>
       </Item>
       <Text style={styles.txtTitle}>Long Description</Text>
@@ -1083,6 +1142,7 @@ export default class CreateNewItemScreen extends React.Component {
           marginBottom: Layout.HEIGHT * 0.015,
       }}
       onChangeText={text => { this.setState({ longDesc:text }); }}
+       maxLength={1024}
       />
       <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
       </Item>
