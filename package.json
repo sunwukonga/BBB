@@ -30,8 +30,8 @@
     "react-native-vector-icons": "^4.5.0",
     "react-navigation": "^1.0.0-beta.27 <- Old input",
     "react-navigation": "^2.4.1",
-"react-native-simple-dialogs":"^0.3.1",
-"react-native-simple-toast": "0.0.5"
+    "react-native-simple-dialogs":"^0.3.1",
+    "react-native-simple-toast": "0.0.5"
   },
   "devDependencies": {
     "jest-expo": "^25.0.0"

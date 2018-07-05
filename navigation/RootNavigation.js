@@ -1,6 +1,6 @@
 import { Notifications } from 'expo';
 import React from 'react';
-import { StackNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation';
 
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 
@@ -10,7 +10,7 @@ import MainDrawerNavigator from './MainDrawerNavigator';
 import LoginScreen from '../screens/LoginScreen';
 import CounrtyScreen from '../screens/CountryScreen';
 
-const RootStackNavigator = StackNavigator(
+const RootStackNavigator = createStackNavigator(
   {
     mainScreen: { screen: MainDrawerNavigator },
     loginScreen: { screen: LoginScreen },
