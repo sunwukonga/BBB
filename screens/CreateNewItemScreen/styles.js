@@ -32,6 +32,41 @@ export default StyleSheet.create({
 		position: 'absolute',
 		borderRadius: Layout.HEIGHT * 0.015,
 		resizeMode: 'contain',
+
+	},
+	imageOverlay:{
+		position: 'absolute',
+		backgroundColor:'#fff',
+		opacity:0.5,
+		height: Layout.HEIGHT * 0.22,
+		width: Layout.HEIGHT * 0.22,
+
+	},
+	imageDeleteContainer:{
+
+    flex: 1,
+    alignItems: 'stretch',
+    justifyContent: 'center',
+
+	},
+	imageReselect:{
+		flexGrow:1,
+	 height:null,
+	 width:null,
+	 margin:Layout.HEIGHT * 0.04,
+	 padding:Layout.moderateScale(10),
+		alignItems:'center',
+		justifyContent:'center',
+
+	},
+	rowDeletedImage: {
+		height: Layout.HEIGHT * 0.22,
+		width: Layout.HEIGHT * 0.22,
+		position: 'relative',
+		alignItems: 'center',
+		justifyContent: 'center',
+
+
 	},
 	listContents: {
 		marginBottom: Layout.HEIGHT * 0.03,
