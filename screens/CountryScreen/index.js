@@ -20,14 +20,46 @@ import BBBIcon from '../../components/BBBIcon';
 // screen style
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
+import Flag from 'react-native-round-flags';
+import getCountryList from './CountryApi';
+import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 
+
+var listItemData = [];
 export default class CountryScreen extends React.Component {
 	constructor(props) {
 		super(props);
-
 		this.state = {
 			countryName: '',
+			listItemData:[],
+			progressVisible:false,
+			  progressMsg:"Please Wait...",
 		};
+	}
+
+	componentDidMount(){
+		this.setState({
+			progressVisible: true,
+
+		});
+		getCountryList().then((res)=>{
+    		Object.keys(res.data.allCountries).forEach((key,index)=>{
+							listItemData.push({ id: key+1,countryName:res.data.allCountries[key].name, isoCode:res.data.allCountries[key].isoCode });
+      	});
+				this.setState({
+		      listItemData:listItemData,
+					progressVisible: false,
+		    })
+
+		})
+		.catch(error => {
+			console.log("Error:" + error.message);
+			this.setState({
+				progressVisible: false,
+
+			});
+		});
+
 	}
 
 	_renderItem = ({ item }) =>
@@ -46,7 +78,9 @@ export default class CountryScreen extends React.Component {
 					onPress={() => this.selectCountry(item.countryName)}
 					style={styles.countryList}>
 					<Left style={styles.left}>
-						<Image source={item.flag} style={styles.flagStyle} />
+
+					 <Flag code={item.isoCode} style={styles.flagStyle} />
+
 					</Left>
 					<Body style={styles.body}>
 						<Text style={styles.countryNameTxt}>{item.countryName}</Text>
@@ -76,43 +110,7 @@ export default class CountryScreen extends React.Component {
 	}
 
 	render() {
-		var listItemData = [
-			{
-				id: 1,
-				countryName: 'Australia',
-				flag: Images.Australia,
-			},
-			{
-				id: 2,
-				countryName: 'Germany',
-				flag: Images.Germany,
-			},
-			{
-				id: 3,
-				countryName: 'Indonesia',
-				flag: Images.Indonesia,
-			},
-			{
-				id: 4,
-				countryName: 'Malaysia',
-				flag: Images.Malaysia,
-			},
-			{
-				id: 5,
-				countryName: 'Philippines',
-				flag: Images.Philippines,
-			},
-			{
-				id: 6,
-				countryName: 'Singapore',
-				flag: Images.Singapore,
-			},
-			{
-				id: 7,
-				countryName: 'USA',
-				flag: Images.USA,
-			},
-		];
+
 		var leftComponent = (
 			<Button
 				transparent
@@ -130,11 +128,17 @@ export default class CountryScreen extends React.Component {
 				<BBBHeader title="Select Country" enableSearch />
 				<Content>
 					<FlatList
-						data={listItemData}
+						data={this.state.listItemData}
 						keyExtractor={listItemData => listItemData.id}
 						renderItem={this._renderItem}
 					/>
 				</Content>
+				<ProgressDialog
+            visible={this.state.progressVisible}
+             message={this.state.progressMsg}
+            activityIndicatorSize="large"
+            activityIndicatorColor="blue"
+                       />
 			</Container>
 		);
 	}
