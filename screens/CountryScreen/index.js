@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Image, View } from 'react-native';
+import { FlatList, Image, View,Platform,AsyncStorage   } from 'react-native';
 import {
 	Container,
 	Content,
@@ -23,7 +23,7 @@ import { Layout, Colors, Images } from '../../constants/';
 import Flag from 'react-native-round-flags';
 import getCountryList from './CountryApi';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
-
+import DefaultPreference from 'react-native-default-preference';
 
 var listItemData = [];
 export default class CountryScreen extends React.Component {
@@ -35,6 +35,7 @@ export default class CountryScreen extends React.Component {
 			progressVisible:false,
 			  progressMsg:"Please Wait...",
 		};
+
 	}
 
 	componentDidMount(){
@@ -75,7 +76,7 @@ export default class CountryScreen extends React.Component {
 					{ backgroundColor: ischecked ? Colors.selectedRow : Colors.white },
 				]}>
 				<ListItem
-					onPress={() => this.selectCountry(item.countryName)}
+					onPress={() => this.selectCountry(item.countryName,item.isoCode)}
 					style={styles.countryList}>
 					<Left style={styles.left}>
 
@@ -97,14 +98,33 @@ export default class CountryScreen extends React.Component {
 				</ListItem>
 			</List>
 		);
+
 	}
 
-	selectCountry(countryName) {
+/**
+ * store selected country to local cache
+ */
+	_storeCountry = async (countryName,isoCode) => {
+		try {
+			  console.log("Stored Country",countryName+","+isoCode);
+				await AsyncStorage.setItem('selectedCountry', countryName);
+				await AsyncStorage.setItem('countryCode', isoCode);
+		} catch (error) {
+			// Error saving data
+			 console.log(error);
+		}
+
+	}
+	selectCountry(countryName,isoCode) {
 		this.setState({
 			countryName: countryName,
 		});
 		setTimeout(() => {
-			this.props.navigation.navigate('homeScreen');
+				this._storeCountry(countryName,isoCode);
+			}, 250);
+
+		setTimeout(() => {
+			this.props.navigation.navigate('createNewItemScreen');//homeScreen
 			console.log("country clicked");
 		}, 300);
 	}
