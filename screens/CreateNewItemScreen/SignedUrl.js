@@ -6,6 +6,7 @@ import client from '../../config/Client';
 const GET_S3_SIGNEDURL = gql`
   mutation getSignedUrl($imageType: String!) {
     getSignedUrl(imageType: $imageType) {
+      id,
       key,
       bucket,
       X_Amz_Date,

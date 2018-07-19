@@ -8,7 +8,7 @@ import {
   View,
   ListView,
   FlatList,
-  TextInput,
+  TextInput,AsyncStorage
 } from 'react-native';
 import {
   ActionSheet,
@@ -25,6 +25,7 @@ import Baby from '../../components/Baby';
 import RedioSelected from '../../components/RedioSelected';
 import RedioUnselect from '../../components/RedioUnselect';
 import Add from '../../components/Add';
+import SearchBtn from '../../components/SearchBtn';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -39,7 +40,10 @@ import CheckBox from 'react-native-check-box';
 import { Layout, Colors, Images } from '../../constants/';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';
+import getCategoryList from './AllCategoryApi';
+import ModalFilterPicker from 'react-native-modal-filter-picker';
 
+//var Realm = require('realm');
 // import { Dropdown } from 'react-native-material-dropdown';
 
 import Collapsible from 'react-native-collapsible';
@@ -48,14 +52,18 @@ const dataObjectsTags = [];
 var tagsList = [];
 var imageList=[];
 var imgList=[];
-
-
+/**
+Catgeory List Details
+*/
+var allCategoryList = [];
+var allCategoryValueList = [];
 export default class CreateNewItemScreen extends React.Component {
   constructor(props) {
     super(props);
 
-
-
+    setTimeout(() => {
+          this._retrieveCountry();
+      }, 250);
     const rowHasChanged = (r1, r2) => r1 !== r2;
     const dataObjects = [
       { id: 'aimg0001', source: Images.logo, inputFlag: false },
@@ -73,9 +81,15 @@ export default class CreateNewItemScreen extends React.Component {
     const BARTER = 'BARTER';
     const DONATE = 'DONATE';
     const SALEDONATE = 'SALEDONATE';
+
     imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
 
     this.state = {
+      visible: false,
+     selectedCateName: null,
+     selectedCateId:null,
+      allCategoryList:[],
+      allCategoryValueList:[],
       progressVisible:false,
       dataSource: ds.cloneWithRows(dataObjects),
       dataSourceCates: dsCates.cloneWithRows(dataObjectsCates),
@@ -89,6 +103,7 @@ export default class CreateNewItemScreen extends React.Component {
       showDialog:false,
       errorMsg:'',
       dialogTitle:'',
+      countryCode: '',
   //    _pickImage = this._pickImage
 
       // Data for mutation i.e. create item
@@ -104,7 +119,7 @@ export default class CreateNewItemScreen extends React.Component {
       address: { lineOne: ''
                , lineTwo: ''
                , postcode: ''
-
+                , long:0.0
                , lat: 0.0
                , directions: ''
       },
@@ -122,9 +137,11 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   _validateAllRequiredFileds(){
-
+    imgList=[];
     for(var i=1;i<imageList.length;i++){
-      imgList.push({imageId:imageList[i].imageId,imageKey:imageList[i].imageKey,primary:imageList[i].primary,deleted:imageList[i].deleted})
+      imgList.push({imageId:imageList[i].imageId,
+        imageKey:imageList[i].imageKey,
+        primary:imageList[i].primary,deleted:imageList[i].deleted})
     }
 
     if(imgList.length===0){
@@ -214,23 +231,24 @@ export default class CreateNewItemScreen extends React.Component {
         return;
     }
 
+    console.log("Country Code",this.state.countryCode);
     var variables = { "mode":this.state.mode
     ,"images":imgList,
     "currency":this.state.currency,
     "cost":this.state.cost,
     "counterOffer":this.state.counterOffer,
-    "barterTemplates":this.state.barterTemplates,
+  /*  "barterTemplates":this.state.barterTemplates,*/
     "address":this.state.address,
     "post":{"postCurrency":this.state.postCurrency,"postCost":this.state.postCost},
     "title":this.state.title,
     "description":this.state.longDesc,
     "category":this.state.category,
     "template":"1",
-    "tags":tagsList
+    "tags":tagsList,
+    "countryCode":"US" /*this.state.countryCode*/
    }
 
    console.log("Params",variables);
-
       this.setState({
         progressVisible: true,
         progressMsg:"Please Wait..."
@@ -257,6 +275,35 @@ export default class CreateNewItemScreen extends React.Component {
     });
 
   }
+
+  componentDidMount(){
+    this.setState({
+      progressVisible: true,
+
+    });
+    getCategoryList().then((res)=>{
+        Object.keys(res.data.allCategoriesFlat).forEach((key,index)=>{
+              allCategoryList.push(res.data.allCategoriesFlat[key]);
+              allCategoryValueList.push({label:res.data.allCategoriesFlat[key].name,key:res.data.allCategoriesFlat[key].id});
+        });
+        console.log("Array:" , allCategoryValueList);
+        this.setState({
+          allCategoryList:allCategoryList,
+          allCategoryValueList:allCategoryValueList,
+          progressVisible: false,
+        })
+
+    })
+    .catch(error => {
+      console.log("Error:" + error.message);
+      this.setState({
+        progressVisible: false,
+
+      });
+    });
+
+  }
+
 
   onClick(data) {
     data.checked = !data.checked;
@@ -306,6 +353,23 @@ export default class CreateNewItemScreen extends React.Component {
       </View>
     );
   }
+
+  _retrieveCountry = async () => {
+      try {
+          const value = await AsyncStorage.getItem('countryCode');
+          if (value !== null) {
+            // We have data!!
+            console.log(value);
+            this.setState({
+              countryCode: value
+            });
+          }
+       } catch (error) {
+         // Error retrieving data
+         console.log(error);
+       }
+    }
+
 
   _pickImage = async () => {
     // At some point I'd like to Hash an image before sending a request for a signed url to upload it.
@@ -381,6 +445,7 @@ export default class CreateNewItemScreen extends React.Component {
         Toast.show("This image already exists",Toast.SHORT)
         retrun;
       }
+
       // https://docs.expo.io/versions/v26.0.0/sdk/imagemanipulator
       await this._uploadImageAsync(compressed.uri,compressed.base64);
     }
@@ -472,9 +537,10 @@ export default class CreateNewItemScreen extends React.Component {
     //let signedUrl = getSignedUrl( 'image/jpeg' )
     getSignedUrl( 'image/jpeg' )
       .then( ({ data }) => {
+        console.log("Data Signed Url: ", data);
       //  console.log("Signed Url from server: ", getSignedUrl);
         const formData = new FormData();
-        this.storeImageDetails(data.getSignedUrl.key,uri,base64);
+        this.storeImageDetails(data.getSignedUrl.key,data.getSignedUrl.id,uri,base64);
         formData.append('key', data.getSignedUrl.key);
         formData.append('bucket', data.getSignedUrl.bucket);
         formData.append('Policy', data.getSignedUrl.policy);
@@ -483,7 +549,7 @@ export default class CreateNewItemScreen extends React.Component {
         formData.append('X-Amz-Date', data.getSignedUrl.X_Amz_Date);
         formData.append('X-Amz-Signature', data.getSignedUrl.X_Amz_Signature);
         formData.append('file', {uri: uri, type: 'multipart/form-data'} );
-       // console.log("Data Signed Url: ", data.getSignedUrl);
+
         return formData
 //    data.append('key', 'somerandomlygeneratedalphanumeric');
 //    data.append('bucket', 'bbb-app-images');
@@ -496,6 +562,7 @@ export default class CreateNewItemScreen extends React.Component {
     //{uri: photo.uri, name: 'image.jpg', type: 'multipart/form-data'}
       })
       .then( (data) => {
+         console.log("Response: ", data)
         // post your data.
         return api.post('', data, {
               onUploadProgress: (e) => {
@@ -505,7 +572,8 @@ export default class CreateNewItemScreen extends React.Component {
               }
             })
       })
-      .then((res) =>{// console.log("Response: ", res)
+      .then((res) =>{
+    //     console.log("Response: ", res)
 
       this.setState({
         progressVisible: false,
@@ -514,15 +582,23 @@ export default class CreateNewItemScreen extends React.Component {
     })
   }
 
-  storeImageDetails(imageKey,uri,base_64){
+  storeImageDetails(imageKey,imgId,uri,base_64){
     var _id=imageList.length+1;
     var isPrimary=_id===2;
       console.log("Key",imageKey);
-    imageList.push({ id: "_"+_id,imageId:_id,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false,base_64:base_64 });
+    imageList.push({ id: "_"+_id,imageId:imgId,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false,base_64:base_64 });
 
-  Expo.SecureStore.setItemAsync(imageKey,base_64, Expo.SecureStore.ALWAYS);
+  /*  realm.write(() => {
 
-    console.log("Items",Expo.SecureStore.getItemAsync(imageKey, Expo.SecureStore.ALWAYS));
+         var ID = realm.objects('Image_Info').length + 1;
+
+          realm.create('Image_Info', {
+            img_id: ID,
+            img_key: imageKey,
+            img_data:base_64
+           });
+
+       });*/
 
     this.setState({
       images:imageList
@@ -706,8 +782,9 @@ export default class CreateNewItemScreen extends React.Component {
 
 
 
-
   render() {
+
+
     let data = [
       {
         value: 'Banana',
@@ -738,17 +815,7 @@ export default class CreateNewItemScreen extends React.Component {
         value: 'PM',
       },
     ];
-    let dataCate = [
-      {
-        value: 'Baby A',
-      },
-      {
-        value: 'Baby B',
-      },
-      {
-        value: 'Baby C',
-      },
-    ];
+    let dataCate = [ ];
     var temp = [
       {
         path: 'Android',
@@ -1147,19 +1214,30 @@ export default class CreateNewItemScreen extends React.Component {
       <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
       </Item>
       </View>
+
+
       <View style={styles.categoty}>
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Category</Text>
       <View>
-      <Dropdown
-      data={dataCate}
-      labelHeight={0}
-      dropdownPosition={0}
-      baseColor="rgba(0, 0, 0, .00)"
-      containerStyle={styles.dateDropDown}
-      onChangeText={(value, index, data) => { this.setState({ category:value }); }}
-      />
+<View style={styles.categoryTxtView}>
+
+      <TouchableOpacity  onPress={this.onShow}>
+      {this.state.selectedCateName === null ?   <Text regular>Select Category</Text> : (
+        <Text regular>{this.state.selectedCateName}</Text>
+      )}
+
+        </TouchableOpacity>
+        </View>
+      <ModalFilterPicker
+          visible={this.state.visible}
+          onSelect={this.onSelect}
+          onCancel={this.onCancel}
+          options={this.state.allCategoryValueList}
+        />
       </View>
+
+
       <Text style={styles.txtTitles}>Templates</Text>
       <View style={styles.templateSec}>
         <Item style={styles.txtInputsmall} regular>
@@ -1167,11 +1245,12 @@ export default class CreateNewItemScreen extends React.Component {
         </Item>
         <TouchableOpacity style={styles.addButton} onPress={this.onPressAdd}>
           <View style={styles.addButton}>
-            <Add width={Layout.WIDTH * 0.08} height={Layout.WIDTH * 0.08} />
+            <SearchBtn width={Layout.WIDTH * 0.10} height={Layout.WIDTH * 0.10} />
           </View>
         </TouchableOpacity>
       </View>
       <View>
+
       <ListView
       horizontal={true}
       contentContainerStyle={styles.listContent}
@@ -1255,5 +1334,33 @@ export default class CreateNewItemScreen extends React.Component {
        </Dialog>
       </View>
     );
+  }
+  onShow = () => {
+    this.setState({ visible: true });
+  }
+
+  onSelect = (picked) => {
+
+    for(var i=1;i<this.state.allCategoryValueList.length;i++){
+      if(this.state.allCategoryValueList[i].key==picked){
+        this.setState({
+          selectedCateName: this.state.allCategoryValueList[i].label,
+          selectedCateId: picked,
+          category:picked,
+          visible: false
+        })
+        break;
+      }
+    }
+    this.setState({
+
+      visible: false
+    })
+  }
+
+  onCancel = () => {
+    this.setState({
+      visible: false
+    });
   }
 }
