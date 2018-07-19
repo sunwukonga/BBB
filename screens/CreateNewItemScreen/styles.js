@@ -177,6 +177,14 @@ export default StyleSheet.create({
 		paddingLeft: Layout.HEIGHT * 0.03,
 		paddingRight: Layout.HEIGHT * 0.03,
 	},
+	categoryTxtView: {
+		backgroundColor: Colors.white,
+		paddingTop: Layout.HEIGHT * 0.01,
+		paddingBottom: Layout.HEIGHT * 0.01,
+		paddingLeft: Layout.HEIGHT * 0.02,
+		paddingRight: Layout.HEIGHT * 0.02,
+		borderColor: Colors.categorylistBorder,
+	},
 	txtcount: {
 		margin: Layout.HEIGHT * 0.01,
 		fontSize: Layout.moderateScale(12),
@@ -198,6 +206,14 @@ export default StyleSheet.create({
 	},
 	txtInputsmall: {
 		backgroundColor: Colors.white,
+		marginRight: Layout.WIDTH * 0.16,
+		height: Layout.WIDTH * 0.14,
+	},
+	txtCategoryInput: {
+		backgroundColor: Colors.white,
+		justifyContent: 'center',
+		alignItems: 'center',
+		flex:1,
 		marginRight: Layout.WIDTH * 0.16,
 		height: Layout.WIDTH * 0.14,
 	},

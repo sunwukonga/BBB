@@ -32,7 +32,9 @@
     "react-navigation": "^2.4.1",
     "react-native-simple-dialogs":"^0.3.1",
     "react-native-simple-toast": "0.0.5",
-"react-native-round-flags": "^1.0.4"
+    "react-native-round-flags": "^1.0.4",
+    "react-native-modal-filter-picker": "^1.3.4"
+
   },
   "devDependencies": {
     "jest-expo": "^25.0.0"

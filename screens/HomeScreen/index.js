@@ -18,6 +18,8 @@ import Baby from '../../components/Baby';
 import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
 import Stars from '../../components/Stars';
+import getMostRecentList from './GetMostRecentListings';
+import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 
 // style
 import styles from './styles';
@@ -36,6 +38,7 @@ import { withClientState } from "apollo-link-state";
 
 // Get login status
 var log_status = '';
+var mostRecentList=[];
 const GET_LOGIN_STATUS = gql`
      query log @client{
            logged_in
@@ -49,12 +52,9 @@ const App = () => (
   {({ loading, error, data }) => {
      if (loading) return <Text>{`Loading...`}</Text>;
      if (error) return <Text>{`Error: ${error}`}</Text>;
-      console.log('get data');
-      console.log('home_query '+data.logged_in);
-      console.log('home_query '+data.jwt_token);
 
       log_status = data.logged_in;
-
+	//	drawerStatus = 'unlocked';
       if(log_status==true){
         drawerStatus = 'unlocked';
       }
@@ -76,6 +76,9 @@ static navigationOptions = () => ({
 
   constructor(props) {
     super(props);
+
+    console.log(props);
+
     const dataObjects = [
       {
           id: 'aimg0001'
@@ -110,13 +113,58 @@ static navigationOptions = () => ({
         , sale_price: 250
       },
     ];
+    const ds = new ListView.DataSource({
+           rowHasChanged: (r1, r2) => r1 !== r2,
+         });
 
     this.state = {
       data: dataObjects,
+      mostRecentList:[],
+       mostRecentListDataSource: ds.cloneWithRows([]),
       LoggedinState:'locked-closed',
       active: false,
+      progressVisible:false,
     };
   }
+
+  componentDidMount(){
+    this.setState({
+      progressVisible: true,
+
+    });
+    var variables={
+      "countryCode":  "US","limit": 10,"page":  1
+    }
+    getMostRecentList(variables).then((res)=>{
+        mostRecentList=res.data.getMostRecentListings;
+        const ds = new ListView.DataSource({
+               rowHasChanged: (r1, r2) => r1 !== r2,
+             });
+
+        this.setState({
+          progressVisible: false,
+          mostRecentListDataSource: ds.cloneWithRows(mostRecentList),
+          mostRecentList:mostRecentList,
+        })
+        console.log("Array length: "+mostRecentList.length);
+
+
+    })
+    .catch(error => {
+      console.log("Error:" + error.message);
+      this.setState({
+        progressVisible: false,
+
+      });
+    });
+
+  }
+
+  componentWillReceiveProps(props){
+    console.log('component: componentWillReceiveProps');
+    console.log(props);
+  }
+
 
 
   checkLogin = () =>{
@@ -143,9 +191,7 @@ static navigationOptions = () => ({
   }
   checkLoginMenu=() =>{
     if(log_status==true){
-      console.log("Log status true, and menu selected.")
-      this.props.navigation.openDrawer();
-      //this._handleMenu('DrawerOpen');
+      this._handleMenu('DrawerOpen');
     }
     else{
       this.props.navigation.navigate('loginScreen');
@@ -166,7 +212,7 @@ static navigationOptions = () => ({
       <View style={styles.imagesSubView}>
 
         <View>
-          <Image source={item.source} style={styles.rowImage} />
+          <Image source={item.primaryImage.imageURL} style={styles.rowImage} />
           <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
           <View >
             <BBBIcon
@@ -183,7 +229,7 @@ static navigationOptions = () => ({
             <BBBIcon
               name="Chat"
               size={Layout.moderateScale(18)}
-              color={item.chatting ? Colors.tintColor : Colors.white}
+              color={item.chatExists ? Colors.tintColor : Colors.white}
               style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
           />
           </View>
@@ -192,17 +238,17 @@ static navigationOptions = () => ({
 
         <Item style={styles.userItemDetailsSec}>
           <View style={styles.userProfileSec}>
-            <Image source={item.profile_pic} style={styles.userProfile} />
-            <View style={item.online ? styles.userOnline : styles.userOffline} />
+            <Image source={item.user.profileImage.imageURL} style={styles.userProfile} />
+            <View style={item.user.online ? styles.userOnline : styles.userOffline} />
           </View>
           <View style={styles.userNameSec}>
-            <Text style={styles.userName}>{item.profile_name}</Text>
+            <Text style={styles.userName}>{item.user.profileName}</Text>
           </View>
           <View style={styles.activeuserSec}>
             <IdentityVerification
               width={Layout.moderateScale(30)}
               height={Layout.moderateScale(30)}
-              level={item.id_level}
+              level={item.user.idVerification}
             />
           </View>
         </Item>
@@ -217,12 +263,12 @@ static navigationOptions = () => ({
               size={Layout.moderateScale(14)}
               styleOn={{ color: Colors.starcolor, marginTop: Layout.moderateScale(2) }}
               styleOff={{ color: Colors.lightGray, marginTop: Layout.moderateScale(2) }}
-              repeats={item.rating}
+              repeats={item.user.sellerRating}
             />
-            <Text style={styles.ratingmsgct}> ({item.num_ratings}) </Text>
+            <Text style={styles.ratingmsgct}> ({item.user.sellerRatingCount}) </Text>
           </View>
           <View style={styles.priceSec}>
-            <Text style={styles.pricetext}>{item.currency_symbol}{item.sale_price}</Text>
+            <Text style={styles.pricetext}>{item.saleMode.currency.currencySymbol}{item.saleMode.price}</Text>
           </View>
         </View>
 
@@ -282,11 +328,77 @@ static navigationOptions = () => ({
               <View style={styles.populerSec}>
                 <Text style={styles.populerText}>Most Popular Items</Text>
               </View>
-              <FlatList
+              <ListView
                 horizontal={true}
-                data={this.state.data}
-                keyExtractor={data => data.id}
-                renderItem={this._renderItem}
+                dataSource={this.state.mostRecentListDataSource}
+                renderRow={(item)=>
+                   <TouchableOpacity
+                    onPress={ ()=>this.navigatess()}>
+                  <View style={styles.imagesSubView}>
+
+                    <View>
+                      <Image source={item.primaryImage.imageURL} style={styles.rowImage} />
+                      <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
+                      <View >
+                        <BBBIcon
+                          name="Favorite"
+                          size={Layout.moderateScale(18)}
+                          //color={Colors.tintColor}
+                          color={item.liked ? Colors.tintColor : Colors.white}
+                          style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+                        />
+                      </View>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()}>
+                      <View >
+                        <BBBIcon
+                          name="Chat"
+                          size={Layout.moderateScale(18)}
+                          color={item.chatExists ? Colors.tintColor : Colors.white}
+                          style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+                      />
+                      </View>
+                      </TouchableOpacity>
+                    </View>
+
+                    <Item style={styles.userItemDetailsSec}>
+                      <View style={styles.userProfileSec}>
+                        <Image source={item.user.profileImage.imageURL} style={styles.userProfile} />
+                        <View style={item.user.online ? styles.userOnline : styles.userOffline} />
+                      </View>
+                      <View style={styles.userNameSec}>
+                        <Text style={styles.userName}>{item.user.profileName}</Text>
+                      </View>
+                      <View style={styles.activeuserSec}>
+                        <IdentityVerification
+                          width={Layout.moderateScale(30)}
+                          height={Layout.moderateScale(30)}
+                          level={item.user.idVerification}
+                        />
+                      </View>
+                    </Item>
+
+                    <View>
+                      <Text style={styles.postDesc}>{item.description}</Text>
+                    </View>
+
+                    <View style={styles.productreviewSec}>
+                      <View style={styles.ratingSec}>
+                        <Stars
+                          size={Layout.moderateScale(14)}
+                          styleOn={{ color: Colors.starcolor, marginTop: Layout.moderateScale(2) }}
+                          styleOff={{ color: Colors.lightGray, marginTop: Layout.moderateScale(2) }}
+                          repeats={item.user.sellerRating}
+                        />
+                        <Text style={styles.ratingmsgct}> ({item.user.sellerRatingCount}) </Text>
+                      </View>
+                      <View style={styles.priceSec}>
+                        <Text style={styles.pricetext}>{item.saleMode.currency.currencySymbol}{item.saleMode.price}</Text>
+                      </View>
+                    </View>
+
+                  </View>
+                          </TouchableOpacity>}
                 contentContainerStyle={styles.listContent}
               />
             </View>
@@ -306,13 +418,9 @@ static navigationOptions = () => ({
                   Your Recently Visited Items
                 </Text>
               </View>
-              <FlatList
-                horizontal={true}
-                data={this.state.data}
-                keyExtractor={data => data.id}
-                renderItem={this._renderItem}
-                contentContainerStyle={styles.listContent}
-              />
+
+            <Text>List View here</Text>
+
             </View>
           </View>
         </Content>
@@ -321,9 +429,17 @@ static navigationOptions = () => ({
           direction="up"
           style={styles.fabStyle}
           position="bottomRight"
-          onPress={() => this.checkLogin()}>
+          /*onPress={() => this.checkLogin()}*/
+          onPress={() => this.props.navigation.navigate('createNewItemScreen')}
+          >
           <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
         </Fab>
+        <ProgressDialog
+            visible={this.state.progressVisible}
+             message={this.state.progressMsg}
+            activityIndicatorSize="large"
+            activityIndicatorColor="blue"
+                       />
       </Container>
     );
   }
