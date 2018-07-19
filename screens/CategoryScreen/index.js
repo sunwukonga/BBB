@@ -16,22 +16,35 @@ import {
 import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
-
+import getCategoryList from './AllCategoryApi';
+import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 // screen style
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
-
+var allCategoryList = [];
+var allCategoryValueList = [];
 export default class CategoryScreen extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		this.state = {
+		  progressVisible:false,
+			allCategoryList:[],
+			allCategoryValueList:[],
+		}
+	}
+
 	_renderItem = ({ item }) => (
 		<List style={styles.mainlist}>
-			<ListItem avatar onPress={() => alert(item.title)}>
+			<ListItem avatar onPress={() => alert(item.id+","+item.label)}>
 				<Left style={styles.body}>
 					<View style={styles.bebyview}>
 						<Baby height={Layout.HEIGHT * 0.05} width={Layout.HEIGHT * 0.05} />
 					</View>
 				</Left>
 				<Body style={styles.bodys}>
-					<Text style={styles.bodyTitle}>{item.title}</Text>
+					<Text style={styles.bodyTitle}>{item.label}</Text>
 				</Body>
 				<Right style={styles.body}>
 					<BBBIcon
@@ -44,53 +57,37 @@ export default class CategoryScreen extends React.Component {
 		</List>
 	);
 
+	componentDidMount(){
+		this.setState({
+			progressVisible: true,
+
+		});
+		getCategoryList().then((res)=>{
+				Object.keys(res.data.allCategoriesFlat).forEach((key,index)=>{
+							allCategoryList.push(res.data.allCategoriesFlat[key]);
+							allCategoryValueList.push({label:res.data.allCategoriesFlat[key].name,key:res.data.allCategoriesFlat[key].id});
+				});
+				console.log("Array:" , allCategoryList);
+				this.setState({
+					allCategoryList:allCategoryList,
+					allCategoryValueList:allCategoryValueList,
+					progressVisible: false,
+				})
+
+		})
+		.catch(error => {
+			console.log("Error:" + error.message);
+			this.setState({
+				progressVisible: false,
+
+			});
+		});
+
+	}
+
+
 	render() {
-		var listItemData = [
-			{
-				id: 1,
-				title: 'Baby Strollers',
-			},
-			{
-				id: 2,
-				title: 'Baby Food',
-			},
-			{
-				id: 3,
-				title: 'Baby Clothes',
-			},
-			{
-				id: 4,
-				title: 'Baby Skincare',
-			},
-			{
-				id: 5,
-				title: 'Baby Toys',
-			},
-			{
-				id: 6,
-				title: 'Baby Books',
-			},
-			{
-				id: 7,
-				title: 'Baby Strollers',
-			},
-			{
-				id: 8,
-				title: 'Baby Food',
-			},
-			{
-				id: 9,
-				title: 'Baby Clothes',
-			},
-			{
-				id: 10,
-				title: 'Baby Skincare',
-			},
-			{
-				id: 11,
-				title: 'Baby Toys',
-			},
-		];
+
 		var leftComponent = (
 			<Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
 				<BBBIcon
@@ -110,11 +107,17 @@ export default class CategoryScreen extends React.Component {
 				/>
 				<Content>
 					<FlatList
-						data={listItemData}
+						data={this.state.allCategoryValueList}
 						keyExtractor={listItemData => listItemData.id}
 						renderItem={this._renderItem}
 					/>
 				</Content>
+				<ProgressDialog
+						visible={this.state.progressVisible}
+						 message="Please Wait..."
+						activityIndicatorSize="large"
+						activityIndicatorColor="blue"
+											 />
 			</Container>
 		);
 	}
