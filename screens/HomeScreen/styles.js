@@ -36,6 +36,13 @@ export default StyleSheet.create({
     fontSize: Layout.moderateScale(18),
     fontFamily: 'roboto-bold',
   },
+  noDataText: {
+    color: Colors.menuuserNameandTokenColor,
+    fontSize: Layout.moderateScale(12),
+    fontFamily: 'roboto-reguler',
+    textAlign: 'center',
+    marginBottom: Layout.HEIGHT * 0.02,
+  },
   imagesMainView: {
     width: Layout.WIDTH,
     backgroundColor: Colors.white,

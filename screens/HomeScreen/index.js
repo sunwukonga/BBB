@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, ListView, FlatList } from 'react-native';
+import { Image, TouchableOpacity, View,  FlatList,ActivityIndicator } from 'react-native';
 import {
   Container,
   Content,
@@ -19,6 +19,7 @@ import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
 import Stars from '../../components/Stars';
 import getMostRecentList from './GetMostRecentListings';
+import getMostVisitedList from './GetMostVisitedListings';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 
 // style
@@ -76,95 +77,116 @@ static navigationOptions = () => ({
 
   constructor(props) {
     super(props);
-
-    console.log(props);
-
-    const dataObjects = [
-      {
-          id: 'aimg0001'
-        , source: Images.trollie
-        , flag: false
-        , liked: true
-        , chatting: true
-        , profile_pic: Images.tempUser
-        , profile_name: 'Best Buyz'
-        , description: 'Pre-loved stroller. Used twice and kept in stoage.'
-        , online: false
-        , id_level: 2
-        , rating: 4
-        , num_ratings: 32
-        , currency_symbol: '$'
-        , sale_price: 250
-      },
-      {
-          id: 'aimg0002'
-        , source: Images.trollie
-        , flag: false
-        , liked: false
-        , chatting: false
-        , profile_pic: Images.tempUser
-        , profile_name: 'Best Buyz'
-        , description: 'Pre-loved stroller. Used twice and kept in stoage.'
-        , online: true
-        , id_level: 4
-        , rating: 5
-        , num_ratings: 52
-        , currency_symbol: '$'
-        , sale_price: 250
-      },
-    ];
-    const ds = new ListView.DataSource({
-           rowHasChanged: (r1, r2) => r1 !== r2,
-         });
+    this.onEndReachedCalledDuringMomentum = true;
+    this.visitedOnEndReachedCalledDuringMomentum = true;
 
     this.state = {
-      data: dataObjects,
       mostRecentList:[],
-       mostRecentListDataSource: ds.cloneWithRows([]),
+      mostVisitedList:[],
       LoggedinState:'locked-closed',
       active: false,
       progressVisible:false,
+      limit:10,
+      page:1,
+      isLoadingMore:false,
+      visitedLoadingMore:false,
+      loadMoreCompleted:false,
+      visitedLoadMoreCompleted:false,
+      visitedLimit:10,
+      visitedPage:1,
     };
+  }
+
+  _fetchMostRecentListing() {
+
+      if(this.state.loadMoreCompleted){
+        console.log("popular Completed");
+        return;
+      }
+      var variables={
+        "countryCode":"US","limit":this.state.limit,"page":this.state.page
+      }
+      console.log("popular "+variables);
+      getMostRecentList(variables).then((res)=>{
+          if(res.data.getMostRecentListings.length==0){
+            this.setState({
+              progressVisible: false,
+              isLoadingMore:false,
+              loadMoreCompleted:true,
+
+            })
+          } else {
+
+          const data = this.state.mostRecentList.concat(res.data.getMostRecentListings);
+          let _page=this.state.page+1;
+          this.setState({
+            progressVisible: false,
+            mostRecentList:data,
+            isLoadingMore:false,
+            page:_page,
+          });
+
+          }
+          console.log("popular Array length: "+this.state.mostRecentList.length);
+
+      })
+      .catch(error => {
+        console.log("Error:" + error.message);
+        this.setState({
+          progressVisible: false,
+          isLoadingMore:false,
+        });
+      });
+  }
+
+  _fetchMostVisitedListing() {
+
+      if(this.state.visitedLoadMoreCompleted){
+        console.log("Visited Completed");
+        return;
+      }
+      var variables={
+        "countryCode":"US","limit":this.state.visitedLimit,"page":this.state.visitedPage
+      }
+      console.log("visited: "+variables);
+      getMostVisitedList(variables).then((res)=>{
+          if(res.data.getMostVisitedListings.length==0){
+            this.setState({
+              visitedLoadingMore:false,
+              visitedLoadMoreCompleted:true,
+
+            })
+          } else {
+
+          const data = this.state.mostVisitedList.concat(res.data.getMostVisitedListings);
+          let _page=this.state.visitedPage+1;
+          this.setState({
+            mostVisitedList:data,
+            visitedLoadingMore:false,
+            visitedLoadMoreCompleted:false,
+            visitedPage:_page,
+          })
+          }
+          console.log("visited Array length: "+this.state.mostVisitedList.length);
+
+      })
+      .catch(error => {
+        console.log("Error:" + error.message);
+        this.setState({
+          visitedLoadingMore:false,
+        });
+      });
   }
 
   componentDidMount(){
     this.setState({
       progressVisible: true,
-
+      page:1,
+      visitedPage:1,
     });
-    var variables={
-      "countryCode":  "US","limit": 10,"page":  1
-    }
-    getMostRecentList(variables).then((res)=>{
-        mostRecentList=res.data.getMostRecentListings;
-        const ds = new ListView.DataSource({
-               rowHasChanged: (r1, r2) => r1 !== r2,
-             });
-
-        this.setState({
-          progressVisible: false,
-          mostRecentListDataSource: ds.cloneWithRows(mostRecentList),
-          mostRecentList:mostRecentList,
-        })
-        console.log("Array length: "+mostRecentList.length);
-
-
-    })
-    .catch(error => {
-      console.log("Error:" + error.message);
-      this.setState({
-        progressVisible: false,
-
-      });
-    });
-
+    this._fetchMostRecentListing();
+    this._fetchMostVisitedListing();
   }
-
-  componentWillReceiveProps(props){
-    console.log('component: componentWillReceiveProps');
-    console.log(props);
-  }
-
 
 
   checkLogin = () =>{
@@ -205,14 +227,21 @@ static navigationOptions = () => ({
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')
   }
-
+//  item.user.profileImage.imageURL
   _renderItem = ({ item }) => (
       <TouchableOpacity
         onPress={ ()=>this.navigatess()}>
       <View style={styles.imagesSubView}>
 
         <View>
-          <Image source={item.primaryImage.imageURL} style={styles.rowImage} />
+
+        {item.primaryImage.imageURL===null ?   <Image  source={Images.trollie} style={styles.rowImage} /> :
+
+          <Image source={{
+                      uri: item.primaryImage.imageURL,
+                    }} style={styles.rowImage} />
+          }
+
           <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
           <View >
             <BBBIcon
@@ -238,7 +267,8 @@ static navigationOptions = () => ({
 
         <Item style={styles.userItemDetailsSec}>
           <View style={styles.userProfileSec}>
-            <Image source={item.user.profileImage.imageURL} style={styles.userProfile} />
+
+            <Image source={{uri:item.user.profileImage.imageURL}} style={styles.userProfile} />
             <View style={item.user.online ? styles.userOnline : styles.userOffline} />
           </View>
           <View style={styles.userNameSec}>
@@ -328,81 +358,17 @@ static navigationOptions = () => ({
               <View style={styles.populerSec}>
                 <Text style={styles.populerText}>Most Popular Items</Text>
               </View>
-              <ListView
+              <FlatList
                 horizontal={true}
-                dataSource={this.state.mostRecentListDataSource}
-                renderRow={(item)=>
-                   <TouchableOpacity
-                    onPress={ ()=>this.navigatess()}>
-                  <View style={styles.imagesSubView}>
-
-                    <View>
-                      <Image source={item.primaryImage.imageURL} style={styles.rowImage} />
-                      <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
-                      <View >
-                        <BBBIcon
-                          name="Favorite"
-                          size={Layout.moderateScale(18)}
-                          //color={Colors.tintColor}
-                          color={item.liked ? Colors.tintColor : Colors.white}
-                          style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-                        />
-                      </View>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()}>
-                      <View >
-                        <BBBIcon
-                          name="Chat"
-                          size={Layout.moderateScale(18)}
-                          color={item.chatExists ? Colors.tintColor : Colors.white}
-                          style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-                      />
-                      </View>
-                      </TouchableOpacity>
-                    </View>
-
-                    <Item style={styles.userItemDetailsSec}>
-                      <View style={styles.userProfileSec}>
-                        <Image source={item.user.profileImage.imageURL} style={styles.userProfile} />
-                        <View style={item.user.online ? styles.userOnline : styles.userOffline} />
-                      </View>
-                      <View style={styles.userNameSec}>
-                        <Text style={styles.userName}>{item.user.profileName}</Text>
-                      </View>
-                      <View style={styles.activeuserSec}>
-                        <IdentityVerification
-                          width={Layout.moderateScale(30)}
-                          height={Layout.moderateScale(30)}
-                          level={item.user.idVerification}
-                        />
-                      </View>
-                    </Item>
-
-                    <View>
-                      <Text style={styles.postDesc}>{item.description}</Text>
-                    </View>
-
-                    <View style={styles.productreviewSec}>
-                      <View style={styles.ratingSec}>
-                        <Stars
-                          size={Layout.moderateScale(14)}
-                          styleOn={{ color: Colors.starcolor, marginTop: Layout.moderateScale(2) }}
-                          styleOff={{ color: Colors.lightGray, marginTop: Layout.moderateScale(2) }}
-                          repeats={item.user.sellerRating}
-                        />
-                        <Text style={styles.ratingmsgct}> ({item.user.sellerRatingCount}) </Text>
-                      </View>
-                      <View style={styles.priceSec}>
-                        <Text style={styles.pricetext}>{item.saleMode.currency.currencySymbol}{item.saleMode.price}</Text>
-                      </View>
-                    </View>
-
-                  </View>
-                          </TouchableOpacity>}
+                data={this.state.mostRecentList}
+              	renderItem={this._renderItem}
                 contentContainerStyle={styles.listContent}
+                onEndReached={this.onEndReached.bind(this)}
+                onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
+                keyExtractor={(item, index) => index.toString()}
+                ListFooterComponent={this.renderFooter.bind(this)}
               />
             </View>
-
             <View style={styles.adSec}>
               <Text style={styles.mainadText}>
                 Do you have something to sell or give away?
@@ -411,16 +377,28 @@ static navigationOptions = () => ({
                 Post it with us and well give you an audience.
               </Text>
             </View>
-
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
                 <Text style={styles.populerText}>
                   Your Recently Visited Items
                 </Text>
               </View>
-
-            <Text>List View here</Text>
-
+              {this.state.mostVisitedList.length == 0 ?
+                <Text style={styles.noDataText}>
+                  No Data Found
+                </Text>
+                :
+              <FlatList
+                horizontal={true}
+                data={this.state.mostVisitedList}
+                renderItem={this._renderItem}
+                contentContainerStyle={styles.listContent}
+                onEndReached={this.visited_onEndReached.bind(this)}
+                onMomentumScrollBegin={() => { this.visitedOnEndReachedCalledDuringMomentum = false; }}
+                keyExtractor={(item, index) => index.toString()}
+                ListFooterComponent={this.visited_renderFooter.bind(this)}
+              />
+              }
             </View>
           </View>
         </Content>
@@ -429,18 +407,52 @@ static navigationOptions = () => ({
           direction="up"
           style={styles.fabStyle}
           position="bottomRight"
-          /*onPress={() => this.checkLogin()}*/
-          onPress={() => this.props.navigation.navigate('createNewItemScreen')}
+          onPress={() => this.checkLogin()}
+        /*onPress={() => this.props.navigation.navigate('createNewItemScreen')}*/
           >
           <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
         </Fab>
         <ProgressDialog
             visible={this.state.progressVisible}
-             message={this.state.progressMsg}
+             message="Please Wait..."
             activityIndicatorSize="large"
-            activityIndicatorColor="blue"
                        />
       </Container>
     );
   }
+
+  /* START POPULAR LISTING*/
+  renderFooter () {
+        return this.state.isLoadingMore && !this.state.loadMoreCompleted ?   <View style={{ flex: 1,  flexDirection: 'row', padding: 10 }}>
+            <ActivityIndicator size="small" />
+            </View>  : null
+    }
+    onEndReached = ({ distanceFromEnd }) => {
+      console.log("Popular"+distanceFromEnd);
+      console.log(this.onEndReachedCalledDuringMomentum);
+      if(!this.onEndReachedCalledDuringMomentum && !this.state.isLoadingMore){
+          this.setState({ isLoadingMore: true });
+          this._fetchMostRecentListing();
+          this.onEndReachedCalledDuringMomentum = true;
+      }
+  }
+/* END POPULAR LISTING*/
+
+/* START VISITED LISTING*/
+visited_renderFooter () {
+      return this.state.visitedLoadingMore && !this.state.visitedLoadMoreCompleted ?   <View style={{ flex: 1,  flexDirection: 'row', padding: 10 }}>
+          <ActivityIndicator size="small" />
+          </View>  : null
+  }
+  visited_onEndReached = ({ distanceFromEnd }) => {
+    console.log("Visited"+ distanceFromEnd);
+    console.log(this.visitedOnEndReachedCalledDuringMomentum);
+    if(!this.visitedOnEndReachedCalledDuringMomentum && !this.state.visitedLoadingMore){
+        this.setState({ visitedLoadingMore: true });
+        this._fetchMostVisitedListing();
+        this.visitedOnEndReachedCalledDuringMomentum = true;
+    }
+}
+/* END VISITED LISTING*/
+
 }
