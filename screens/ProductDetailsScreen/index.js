@@ -207,6 +207,7 @@ export default class ProductDetailsScreen extends React.Component {
 		for (var i = 0; i < 5; i++) {
 			temp.push(
 				<BBBIcon
+					key={i}
 					name="Star"
 					size={Layout.moderateScale(14)}
 					style={styles.starstyle}
