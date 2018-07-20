@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import BBBIcon from './BBBIcon';
-
+var _key=0,iKey=0;
 export default function Stars (props) {
   var stars = [];
   for (var i = 0; i < 5; i++) {
@@ -25,5 +25,9 @@ export default function Stars (props) {
       );
     }
   }
-  return (<View style={{ flexDirection: 'row' }}>{stars.map(star => {return (<View>{star}</View>)})}</View>);
+
+  return (<View style={{ flexDirection: 'row' }}>{stars.map(star => {
+      _key=_key+1;
+    return (<View key={_key} >{star}</View>)
+  })}</View>);
 }
