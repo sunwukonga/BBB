@@ -23,7 +23,6 @@ import { Layout, Colors, Images } from '../../constants/';
 import Flag from 'react-native-round-flags';
 import getCountryList from './CountryApi';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
-import DefaultPreference from 'react-native-default-preference';
 
 var listItemData = [];
 export default class CountryScreen extends React.Component {
