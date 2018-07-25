@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Image, View } from 'react-native';
+import { FlatList, Image, View,SectionList,StyleSheet } from 'react-native';
 import {
 	Container,
 	Content,
@@ -16,13 +16,12 @@ import {
 import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
-import getCategoryList from './AllCategoryApi';
+import getNestedCategoryList from './NestedCategoryApi';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 // screen style
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
-var allCategoryList = [];
-var allCategoryValueList = [];
+
 export default class CategoryScreen extends React.Component {
 
 	constructor(props) {
@@ -31,8 +30,7 @@ export default class CategoryScreen extends React.Component {
 		this.state = {
 		  progressVisible:false,
 			allCategoryList:[],
-			allCategoryValueList:[],
-		}
+		};
 	}
 
 	_renderItem = ({ item }) => (
@@ -62,18 +60,22 @@ export default class CategoryScreen extends React.Component {
 			progressVisible: true,
 
 		});
-		getCategoryList().then((res)=>{
-				Object.keys(res.data.allCategoriesFlat).forEach((key,index)=>{
-							allCategoryList.push(res.data.allCategoriesFlat[key]);
-							allCategoryValueList.push({label:res.data.allCategoriesFlat[key].name,key:res.data.allCategoriesFlat[key].id});
-				});
-				console.log("Array:" , allCategoryList);
-				this.setState({
-					allCategoryList:allCategoryList,
-					allCategoryValueList:allCategoryValueList,
-					progressVisible: false,
-				})
+		getNestedCategoryList().then((res)=>{
 
+				const data =[];// this.state.allCategoryList.concat(res.data.allCategoriesNested);
+				console.log("Len: "+data);
+
+				Object.keys(res.data.allCategoriesNested).forEach((key,index)=>{
+						data.push({name:res.data.allCategoriesNested[key].name,data:res.data.allCategoriesNested[key].children})
+
+				});
+			//	console.log("Len: "+data);
+				this.setState({
+					allCategoryList:data,
+					progressVisible: false,
+				});
+			//	console.log(this.state.allCategoryList);
+				console.log("Length: "+this.state.allCategoryList.length);
 		})
 		.catch(error => {
 			console.log("Error:" + error.message);
@@ -84,6 +86,23 @@ export default class CategoryScreen extends React.Component {
 		});
 
 	}
+
+	_renderItem = ({ item }) => (
+		<List style={styles.mainlist}>
+			<ListItem avatar onPress={() => alert(item.id+","+item.name)}>
+						<Body style={styles.bodys}>
+					<Text style={styles.bodyTitle}>{item.name}</Text>
+				</Body>
+				<Right style={styles.body}>
+					<BBBIcon
+						name="RightArrow"
+						style={styles.nextarrow}
+						size={Layout.moderateScale(14)}
+					/>
+				</Right>
+			</ListItem>
+		</List>
+	);
 
 
 	render() {
@@ -106,11 +125,20 @@ export default class CategoryScreen extends React.Component {
 					enableSearch
 				/>
 				<Content>
-					<FlatList
-						data={this.state.allCategoryValueList}
-						keyExtractor={listItemData => listItemData.id}
+			{this.state.allCategoryList.length == 0 && this.state.allCategoryList == 'undefiend' ?
+					(<Text style={styles.noDataText}>
+						No Data Found
+					</Text>)
+					:
+					(<SectionList
+						sections={this.state.allCategoryList}
+						renderSectionHeader={ ({section}) => <Text style={styles.SectionHeaderStyle}> { section.name } </Text> }
+						/*renderItem={ ({item}) => <Text style={styles.SectionListItemStyle} > { item.name } </Text> }*/
 						renderItem={this._renderItem}
-					/>
+						keyExtractor={ (item, index) => index }
+						/>
+)
+					}
 				</Content>
 				<ProgressDialog
 						visible={this.state.progressVisible}

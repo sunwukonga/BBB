@@ -40,6 +40,23 @@ export default StyleSheet.create({
 		fontSize: Layout.moderateScale(18),
 		alignSelf: 'center',
 	},
+	SectionListItemStyle:{
+
+    fontSize : Layout.moderateScale(16),
+    padding: 5,
+    color: '#000',
+  backgroundColor : '#F5F5F5'
+
+  },
+	SectionHeaderStyle:{
+
+    backgroundColor : Colors.primaryColor,
+    fontSize :Layout.moderateScale(20),
+    padding: 5,
+    color: '#fff',
+  },
+
+
 	backarrow: {
 		color: Colors.white,
 	},
