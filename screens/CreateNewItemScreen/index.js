@@ -41,10 +41,9 @@ import { Layout, Colors, Images } from '../../constants/';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';
 import getCategoryList from './AllCategoryApi';
+import getTemplateList from './SearchTemplateApi';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
 
-//var Realm = require('realm');
-// import { Dropdown } from 'react-native-material-dropdown';
 
 import Collapsible from 'react-native-collapsible';
 const dataObjectsCates = [];
@@ -88,8 +87,13 @@ export default class CreateNewItemScreen extends React.Component {
       visible: false,
      selectedCateName: null,
      selectedCateId:null,
+     selectedTemplateName: null,
+     selectedTemplateId:null,
+     templateVisible:false,
       allCategoryList:[],
       allCategoryValueList:[],
+      searchTemplateList:[],
+      searchTemplateValueList:[],
       progressVisible:false,
       dataSource: ds.cloneWithRows(dataObjects),
       dataSourceCates: dsCates.cloneWithRows(dataObjectsCates),
@@ -224,6 +228,36 @@ export default class CreateNewItemScreen extends React.Component {
     return false;
   }
 
+  _getTemplates(){
+
+    var variables={
+      "terms":[""],"limit":20,"page":1,"categoryId":[this.state.selectedCateId]
+    }
+    getTemplateList(variables).then((res)=>{
+      var _data=res.data.searchTemplates;
+      var tmpList=[];
+      Object.keys(res.data.searchTemplates).forEach((key,index)=>{
+
+            tmpList.push({label:res.data.searchTemplates[key].title,key:res.data.searchTemplates[key].id});
+      });
+      console.log("Array data:" , _data.length);
+        console.log("Array New :" , tmpList.length);
+      this.setState({
+        searchTemplateList:_data,
+        searchTemplateValueList:tmpList,
+        progressVisible: false,
+      })
+
+    })
+    .catch(error => {
+      console.log("Error:" + error.message);
+      this.setState({
+        progressVisible: false,
+
+      });
+    });
+  }
+
 //"barterTemplates":[[{"templateId":"1","quantity":1,"tags":["1","2"]},{"templateId":"2","quantity":2,"tags":["1","2"]}]]
   saveToServer(){
 
@@ -243,7 +277,7 @@ export default class CreateNewItemScreen extends React.Component {
     "title":this.state.title,
     "description":this.state.longDesc,
     "category":this.state.category,
-    "template":"1",
+    "template":1,
     "tags":tagsList,
     "countryCode":"US" /*this.state.countryCode*/
    }
@@ -1195,12 +1229,8 @@ export default class CreateNewItemScreen extends React.Component {
       </View>
 
       <View style={styles.Descrip}>
-      <Text style={styles.txtTitle}>Short Description</Text>
-      <Item style={styles.txtInput} regular>
-      <Input  onChangeText={text => { this.setState({ shortDesc:text }); }} maxLength={64} />
-      <Text style={styles.txtcount}>{this.state.shortDesc.length}/64</Text>
-      </Item>
-      <Text style={styles.txtTitle}>Long Description</Text>
+
+      <Text style={styles.txtTitle}>Description</Text>
       <Item style={styles.txtInput} regular>
       <Input
       multiline={true}
@@ -1220,7 +1250,7 @@ export default class CreateNewItemScreen extends React.Component {
       <View style={styles.dataFacetoFace}>
       <Text style={styles.txtTitle}>Category</Text>
       <View>
-<View style={styles.categoryTxtView}>
+      <View style={styles.categoryTxtView}>
 
       <TouchableOpacity  onPress={this.onShow}>
       {this.state.selectedCateName === null ?   <Text regular>Select Category</Text> : (
@@ -1230,16 +1260,42 @@ export default class CreateNewItemScreen extends React.Component {
         </TouchableOpacity>
         </View>
       <ModalFilterPicker
+          key={1}
           visible={this.state.visible}
           onSelect={this.onSelect}
           onCancel={this.onCancel}
+          selectedOption={""+this.state.selectedCateId}
           options={this.state.allCategoryValueList}
+
         />
       </View>
 
-
       <Text style={styles.txtTitles}>Templates</Text>
+      <View>
+      <View style={styles.categoryTxtView}>
+
+      <TouchableOpacity  onPress={this.onShowTemplate}>
+      {this.state.selectedTemplateName === null ?   <Text regular>Select Template</Text> : (
+        <Text regular>{this.state.selectedTemplateName}</Text>
+      )}
+
+        </TouchableOpacity>
+        </View>
+
+        {this.state.searchTemplateValueList.length === 0 ? null : (
+      <ModalFilterPicker
+          key={2}
+          visible={this.state.templateVisible}
+          onSelect={this.onSelectTemplate}
+          onCancel={this.onCancel}
+            selectedOption={""+this.state.selectedTemplateName}
+          options={this.state.searchTemplateValueList}
+        />
+      )}
+        </View>
+
       <View style={styles.templateSec}>
+
         <Item style={styles.txtInputsmall} regular>
           <Input onChangeText={text => { this.setState({ text }); }} />
         </Item>
@@ -1248,6 +1304,7 @@ export default class CreateNewItemScreen extends React.Component {
             <SearchBtn width={Layout.WIDTH * 0.10} height={Layout.WIDTH * 0.10} />
           </View>
         </TouchableOpacity>
+
       </View>
       <View>
 
@@ -1338,6 +1395,9 @@ export default class CreateNewItemScreen extends React.Component {
   onShow = () => {
     this.setState({ visible: true });
   }
+  onShowTemplate = () => {
+    this.setState({ templateVisible: true,visible:false });
+  }
 
   onSelect = (picked) => {
 
@@ -1347,20 +1407,41 @@ export default class CreateNewItemScreen extends React.Component {
           selectedCateName: this.state.allCategoryValueList[i].label,
           selectedCateId: picked,
           category:picked,
+          selectedTemplateId:null,
+          selectedTemplateName:null,
           visible: false
         })
         break;
       }
     }
     this.setState({
-
       visible: false
     })
+    this._getTemplates();
+  }
+
+  onSelectTemplate = (picked) => {
+
+    for(var i=1;i<this.state.searchTemplateValueList.length;i++){
+      if(this.state.searchTemplateValueList[i].key==picked){
+        this.setState({
+          selectedTemplateName: this.state.searchTemplateValueList[i].label,
+          selectedTemplateId: picked,
+          templateVisible: false
+        })
+        break;
+      }
+    }
+    this.setState({
+      templateVisible: false
+      })
+
   }
 
   onCancel = () => {
     this.setState({
-      visible: false
+      visible: false,
+      templateVisible:false,
     });
   }
 }

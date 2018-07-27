@@ -50,10 +50,9 @@ export default StyleSheet.create({
   },
 	SectionHeaderStyle:{
 
-    backgroundColor : Colors.primaryColor,
     fontSize :Layout.moderateScale(20),
-    padding: 5,
-    color: '#fff',
+    padding: 10,
+    color: '#000',
   },
 
 
