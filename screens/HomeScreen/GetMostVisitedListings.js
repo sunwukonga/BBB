@@ -12,11 +12,11 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int){
     description
     primaryImage {
       id
-      imageURL
+      imageKey
     }
     secondaryImages {
       id
-      imageURL
+      imageKey
     }
     saleMode {
       price
@@ -46,10 +46,7 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int){
         name
       }
     }
-    category {
-      id
-      name
-    }
+
     tags{
       name
     }
@@ -66,6 +63,7 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int){
       profileImage {
         id
         imageURL
+        imageKey
       }
       chats {
         id

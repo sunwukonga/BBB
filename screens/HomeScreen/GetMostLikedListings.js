@@ -3,19 +3,20 @@ import gql from "graphql-tag";
 import { Component } from 'react';
 import client from '../../config/Client';
 
-const GET_MOST_RECENT_LIST = gql`
-query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
-  getMostRecentListings(countryCode:$countryCode,limit:$limit,page:$page){
-
+const GET_MOST_LIKED_LIST = gql`
+query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int){
+  getMostLikedListings(countryCode:$countryCode,limit:$limit,page:$page){
     id
     title
     description
     primaryImage {
       id
+      imageURL
       imageKey
     }
     secondaryImages {
       id
+      imageURL
       imageKey
     }
     saleMode {
@@ -38,15 +39,18 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
       description
       primaryImage {
         id
+        imageURL
+        imageKey
       }
       secondaryImages {
-        id
+        imageURL
+        imageKey
       }
       tags{
         name
       }
     }
-
+    
     tags{
       name
     }
@@ -77,13 +81,13 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
 }`;
 
 
-function getMostRecentList(_variables) {
+function getMostLikedList(_variables) {
 
   return client.query({
     variables:_variables,
-    query: GET_MOST_RECENT_LIST,
+    query: GET_MOST_LIKED_LIST,
 
   });
 }
 
-export default getMostRecentList;
+export default getMostLikedList;
