@@ -90,10 +90,15 @@ export default class CreateNewItemScreen extends React.Component {
      selectedTemplateName: null,
      selectedTemplateId:null,
      templateVisible:false,
+     selectedTagName: null,
+     selectedTagId:null,
+      tagVisible:false,
       allCategoryList:[],
       allCategoryValueList:[],
       searchTemplateList:[],
       searchTemplateValueList:[],
+      allTagIdList:[],
+      allTagList:[],
       progressVisible:false,
       dataSource: ds.cloneWithRows(dataObjects),
       dataSourceCates: dsCates.cloneWithRows(dataObjectsCates),
@@ -277,9 +282,9 @@ export default class CreateNewItemScreen extends React.Component {
     "title":this.state.title,
     "description":this.state.longDesc,
     "category":this.state.category,
-    "template":1,
+    "template":this.state.selectedTemplateId,
     "tags":tagsList,
-    "countryCode":"US" /*this.state.countryCode*/
+    "countryCode":"SG" /*this.state.countryCode*/
    }
 
    console.log("Params",variables);
@@ -770,24 +775,19 @@ export default class CreateNewItemScreen extends React.Component {
 
   onPressAddTag = () => {
 
-    if(this.state.textd.length===0){
-      // this.setState({errorMsg:"Please Enter Tag",showDialog:true,dialogTitle:"Error!"})
-      Toast.show("Please Enter Tag",Toast.SHORT)
-      return;
-    }
+
     var idss = dataObjectsTags.length + 1;
-    dataObjectsTags.push({ id: idss.toString(), text: this.state.textd });
+    dataObjectsTags.push({ id: idss.toString(), text: this.state.selectedTagName,tagId:this.state.selectedTagId });
 
     const ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
     });
   let tmp = dataObjectsTags;
     for (var i = 0; i < tmp.length; i++) {
-      tagsList[i]=tmp[i].text;
+      tagsList[i]=parseInt(tmp[i].tagId);
     }
 
-    this.setState({ dataSourceTags: ds.cloneWithRows(dataObjectsTags),textd:"" });
-
+    this.setState({ dataSourceTags: ds.cloneWithRows(dataObjectsTags),textd:"",selectedTagId:"",selectedTagName:"" });
   };
 
   _renderDeleteTag(index) {
@@ -795,7 +795,7 @@ export default class CreateNewItemScreen extends React.Component {
     let newarray = [];
     for (var i = 0; i < tmp.length; i++) {
       if (tmp[i].id != index) {
-        newarray.push({ id: tmp[i].id, text: tmp[i].text });
+        newarray.push({ id: tmp[i].id, text: tmp[i].text,tagId:tmp[i].tagId });
       }
     }
     const ds = new ListView.DataSource({
@@ -804,7 +804,7 @@ export default class CreateNewItemScreen extends React.Component {
     this.setState({ dataSourceTags: ds.cloneWithRows(newarray) });
     tagsList=[];
     for (var i = 0; i < newarray.length; i++) {
-      tagsList[i]=newarray[i].text;
+      tagsList[i]=parseInt(newarray[i].tagId);
     }
     dataObjectsTags=newarray;
   }
@@ -1294,51 +1294,30 @@ export default class CreateNewItemScreen extends React.Component {
       )}
         </View>
 
-      <View style={styles.templateSec}>
-
-        <Item style={styles.txtInputsmall} regular>
-          <Input onChangeText={text => { this.setState({ text }); }} />
-        </Item>
-        <TouchableOpacity style={styles.addButton} onPress={this.onPressAdd}>
-          <View style={styles.addButton}>
-            <SearchBtn width={Layout.WIDTH * 0.10} height={Layout.WIDTH * 0.10} />
-          </View>
-        </TouchableOpacity>
-
-      </View>
       <View>
-
-      <ListView
-      horizontal={true}
-      contentContainerStyle={styles.listContent}
-      dataSource={this.state.dataSourceCates}
-      renderRow={this._renderRowCategory.bind(this)}
-      enableEmptySections
-      pageSize={parseInt(this.state.pageSize)}
-      />
       </View>
-      <Text style={styles.txtTitles}>Tags</Text>
-      <View style={styles.templateSec}>
-      <Item style={styles.txtInputsmall} regular>
-      <Input
-        value={this.state.textd}
-      onChangeText={text => {
-        this.setState({ textd: text });
 
-      }}
-      />
-      </Item>
-      <TouchableOpacity
-      style={styles.addButton}
-      onPress={this.onPressAddTag}>
-                  <View style={styles.addButton}>
-                    <Add
-                      width={Layout.WIDTH * 0.08}
-                      height={Layout.WIDTH * 0.08}
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
+      <Text style={styles.txtTitles}>Tags</Text>
+
+
+      <View style={styles.categoryTxtView}>
+
+      <TouchableOpacity  onPress={this.onShowTags}>
+      <Text regular>Select Tag to Add</Text>
+        </TouchableOpacity>
+        </View>
+
+        {this.state.allTagList.length === 0 ? null : (
+      <ModalFilterPicker
+          key={3}
+          visible={this.state.tagVisible}
+          onSelect={this.onSelectTag}
+          onCancel={this.onCancel}
+          options={this.state.allTagList}
+        />
+      )}
+
+
               <View>
                 <ListView
                   horizontal={true}
@@ -1396,12 +1375,22 @@ export default class CreateNewItemScreen extends React.Component {
     this.setState({ visible: true });
   }
   onShowTemplate = () => {
+    if(this.state.searchTemplateValueList.length==0){
+        Toast.show("Please Select Category",Toast.SHORT);
+        return;
+    }
     this.setState({ templateVisible: true,visible:false });
   }
-
+  onShowTags = () => {
+    if(this.state.allTagList.length==0){
+        Toast.show("Please Select Template",Toast.SHORT);
+        return;
+    }
+    this.setState({ templateVisible: false,visible:false,tagVisible:true });
+  }
   onSelect = (picked) => {
 
-    for(var i=1;i<this.state.allCategoryValueList.length;i++){
+    for(var i=0;i<this.state.allCategoryValueList.length;i++){
       if(this.state.allCategoryValueList[i].key==picked){
         this.setState({
           selectedCateName: this.state.allCategoryValueList[i].label,
@@ -1422,18 +1411,45 @@ export default class CreateNewItemScreen extends React.Component {
 
   onSelectTemplate = (picked) => {
 
-    for(var i=1;i<this.state.searchTemplateValueList.length;i++){
+    for(var i=0;i<this.state.searchTemplateValueList.length;i++){
       if(this.state.searchTemplateValueList[i].key==picked){
+        var tagList=this.state.searchTemplateList[i].tags;
+        var tmpList=[];
+        for(var k=0;k<tagList.length;k++){
+          tmpList.push({label:tagList[k].name,key:tagList[k].id});
+        }
+          console.log("Tags - ",tmpList.length);
         this.setState({
+          allTagList:tmpList,
           selectedTemplateName: this.state.searchTemplateValueList[i].label,
           selectedTemplateId: picked,
-          templateVisible: false
-        })
+          templateVisible: false,
+        });
+      console.log("Tags ",this.state.allTagList.length);
+        break;
+      }
+    }
+
+  }
+
+  onSelectTag = (picked) => {
+
+    for(var i=0;i<this.state.allTagList.length;i++){
+      if(this.state.allTagList[i].key==picked){
+      
+        console.log("tags_ ",this.state.allTagList[i].label);
+        this.setState({
+          textd:picked,
+          selectedTagName: this.state.allTagList[i].label,
+          selectedTagId: picked,
+          tagVisible: false
+        });
+        this.onPressAddTag();
         break;
       }
     }
     this.setState({
-      templateVisible: false
+      tagVisible: false
       })
 
   }
@@ -1442,6 +1458,7 @@ export default class CreateNewItemScreen extends React.Component {
     this.setState({
       visible: false,
       templateVisible:false,
+      tagVisible:false,
     });
   }
 }
