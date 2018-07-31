@@ -93,6 +93,7 @@ static navigationOptions = () => ({
       mostLikedList:[],
       yourLikedList:[],
       yourVisitedList:[],
+	  countryCode:"",
       yourList:[],
       LoggedinState:'locked-closed',
       active: false,
@@ -135,7 +136,7 @@ static navigationOptions = () => ({
         return;
       }
       var variables={
-        "countryCode":"SG","limit":this.state.limit,"page":this.state.page
+        "countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page
       }
       console.log("popular "+variables);
       getMostRecentList(variables).then((res)=>{
@@ -180,7 +181,7 @@ static navigationOptions = () => ({
         return;
       }
       var variables={
-        "countryCode":"SG","limit":this.state.visitedLimit,"page":this.state.visitedPage
+        "countryCode":this.state.countryCode,"limit":this.state.visitedLimit,"page":this.state.visitedPage
       }
       console.log("visited: "+variables);
       getMostVisitedList(variables).then((res)=>{
@@ -218,7 +219,7 @@ static navigationOptions = () => ({
         return;
       }
       var variables={
-        "countryCode":"SG","limit":this.state.likedLimit,"page":this.state.likedPage
+        "countryCode":this.state.countryCode,"limit":this.state.likedLimit,"page":this.state.likedPage
       }
       console.log("Liked: "+variables);
       getMostLikedList(variables).then((res)=>{
@@ -256,7 +257,7 @@ static navigationOptions = () => ({
         return;
       }
       var variables={
-        "countryCode":"SG","limit":this.state.yourLikedLimit,"page":this.state.yourLikedPage
+        "countryCode":this.state.countryCode,"limit":this.state.yourLikedLimit,"page":this.state.yourLikedPage
       }
       console.log("Your Liked: "+variables);
       getUserLikedList(variables).then((res)=>{
@@ -294,7 +295,7 @@ static navigationOptions = () => ({
         return;
       }
       var variables={
-        "countryCode":"SG","limit":this.state.yourVisitedLimit,"page":this.state.yourVisitedPage
+        "countryCode":this.state.countryCode,"limit":this.state.yourVisitedLimit,"page":this.state.yourVisitedPage
       }
       console.log("Your Visited: "+variables);
       getUserVisitedList(variables).then((res)=>{
@@ -332,7 +333,7 @@ static navigationOptions = () => ({
         return;
       }
       var variables={
-        "countryCode":"SG","limit":this.state.yourLimit,"page":this.state.yourPage
+        "countryCode":this.state.countryCode,"limit":this.state.yourLimit,"page":this.state.yourPage
       }
       console.log("Your: "+variables);
       getUserPostedList(variables).then((res)=>{
@@ -367,15 +368,33 @@ static navigationOptions = () => ({
     console.log(nextProps);
 
  }
-
+_retrieveCountry = async () => {
+      try {
+          const value = await AsyncStorage.getItem('countryCode');
+          if (value !== null) {
+            // We have data!!
+            console.log(value);
+            this.setState({
+              countryCode: value
+            });
+          }
+       } catch (error) {
+         // Error retrieving data
+         console.log(error);
+       }
+    }
   componentDidMount(){
+	  this._retrieveCountry();
       this._resetAllApiValues();
       this.setState({
           progressVisible: true,
       });
-    this._fetchMostRecentListing();
-    this._fetchMostVisitedListing();
-    this._fetchMostLikedListing();
+    setTimeout(() => {
+      this._fetchMostRecentListing();
+      this._fetchMostVisitedListing();
+      this._fetchMostLikedListing();
+
+    }, 350);
     console.log("Login Status",log_status);
     setTimeout(() => {
       if( log_status == true )
