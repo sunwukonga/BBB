@@ -106,7 +106,7 @@ export default class CountryScreen extends React.Component {
   _storeCountry = async (countryName,isoCode) => {
     try {
         console.log("Stored Country",countryName+","+isoCode);
-        await AsyncStorage.setItem('selectedCountry', countryName);
+        //await AsyncStorage.setItem('selectedCountry', countryName);
         await AsyncStorage.setItem('countryCode', isoCode);
     } catch (error) {
       // Error saving data
