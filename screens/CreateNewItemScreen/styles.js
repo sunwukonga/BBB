@@ -26,6 +26,7 @@ export default StyleSheet.create({
 		marginRight: Layout.WIDTH * 0.16,
 		height: Layout.WIDTH * 0.14,
 	},
+
 	imagesSubView: {
 		height: Layout.HEIGHT * 0.22,
 		width: Layout.HEIGHT * 0.22,
@@ -216,14 +217,30 @@ export default StyleSheet.create({
 		marginRight: Layout.WIDTH * 0.16,
 		height: Layout.WIDTH * 0.14,
 	},
+
 	txtCategoryInput: {
 		backgroundColor: Colors.white,
-		justifyContent: 'center',
-		alignItems: 'center',
-		flex:1,
-		marginRight: Layout.WIDTH * 0.16,
 		height: Layout.WIDTH * 0.14,
+ 		borderWidth: 1,
+ 		borderColor: '#DEDADA',
+		justifyContent: 'flex-start',
+	  alignItems: 'center',
+ 		flex:1,
+		flexDirection:'row',
+		paddingTop: Layout.HEIGHT * 0.01,
+		paddingBottom: Layout.HEIGHT * 0.01,
+		paddingLeft: Layout.HEIGHT * 0.02,
+		paddingRight: Layout.HEIGHT * 0.02,
 	},
+	selectionInput: {
+		backgroundColor: Colors.white,
+		height: Layout.WIDTH * 0.14,
+ 		justifyContent: 'flex-start',
+	  alignItems: 'center',
+ 		flex:1,
+		flexDirection:'row',
+	},
+
 	addButton: {
 		height: Layout.WIDTH * 0.14,
 		width: Layout.WIDTH * 0.14,
