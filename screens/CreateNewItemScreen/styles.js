@@ -19,6 +19,13 @@ export default StyleSheet.create({
 		borderRadius: Layout.moderateScale(3),
 		backgroundColor: Colors.white,
 	},
+	tagDropDown: {
+		borderWidth: 0.8,
+		borderColor: '#c8d5d5',
+		backgroundColor: Colors.white,
+		marginRight: Layout.WIDTH * 0.16,
+		height: Layout.WIDTH * 0.14,
+	},
 	imagesSubView: {
 		height: Layout.HEIGHT * 0.22,
 		width: Layout.HEIGHT * 0.22,
