@@ -5,8 +5,8 @@ import client from '../../config/Client';
 
 
 const ADD_NEW_ITEM = gql`
-mutation createListing($mode: String!, $images: [UploadedImage], $currency: String!, $cost: Float, $counterOffer: Boolean,$countryCode:String!, $barterTemplates: [[TemplateQty]], $address: Address, $post: Postage, $title: String, $description: String, $category: Int, $template: Int, $tags: [Int]) {
-createListing(mode: $mode, images: $images, currency: $currency, cost: $cost, counterOffer: $counterOffer,countryCode:$countryCode, barterTemplates: $barterTemplates, address: $address, post: $post, title: $title, description: $description, categoryId: $category, templateId: $template, tagIds: $tags) {
+  mutation createListing($mode: String!, $images: [UploadedImage], $currency: String!, $cost: Float, $counterOffer: Boolean,$countryCode:String!, $barterTemplates: [[TemplateQty]], $address: Address, $post: Postage, $title: String, $description: String, $category: String, $template: String, $tags: [String]) {
+  createListing(mode: $mode, images: $images, currency: $currency, cost: $cost, counterOffer: $counterOffer,countryCode:$countryCode, barterTemplates: $barterTemplates, address: $address, post: $post, title: $title, description: $description, category: $category, template: $template, tags: $tags) {
     id
     title
     description
@@ -51,7 +51,7 @@ createListing(mode: $mode, images: $images, currency: $currency, cost: $cost, co
         name
       }
     }
-
+  
     user {
       id
     }
