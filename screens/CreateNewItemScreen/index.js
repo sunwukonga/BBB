@@ -60,9 +60,7 @@ export default class CreateNewItemScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    setTimeout(() => {
-          this._retrieveCountry();
-      }, 250);
+
     const rowHasChanged = (r1, r2) => r1 !== r2;
     const dataObjects = [
       { id: 'aimg0001', source: Images.logo, inputFlag: false },
@@ -84,6 +82,7 @@ export default class CreateNewItemScreen extends React.Component {
     imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
 
     this.state = {
+      countryCode: '',
       visible: false,
      selectedCateName: null,
      selectedCateId:null,
@@ -112,7 +111,7 @@ export default class CreateNewItemScreen extends React.Component {
       showDialog:false,
       errorMsg:'',
       dialogTitle:'',
-      countryCode: '',
+
   //    _pickImage = this._pickImage
 
       // Data for mutation i.e. create item
@@ -123,7 +122,7 @@ export default class CreateNewItemScreen extends React.Component {
       currency: '',
       cost: 0.0,
       counterOffer: false,
-      template: '',
+      template: null,
       barterTemplates: [], // [ [{template, qty}, {template, qty}], [{template, qty}] ]
       address: { lineOne: ''
                , lineTwo: ''
@@ -133,8 +132,8 @@ export default class CreateNewItemScreen extends React.Component {
                , directions: ''
       },
       postCost: 0.0,
-      postCurrency: '',
-      shortDesc: '',
+      postCurrency: "",
+      shortDesc: null,
       longDesc: '',
       category: '',
       title:'',
@@ -153,70 +152,51 @@ export default class CreateNewItemScreen extends React.Component {
         primary:imageList[i].primary,deleted:imageList[i].deleted})
     }
 
-    if(imgList.length===0){
-      // this.setState({errorMsg:"Please Upload Atleast One Image",showDialog:true,dialogTitle:"Error!"})
+    /*if(imgList.length===0){
         Toast.show("Please Upload Atleast One Image",Toast.SHORT)
-      return false;
-    }
+        return false;
+    }*/
     if(this.state.title.length===0){
-      // this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
-      Toast.show("Please Enter Title",Toast.SHORT)
+        Toast.show("Please Enter Title",Toast.SHORT)
         return false;
     }
-    if(this.state.mode==="SALE"){
-      if(this.state.currency.length===0){
-        // this.setState({errorMsg:"Please Select Currency",showDialog:true,dialogTitle:"Error!"})
-        Toast.show("Please Select Currency",Toast.SHORT)
 
-          return false;
-      }
-      if(this.state.cost.length===0){
-        //this.setState({errorMsg:"Please Enter Additional Cost",showDialog:true,dialogTitle:"Error!"})
-        Toast.show("Please Enter Additional Cost",Toast.SHORT)
+    if(this.state.longDesc.length===0){
+        Toast.show("Please Enter Description",Toast.SHORT)
         return false;
-      }
+    }
+    if(this.state.category.length===0){
+        Toast.show("Please Select Category",Toast.SHORT)
+        return false;
     }
     if(this.state.address.lineOne.length>=1 || this.state.address.lineTwo.length>=1 || this.state.address.postcode.length>=1){
-      if(this.state.address.lineOne.length===0){
-        // this.setState({errorMsg:"Please Enter Address Line 1",showDialog:true,dialogTitle:"Error!"})
-          Toast.show("Please Enter Address Line 1",Toast.SHORT)
-        return false;
-      }
-      if(this.state.address.lineTwo.length===0){
-        // this.setState({errorMsg:"Please Enter Address Line 2",showDialog:true,dialogTitle:"Error!"})
-          Toast.show("Please Enter Address Line 2",Toast.SHORT)
-          return false;
-      }
-      if(this.state.address.postcode.length===0){
-        // this.setState({errorMsg:"Please Enter Postcode",showDialog:true,dialogTitle:"Error!"})
-          Toast.show("Please Enter Postcode",Toast.SHORT)
-          return false;
-      }
-    } else if(this.state.postCurrency.length>=1 || this.state.postCost.length>=1 ){
+          if(this.state.address.lineOne.length===0){
+            Toast.show("Please Enter Address Line 1",Toast.SHORT)
+            return false;
+          }
+          if(this.state.address.lineTwo.length===0){
+             Toast.show("Please Enter Address Line 2",Toast.SHORT)
+              return false;
+          }
+          if(this.state.address.postcode.length===0){
+              Toast.show("Please Enter Postcode",Toast.SHORT)
+              return false;
+          }
+        }
 
+    if(this.state.postCurrency.length>=1 || (this.state.postCost.length>=1 && this.state.postCost != 0.0)){
       if(this.state.postCurrency.length===0){
-        // this.setState({errorMsg:"Please Select Post Currency",showDialog:true,dialogTitle:"Error!"})
           Toast.show("Please Select Post Currency",Toast.SHORT)
           return false;
       }
       if(this.state.postCost.length===0){
-        // this.setState({errorMsg:"Please Enter Post Cost",showDialog:true,dialogTitle:"Error!"})
           Toast.show("Please Enter Post Cost",Toast.SHORT)
           return false;
       }
 
-    } else {
-        // this.setState({errorMsg:"Please Enter Address or Registered Post",showDialog:true,dialogTitle:"Error!"})
-          Toast.show("Please Enter Address or Registered Post",Toast.SHORT)
-        return false;
     }
 
 
-    if(tagsList.length===0){
-      // this.setState({errorMsg:"Please Enter Atleast One Tag",showDialog:true,dialogTitle:"Error!"})
-        Toast.show("Please Enter Atleast One Tag",Toast.SHORT)
-        return false;
-    }
     return true;
   }
 
@@ -271,20 +251,32 @@ export default class CreateNewItemScreen extends React.Component {
     }
 
     console.log("Country Code",this.state.countryCode);
-    var variables = { "mode":this.state.mode
-    ,"images":imgList,
+    var variables = "";
+    var post_=null;
+    var addr_=null;
+
+    if(this.state.postCurrency.length!=0){
+      post_={"postCurrency":this.state.postCurrency,"postCost":this.state.postCost};
+    }
+    if(this.state.address.lineOne.length!=0){
+      addr_=this.state.address;
+    }
+
+    variables={
+      "mode":this.state.mode,
+    "images":imgList,
     "currency":this.state.currency,
     "cost":this.state.cost,
     "counterOffer":this.state.counterOffer,
   /*  "barterTemplates":this.state.barterTemplates,*/
-    "address":this.state.address,
-    "post":{"postCurrency":this.state.postCurrency,"postCost":this.state.postCost},
+    "address":addr_,
+    "post":post_,
     "title":this.state.title,
     "description":this.state.longDesc,
     "category":this.state.category,
     "template":this.state.selectedTemplateId,
     "tags":tagsList,
-    "countryCode":"SG" /*this.state.countryCode*/
+    "countryCode":this.state.countryCode
    }
 
    console.log("Params",variables);
@@ -316,6 +308,7 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   componentDidMount(){
+    this._retrieveCountry();
     this.setState({
       progressVisible: true,
 
@@ -325,7 +318,7 @@ export default class CreateNewItemScreen extends React.Component {
               allCategoryList.push(res.data.allCategoriesFlat[key]);
               allCategoryValueList.push({label:res.data.allCategoriesFlat[key].name,key:res.data.allCategoriesFlat[key].id});
         });
-        console.log("Array:" , allCategoryValueList);
+
         this.setState({
           allCategoryList:allCategoryList,
           allCategoryValueList:allCategoryValueList,
@@ -758,6 +751,7 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   _renderRowTags(rowData) {
+    console.log(rowData);
     return (
       <View style={styles.mainRowView}>
         <Text style={styles.txttemp}>{rowData.text}</Text>
@@ -775,10 +769,22 @@ export default class CreateNewItemScreen extends React.Component {
 
   onPressAddTag = () => {
 
+    var isNew=true;
+    let tmp_ = dataObjectsTags;
+    for (var i = 0; i < tmp_.length; i++) {
+      if(tmp_[i].tagId==this.state.selectedTagId){
+        console.log("Tags",this.state.selectedTagId);
+        isNew=false;
+        return;
+      }
+    }
 
+    if(!isNew){
+      return;
+    }
     var idss = dataObjectsTags.length + 1;
     dataObjectsTags.push({ id: idss.toString(), text: this.state.selectedTagName,tagId:this.state.selectedTagId });
-
+    console.log(dataObjectsTags);
     const ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
     });
@@ -912,6 +918,53 @@ export default class CreateNewItemScreen extends React.Component {
       </Item>
       </View>
 
+            <View style={styles.Descrip}>
+
+            <Text style={styles.txtTitle}>Description</Text>
+            <Item style={styles.txtInput} regular>
+            <Input
+            multiline={true}
+            style={{
+              height: Layout.HEIGHT * 0.1,
+                marginBottom: Layout.HEIGHT * 0.015,
+            }}
+            onChangeText={text => { this.setState({ longDesc:text }); }}
+             maxLength={1024}
+            />
+            <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
+            </Item>
+            </View>
+
+
+
+            <View style={styles.dataFacetoFace}>
+            <Text style={styles.txtTitle}>Category</Text>
+            <View>
+            <View style={styles.categoryTxtView}>
+
+            <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
+            {this.state.selectedCateName === null ?
+
+               <Text regular   >Select Category</Text>
+
+                : (
+
+              <Text regular>{this.state.selectedCateName}</Text>
+            )}
+              </TouchableOpacity>
+              </View>
+            <ModalFilterPicker
+                key={1}
+                visible={this.state.visible}
+                onSelect={this.onSelect}
+                onCancel={this.onCancel}
+                selectedOption={""+this.state.selectedCateId}
+                options={this.state.allCategoryValueList}
+
+              />
+            </View>
+  </View>
+
       <View style={styles.exchangeMode}>
       <Text style={styles.txtExch}>Exchange Mode</Text>
       <View style={styles.saleview}>
@@ -994,45 +1047,8 @@ export default class CreateNewItemScreen extends React.Component {
       </View>
       </Collapsible>
       </View>
-      <View style={styles.saleview}>
-      <TouchableOpacity onPress={this.onPressHeadBarter}>
-      <View style={styles.saleHeader}>
-      {this.state.isCollapsedBarter ? (
-        <Feather
-        name="circle"
-        style={{
-          width: Layout.moderateScale(30),
-            height: Layout.moderateScale(30),
-            fontSize: Layout.moderateScale(30),
-            color: '#c8c8c8',
-        }}
-        />
-      ) : (
-        <RedioSelected
-        width={Layout.moderateScale(30)}
-        height={Layout.moderateScale(30)}
-        />
-      )}
-      <Text style={styles.txtfacetoFace}>Barter</Text>
-      </View>
-      </TouchableOpacity>
-      {this.state.isCollapsedBarter ? null : (
-        <View style={styles.bottomline} />
-      )}
-      <Collapsible collapsed={this.state.isCollapsedBarter}>
-      <View style={styles.saleChild}>
-      <View style={styles.subFacetoFace}>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Price</Text>
-      <Item style={styles.txtInput} regular>
-      <Input keyboardType="numeric" />
-      </Item>
-      </View>
 
-      </View>
-      </View>
-      </Collapsible>
-      </View>
+
       <View style={styles.saleview}>
       <TouchableOpacity onPress={this.onPressHeadDonate}>
       <View style={styles.saleHeader}>
@@ -1073,96 +1089,11 @@ export default class CreateNewItemScreen extends React.Component {
       </View>
       </Collapsible>
       </View>
-      <View style={styles.saleview}>
-      <TouchableOpacity onPress={this.onPressHeadDnS}>
-      <View style={styles.saleHeader}>
-      {this.state.isCollapsedDnS ? (
-        <Feather
-        name="circle"
-        style={{
-          width: Layout.moderateScale(30),
-            height: Layout.moderateScale(30),
-            fontSize: Layout.moderateScale(30),
-            color: '#c8c8c8',
-        }}
-        />
-      ) : (
-        <RedioSelected
-        width={Layout.moderateScale(30)}
-        height={Layout.moderateScale(30)}
-        />
-      )}
-      <Text style={styles.txtfacetoFace}>Sale & Barter</Text>
-      </View>
-      </TouchableOpacity>
-      {this.state.isCollapsedDnS ? null : (
-        <View style={styles.bottomline} />
-      )}
-      <Collapsible collapsed={this.state.isCollapsedDnS}>
-      <View style={styles.saleChild}>
-      <Text style={styles.txtsubtxt}>Sale</Text>
-      <View style={styles.subFacetoFace}>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Currency</Text>
-      <Dropdown
-      data={dataCurrency}
-      labelHeight={0}
-      dropdownPosition={0}
-      baseColor="rgba(0, 0, 0, .00)"
-      containerStyle={styles.dateDropDown}
-        onChangeText={(value, index, data) => this.setState({postCurrency: text})}
-      />
-      </View>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Additional Cost</Text>
-      <Item style={styles.txtInput} regular>
-      <Input keyboardType="numeric" onChangeText={(text) => this.setState({postCost: text})}  />
-      </Item>
-      </View>
-      </View>
-      <CheckBox
-      style={styles.chboxRemember}
-      onClick={() => _this.onClick(temp)}
-      isChecked={true}
-      checkBoxColor={'#fff'}
-      rightText={'Allow counter offer'}
-      rightTextStyle={{
-        color: 'black',
-          fontSize: 20,
-          marginLeft: 20,
-      }}
-      unCheckedImage={
-        <Ionicons
-        name="ios-square-outline"
-        size={Layout.moderateScale(20)}
-        color="black"
-        style={styles.cancle}
-        />
-      }
-      checkedImage={
-        <Ionicons
-        name="ios-checkbox-outline"
-        size={Layout.moderateScale(20)}
-        color="black"
-        style={styles.cancle}
-        />
-      }
-      />
-      </View>
-      <View style={styles.bottomlineShort} />
-      <Text style={styles.txtsubtxt}>Barter</Text>
-      <View style={styles.subFacetoFace}>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Price</Text>
-      <Item style={styles.txtInput} regular>
-      <Input  keyboardType="numeric"/>
-      </Item>
-      </View>
+
+
 
       </View>
-      </Collapsible>
-      </View>
-      </View>
+
       <View style={styles.deliveryOption}>
       <Text style={styles.txtDelOpt}>Delivery Options</Text>
       <View style={styles.faceToFace}>
@@ -1228,53 +1159,18 @@ export default class CreateNewItemScreen extends React.Component {
       </View>
       </View>
 
-      <View style={styles.Descrip}>
-
-      <Text style={styles.txtTitle}>Description</Text>
-      <Item style={styles.txtInput} regular>
-      <Input
-      multiline={true}
-      style={{
-        height: Layout.HEIGHT * 0.1,
-          marginBottom: Layout.HEIGHT * 0.015,
-      }}
-      onChangeText={text => { this.setState({ longDesc:text }); }}
-       maxLength={1024}
-      />
-      <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
-      </Item>
-      </View>
 
 
       <View style={styles.categoty}>
+
       <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Category</Text>
-      <View>
-      <View style={styles.categoryTxtView}>
 
-      <TouchableOpacity  onPress={this.onShow}>
-      {this.state.selectedCateName === null ?   <Text regular>Select Category</Text> : (
-        <Text regular>{this.state.selectedCateName}</Text>
-      )}
-
-        </TouchableOpacity>
-        </View>
-      <ModalFilterPicker
-          key={1}
-          visible={this.state.visible}
-          onSelect={this.onSelect}
-          onCancel={this.onCancel}
-          selectedOption={""+this.state.selectedCateId}
-          options={this.state.allCategoryValueList}
-
-        />
-      </View>
 
       <Text style={styles.txtTitles}>Templates</Text>
       <View>
       <View style={styles.categoryTxtView}>
 
-      <TouchableOpacity  onPress={this.onShowTemplate}>
+      <TouchableOpacity  onPress={this.onShowTemplate}   style={styles.selectionInput}>
       {this.state.selectedTemplateName === null ?   <Text regular>Select Template</Text> : (
         <Text regular>{this.state.selectedTemplateName}</Text>
       )}
@@ -1302,8 +1198,8 @@ export default class CreateNewItemScreen extends React.Component {
 
       <View style={styles.categoryTxtView}>
 
-      <TouchableOpacity  onPress={this.onShowTags}>
-      <Text regular>Select Tag to Add</Text>
+      <TouchableOpacity  onPress={this.onShowTags}  style={styles.selectionInput}>
+      <Text regular>Select Tag</Text>
         </TouchableOpacity>
         </View>
 
@@ -1316,8 +1212,6 @@ export default class CreateNewItemScreen extends React.Component {
           options={this.state.allTagList}
         />
       )}
-
-
               <View>
                 <ListView
                   horizontal={true}
@@ -1388,8 +1282,8 @@ export default class CreateNewItemScreen extends React.Component {
     }
     this.setState({ templateVisible: false,visible:false,tagVisible:true });
   }
-  onSelect = (picked) => {
 
+  onSelect = (picked) => {
     for(var i=0;i<this.state.allCategoryValueList.length;i++){
       if(this.state.allCategoryValueList[i].key==picked){
         this.setState({
@@ -1410,7 +1304,6 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   onSelectTemplate = (picked) => {
-
     for(var i=0;i<this.state.searchTemplateValueList.length;i++){
       if(this.state.searchTemplateValueList[i].key==picked){
         var tagList=this.state.searchTemplateList[i].tags;
@@ -1429,14 +1322,11 @@ export default class CreateNewItemScreen extends React.Component {
         break;
       }
     }
-
   }
-
   onSelectTag = (picked) => {
-
+    console.log(this.state.allTagList);
     for(var i=0;i<this.state.allTagList.length;i++){
       if(this.state.allTagList[i].key==picked){
-      
         console.log("tags_ ",this.state.allTagList[i].label);
         this.setState({
           textd:picked,
@@ -1444,16 +1334,17 @@ export default class CreateNewItemScreen extends React.Component {
           selectedTagId: picked,
           tagVisible: false
         });
+      setTimeout(() => {
+        console.log("Tag Name: ",this.state.selectedTagName);
         this.onPressAddTag();
+          },150);
         break;
       }
     }
     this.setState({
       tagVisible: false
       })
-
   }
-
   onCancel = () => {
     this.setState({
       visible: false,
