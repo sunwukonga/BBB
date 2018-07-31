@@ -447,16 +447,19 @@ static navigationOptions = () => ({
   }
   checkLoginMenu=() =>{
     if(log_status==true){
-      this._handleMenu('DrawerOpen');
+      this.props.navigation.openDrawer()
+   //   this._handleMenu('DrawerOpen');
     }
     else{
       this.props.navigation.navigate('loginScreen');
 
     }
   }
+  /*
   _handleMenu(menuitem) {
     this.props.navigation.navigate(menuitem);
   }
+  */
 
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')

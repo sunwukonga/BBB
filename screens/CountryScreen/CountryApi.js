@@ -8,7 +8,7 @@ query {
   allCountries {
     isoCode,
     name,
-    tld,  
+    tld,
   }
 }`;
 
