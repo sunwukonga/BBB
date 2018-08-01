@@ -506,12 +506,23 @@ _retrieveCountry = async () => {
     }
   }
 
-  checkLoginChat = () => {
+ 
+  checkLoginChat = (item) => {
     console.log("Log Status: " + log_status);
     if( log_status == false ) {
       this.props.navigation.navigate('loginScreen');
     } else {
-      this.props.navigation.navigate('chatListScreen')
+      var recUserId_=item.user.id;
+      var listingId_=item.id;
+      var chatId_=item.chatId;
+      var chatExists=chatId_!=null;
+      this.props.navigation.navigate('chatDetailScreen', {
+              recUserId: recUserId_,
+              listingId: listingId_,
+              isChatExists:chatExists,
+              chatId:chatId_,
+            });
+
     }
   }
 
@@ -554,7 +565,7 @@ _retrieveCountry = async () => {
             ----------------> listingId = item.id
 */
 }</Text>
-          <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert("https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+"")}>
+          <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert("favorite")}>
           <View >
 
             <BBBIcon
@@ -566,7 +577,7 @@ _retrieveCountry = async () => {
             />
           </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()/* TODO: No checking, use a NavigationAction or StackAction. Auth checking should be done in ChatScreen and ChatListScreen */}>
+          <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(item)/* TODO: No checking, use a NavigationAction or StackAction. Auth checking should be done in ChatScreen and ChatListScreen */}>
           <View >
             <BBBIcon
               name="Chat"
