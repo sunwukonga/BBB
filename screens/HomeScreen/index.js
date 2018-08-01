@@ -5,6 +5,7 @@ import {
 , View
 , FlatList,ActivityIndicator
 , AsyncStorage
+, BackHandler
 } from 'react-native';
 // For creating Actions. Will move out to external file later
 import { NavigationActions } from 'react-navigation';
@@ -48,6 +49,7 @@ import getUserLikedList from './GetUserLikedListings';
 import getUserPostedList from './GetUserPostedListings';
 
 
+import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 // Get login status
 var log_status = '';
@@ -58,11 +60,16 @@ const GET_LOGIN_STATUS = gql`
            jwt_token
         }`;
 
-const NA_homeToLogin = NavigationActions.navigate({
-    routeName: 'loginScreen',
-    params: { previous_screen: 'homeScreen' },
-    //action: NavigationActions.navigate({ routeName: 'NEXT_SCREEN' }),
-  })
+const NA_HomeToLoginToDrawer = NavigationActions.navigate({
+  routeName: 'loginScreen'
+, params: { previous_screen: 'homeScreen'
+          , finalDestination: 'drawer'}
+})
+const NA_HomeToLoginToCreate = NavigationActions.navigate({
+  routeName: 'loginScreen'
+, params: { previous_screen: 'homeScreen'
+          , finalDestination: 'createNewItemScreen'}
+})
 
 const drawerStatus = 'locked-closed';
 
@@ -93,8 +100,29 @@ export default class HomeScreen extends React.Component {
     drawerLockMode: drawerStatus,
   });
 
+  onBackPress = () => {
+    console.log("onBackPress called to close drawer")
+    this.props.navigation.closeDrawer()
+    return true
+  }
+  
   constructor(props) {
     super(props);
+    const defaultGetStateForAction = MainDrawer.router.getStateForAction;
+    MainDrawer.router.getStateForAction = (action, state) => {
+      console.log('getStateForAction called');
+      if (state && action.type === 'Navigation/OPEN_DRAWER') {
+          console.log('<===============>DrawerOpen');
+        this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
+          console.log('Listener ADDED');
+      }
+      if (state && action.type === 'Navigation/DRAWER_CLOSED') {
+          console.log('<|||||||||||||||>DrawerClose');
+        this.drawerBackHandler.remove()
+          console.log('Listener REMOVED');
+      }
+      return defaultGetStateForAction(action, state);
+    };
     this.props.navigation.addListener(
       'didFocus',
       payload => {
@@ -472,7 +500,7 @@ _retrieveCountry = async () => {
   checkLogin = () =>{
     console.log("Log Status: " + log_status);
     if( log_status == false ) {
-      this.props.navigation.navigate('loginScreen');
+      this.props.navigation.dispatch(NA_HomeToLoginToCreate);
     } else{
       this.props.navigation.navigate('createNewItemScreen')
     }
@@ -493,7 +521,7 @@ _retrieveCountry = async () => {
    //   this._handleMenu('DrawerOpen');
     }
     else{
-      this.props.navigation.dispatch(NA_homeToLogin)
+      this.props.navigation.dispatch(NA_HomeToLoginToDrawer)
       //this.props.navigation.navigate('loginScreen');
     }
   }
@@ -543,7 +571,7 @@ _retrieveCountry = async () => {
             <BBBIcon
               name="Chat"
               size={Layout.moderateScale(18)}
-              color={item.chatExists ? Colors.tintColor : Colors.white}
+              color={item.chatId!==null ? Colors.tintColor : Colors.white}
               style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
           />
           </View>
