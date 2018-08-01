@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { View, Image, TouchableOpacity, BackHandler} from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Container, Content, Text, Item } from 'native-base';
 
@@ -20,6 +20,7 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider, graphql,Mutation } from "react-apollo";
 import { withClientState } from "apollo-link-state";
 
+import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 //reset the appolo cache
 export default LoggedinState = graphql(gql`
@@ -28,20 +29,68 @@ export default LoggedinState = graphql(gql`
   }
 `)(
   class extends Component {
+    constructor(props) {
+      super(props)
+
+      const defaultGetStateForAction = MainDrawer.router.getStateForAction;
+      MainDrawer.router.getStateForAction = (action, state) => {
+        console.log('getStateForAction called');
+        if (state && action.type === 'Navigation/OPEN_DRAWER') {
+            console.log('<===============>DrawerOpen');
+          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
+            console.log('Listener ADDED');
+        }
+        if (state && action.type === 'Navigation/DRAWER_CLOSED') {
+            console.log('<|||||||||||||||>DrawerClose');
+          this.drawerBackHandler.remove()
+//            BackHandler.removeEventListener("hardwareBackPress", this.onBackPress.bind(this));
+            console.log('Listener REMOVED');
+        }
+        return defaultGetStateForAction(action, state);
+      };
+      /*
+      this.props.navigation.addListener(
+        'didFocus',
+        payload => {
+      console.log("Drawer BackHandler added")
+          BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
+        }
+      )
+      this.props.navigation.addListener(
+        'willBlur',
+        payload => {
+      console.log("Drawer BackHandler removed")
+          BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+        }
+      )
+      */
+    }
+    /*
+    componentDidMount() {
+      console.log("Drawer BackHandler added")
+      BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
+    }
+    componentWillUnmount() {
+      console.log("Drawer BackHandler removed")
+      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
+    }
+    */
+    onBackPress = () => {
+      console.log("onBackPress called to close drawer")
+      this.props.navigation.closeDrawer()
+      return true
+    }
 
     onLoggedinState = () => {
       this.props.mutate({});
       console.log('onLoggedinState done');
-
-    };
+    }
 
     logout = async () => {
-
-       this.props.navigation.navigate('homeScreen');
-       console.log('clicked on logout');
-        this.onLoggedinState();
-
-   };
+      this.props.navigation.closeDrawer()
+      console.log('clicked on logout');
+      this.onLoggedinState();
+    }
 
     render() {
       const { navigation } = this.props;
@@ -62,7 +111,7 @@ export default LoggedinState = graphql(gql`
           <Content style={styles.content}>
             <Item
               style={styles.borderView}
-              onPress={() => navigation.navigate('homeScreen')}>
+              onPress={() =>  navigation.closeDrawer()}>
               <BBBIcon
                 name="Home"
                 size={Layout.moderateScale(20)}

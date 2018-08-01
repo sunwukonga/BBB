@@ -1,17 +1,24 @@
 import React from 'react';
-import { FlatList, Image, View,Platform,AsyncStorage   } from 'react-native';
 import {
-  Container,
-  Content,
-  List,
-  ListItem,
-  Body,
-  Left,
-  Right,
-  Text,
-  Button,
+  FlatList
+, Image
+, View
+, Platform
+, AsyncStorage
+} from 'react-native';
+import {
+  Container
+, Content
+, List
+, ListItem
+, Body
+, Left
+, Right
+, Text
+, Button
 } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 // custom components
 import BBBHeader from '../../components/BBBHeader/';
@@ -24,7 +31,17 @@ import Flag from 'react-native-round-flags';
 import getCountryList from './CountryApi';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 
+// Navigation Actions
+const SA_CountryToHome = StackActions.reset({
+    index: 0
+  , actions: [NavigationActions.navigate({
+      routeName: 'mainScreen'
+    , action: NavigationActions.navigate({ routeName: 'homeScreen' }) 
+  })]
+}, 300)
+
 var listItemData = [];
+
 export default class CountryScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -123,9 +140,8 @@ export default class CountryScreen extends React.Component {
       }, 250);
 
     setTimeout(() => {
-      this.props.navigation.navigate('homeScreen');
-      console.log("country clicked");
-    }, 300);
+      this.props.navigation.dispatch(SA_CountryToHome)
+    }, 250)
   }
 
   render() {
