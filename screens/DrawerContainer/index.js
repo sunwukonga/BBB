@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { View, Image, TouchableOpacity, BackHandler} from 'react-native';
+import { View, Image, TouchableOpacity} from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Container, Content, Text, Item } from 'native-base';
 
@@ -20,7 +20,7 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider, graphql,Mutation } from "react-apollo";
 import { withClientState } from "apollo-link-state";
 
-import MainDrawer from '../../navigation/MainDrawerNavigator'
+//import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 //reset the appolo cache
 export default LoggedinState = graphql(gql`
@@ -31,7 +31,7 @@ export default LoggedinState = graphql(gql`
   class extends Component {
     constructor(props) {
       super(props)
-
+/*
       const defaultGetStateForAction = MainDrawer.router.getStateForAction;
       MainDrawer.router.getStateForAction = (action, state) => {
         console.log('getStateForAction called');
@@ -43,11 +43,11 @@ export default LoggedinState = graphql(gql`
         if (state && action.type === 'Navigation/DRAWER_CLOSED') {
             console.log('<|||||||||||||||>DrawerClose');
           this.drawerBackHandler.remove()
-//            BackHandler.removeEventListener("hardwareBackPress", this.onBackPress.bind(this));
             console.log('Listener REMOVED');
         }
         return defaultGetStateForAction(action, state);
       };
+*/
       /*
       this.props.navigation.addListener(
         'didFocus',
@@ -75,11 +75,13 @@ export default LoggedinState = graphql(gql`
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
     }
     */
+    /*
     onBackPress = () => {
       console.log("onBackPress called to close drawer")
       this.props.navigation.closeDrawer()
       return true
     }
+    */
 
     onLoggedinState = () => {
       this.props.mutate({});

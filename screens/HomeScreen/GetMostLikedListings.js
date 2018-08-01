@@ -58,7 +58,7 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int){
     viewers
     likes
     liked
-    chatExists
+    chatId
     user {
       id
       firstName

@@ -1,14 +1,15 @@
 import React from 'react';
 import {
-  Image,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ListView,
-  FlatList,
-  TextInput,AsyncStorage
+  Image
+, Platform
+, ScrollView
+, StyleSheet
+, TouchableOpacity
+, View
+, ListView
+, FlatList
+, TextInput
+, AsyncStorage
 } from 'react-native';
 import {
   ActionSheet,
@@ -62,12 +63,13 @@ export default class CreateNewItemScreen extends React.Component {
 
 
     const rowHasChanged = (r1, r2) => r1 !== r2;
-    const dataObjects = [
+/*    const dataObjects = [
       { id: 'aimg0001', source: Images.logo, inputFlag: false },
       { id: 'aimg0001', source: Images.logo, inputFlag: false },
       { id: 'aimg0001', source: Images.logo, inputFlag: false },
       { id: 'aimg0001', inputFlag: true },
     ];
+    */
 
     // DataSource configured
     const ds = new ListView.DataSource({ rowHasChanged });
@@ -78,8 +80,10 @@ export default class CreateNewItemScreen extends React.Component {
     const BARTER = 'BARTER';
     const DONATE = 'DONATE';
     const SALEDONATE = 'SALEDONATE';
-
-    imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
+    
+    if (imageList.length == 0) {
+      imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
+    }
 
     this.state = {
       countryCode: '',
@@ -99,7 +103,7 @@ export default class CreateNewItemScreen extends React.Component {
       allTagIdList:[],
       allTagList:[],
       progressVisible:false,
-      dataSource: ds.cloneWithRows(dataObjects),
+      //dataSource: ds.cloneWithRows(dataObjects),
       dataSourceCates: dsCates.cloneWithRows(dataObjectsCates),
       dataSourceTags: dsTags.cloneWithRows(dataObjectsTags),
       texts: '',
@@ -222,7 +226,6 @@ export default class CreateNewItemScreen extends React.Component {
       var _data=res.data.searchTemplates;
       var tmpList=[];
       Object.keys(res.data.searchTemplates).forEach((key,index)=>{
-
             tmpList.push({label:res.data.searchTemplates[key].title,key:res.data.searchTemplates[key].id});
       });
       console.log("Array data:" , _data.length);
@@ -867,7 +870,7 @@ export default class CreateNewItemScreen extends React.Component {
 
 
     var leftComponent = (
-      <Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
+      <Button transparent onPress={() => this.props.navigation.goBack()}>
       <Icon
       name="md-arrow-back"
       size={Layout.moderateScale(18)}
@@ -945,7 +948,7 @@ export default class CreateNewItemScreen extends React.Component {
             <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
             {this.state.selectedCateName === null ?
 
-               <Text regular   >Select Category</Text>
+               <Text regular>Select Category</Text>
 
                 : (
 
@@ -958,7 +961,7 @@ export default class CreateNewItemScreen extends React.Component {
                 visible={this.state.visible}
                 onSelect={this.onSelect}
                 onCancel={this.onCancel}
-                selectedOption={""+this.state.selectedCateId}
+                selectedOption={this.state.selectedCateId}
                 options={this.state.allCategoryValueList}
 
               />
@@ -1184,7 +1187,7 @@ export default class CreateNewItemScreen extends React.Component {
           visible={this.state.templateVisible}
           onSelect={this.onSelectTemplate}
           onCancel={this.onCancel}
-            selectedOption={""+this.state.selectedTemplateName}
+            selectedOption={this.state.selectedTemplateName}
           options={this.state.searchTemplateValueList}
         />
       )}
