@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { Text, Animated, Easing, Platform } from 'react-native';
+import { Text, Animated, Easing, Platform} from 'react-native';
 import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
 
 import { Colors, Layout } from '../constants/';
@@ -27,7 +27,7 @@ import DrawerContainer from '../screens/DrawerContainer/';
 // drawer stack
 const DrawerStack = createDrawerNavigator(
   {
-    loginscreen: { screen:LoginScreen },
+//    loginscreen: { screen:LoginScreen },
     homeScreen: { screen: HomeScreen },
     favoriteScreen: { screen: FavoriteScreen },
     notificationScreen: { screen: NotificationScreen },
