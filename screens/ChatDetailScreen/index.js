@@ -5,7 +5,7 @@ import {
 	Text,
 	TouchableOpacity,
 	View,
-	KeyboardAvoidingView,
+	KeyboardAvoidingView,ScrollView,Alert,TouchableWithoutFeedback,
 } from 'react-native';
 import {
 	Container,
@@ -29,35 +29,165 @@ import BBBIcon from '../../components/BBBIcon';
 import styles from './styles';
 import { Layout, Images, Colors } from '../../constants/';
 
+import getChatMessages from './GetChatMessages';
+import sendChatMessage from './SendMessage';
+import createChat from './CreateChat';
+import { ProgressDialog } from 'react-native-simple-dialogs';
+import Toast from 'react-native-simple-toast';
+var chatIds=[];
+var chatMessageList=[];
+var listingId;
+var recUserId;
+var chatId_;
+var chatExists;
 export default class ChatDetailScreen extends React.Component {
 	constructor(props) {
 		super(props);
+		console.log(props);
+		console.log(this.props.navigation.state.params.listingId);
+		console.log(this.props.navigation.state.params.recUserId);
+		console.log(this.props.navigation.state.params.isChatExists);
+		console.log(this.props.navigation.state.params.chatId);
+		listingId=this.props.navigation.state.params.listingId;
+		recUserId=this.props.navigation.state.params.recUserId;
+		chatId_=this.props.navigation.state.params.chatId;
+		chatExists=this.props.navigation.state.params.isChatExists;
+		this.scroll = null;
 		this.state = {
 			newPost: '',
+			btnDisabled:false,
+			chatMessageList:[],
+
 		};
 	}
 
+	componentDidMount(){
+		this.setState({
+			progressVisible: true,
+		});
+		chatIds=[];
+		if(!chatExists){
+		var createChat_={"recUserId":recUserId,"listingId":listingId};
+		createChat(createChat_).then((res)=>{
+			chatId_=res.data.createChat.id;
+				chatIds.push({chatId:chatId_});
+				console.log(chatIds);
+				this.setState({
+					progressVisible: false,
+					btnDisabled:false,
+				});
+				//this.getChatMsg();
+				this.updateChatList();
+		})
+		.catch(error => {
+			console.log("Error:" + error.message);
+			this.setState({
+				progressVisible: false,
+				btnDisabled:false,
+			});
+		});
+	} else {
+			chatIds.push({chatId:chatId_});
+			this.updateChatList();
+ 	}
+}
+
+  updateChatList(){
+			this.getChatMsg();
+	/*	this.setInterval( () => {
+				if(chatId_==null){
+					this.getChatMsg();
+				}
+    }, 1500);*/
+	}
+	
+
+	getChatMsg(){
+		var variables={
+			"chatIndexes":chatIds
+		}
+		getChatMessages(variables).then((res)=>{
+
+				Object.keys(res.data.getChatMessages).forEach((key,index)=>{
+						if(res.data.getChatMessages[key].id==chatId_){
+							chatMessageList=res.data.getChatMessages[key].chatMessages;
+						}
+				});
+
+				this.setState({
+					chatMessageList:chatMessageList,
+					progressVisible: false,
+					btnDisabled:false,
+				})
+				setTimeout(() => {
+						this.scroll.scrollToEnd();
+					}, 150);
+
+		})
+		.catch(error => {
+			console.log("Error:" + error.message);
+			this.setState({
+				progressVisible: false,
+				btnDisabled:false,
+			});
+		});
+	}
+	deleteSelectedMessage(msgId){
+			Alert.alert("Delete:"+msgId)
+	}
+
+	sendChatMsg(){
+
+		if(this.state.newPost.length===0){
+			// this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
+			Toast.show("Please Enter Message",Toast.SHORT)
+				return false;
+		}
+		this.setState({
+			progressVisible: false,
+			btnDisabled:true,
+		});
+		var variables={
+  									"chatId": chatId_,
+  									"message": this.state.newPost,
+  									"lastMessageId": 0
+									}
+			sendChatMessage(variables).then((res)=>{
+					console.log(res);
+					chatMessageList=[]
+					chatMessageList=res.data.sendChatMessage
+					this.setState({
+						chatMessageList:chatMessageList,
+						progressVisible: false,
+						newPost:'',
+						btnDisabled:false,
+					})
+					setTimeout(() => {
+							this.scroll.scrollToEnd();
+						}, 150);
+
+			})
+			.catch(error =>{
+				console.log("Error:" + error.message);
+				this.setState({
+					progressVisible: false,
+					btnDisabled:false,
+				});
+			});
+
+
+
+	}
+	openMenu(id) {
+    Alert.alert("Trest"+id)
+  };
+
+	itemClicked(item){
+		var msgId=item.id;
+		  console.log(msgId);
+	}
+
 	render() {
-		var data = [
-			{
-				id: 1,
-				user_id: 1,
-				text: 'Hi !',
-				time: 'Feb 27, 10:28 AM',
-			},
-			{
-				id: 2,
-				user_id: 2,
-				text: 'Hi !',
-				time: 'Feb 27, 10:28 AM',
-			},
-			{
-				id: 3,
-				user_id: 1,
-				text: 'How are you?',
-				time: 'Feb 27, 10:28 AM',
-			},
-		];
 		var titleComponent = (
 			<View style={styles.body}>
 				<Image source={Images.tempUser} style={styles.profileImage} />
@@ -65,7 +195,7 @@ export default class ChatDetailScreen extends React.Component {
 			</View>
 		);
 		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.navigate('chatListScreen')}>
+			<Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
 				<BBBIcon
 					name="BackArrow"
 					size={Layout.moderateScale(18)}
@@ -85,14 +215,20 @@ export default class ChatDetailScreen extends React.Component {
 						Pre-loved stroller. Used twice and kept in storage.
 					</Text>
 				</View>
-				<Content style={styles.contentStyle}>
-					{data.map((item, index) => {
+				<ScrollView
+					ref={(scroll) => {this.scroll = scroll;}}>
+
+				<View style={styles.contentStyle}>
+
+					{this.state.chatMessageList.map((item, index) => {
 						return (
+							<TouchableOpacity onLongPress={this.itemClicked(item)}>
 							<View
 								key={index}
 								style={{ marginHorizontal: Layout.moderateScale(10) }}>
-								<View style={item.user_id == 1 ? styles.chat : styles.response}>
-									{item.user_id == 1 ? (
+
+								<View style={item.authorId == "1" ? styles.chat : styles.response}>
+									{item.authorId == 1 ? (
 										<BBBIcon
 											name="MsgRightSvg"
 											color={Colors.avtarBorder}
@@ -113,14 +249,17 @@ export default class ChatDetailScreen extends React.Component {
 											}}
 										/>
 									)}
-									<Text style={styles.regularSmall}>{item.text}</Text>
-									<Text style={styles.timeStyle}>{item.time}</Text>
+									<Text style={styles.regularSmall}>{item.message}</Text>
+									<Text style={styles.timeStyle}>Today</Text>
 								</View>
+
 							</View>
+	</TouchableOpacity >
 						);
 					})}
-				</Content>
 
+				</View>
+	</ScrollView>
 				<KeyboardAvoidingView behavior="padding">
 					{/*Second Section START*/}
 					<View style={styles.footerStyle}>
@@ -132,6 +271,7 @@ export default class ChatDetailScreen extends React.Component {
 							returnKeyType="done"
 							autoCapitalize="none"
 							autoCorrect={false}
+							text={this.state.newPost}
 							onChangeText={newPost => this.setState({ newPost })}
 							underlineColorAndroid="transparent"
 							placeholder="Send Message"
@@ -139,7 +279,8 @@ export default class ChatDetailScreen extends React.Component {
 						/>
 
 						<TouchableOpacity
-							onPress={() => alert('POST')}
+							onPress={() => this.sendChatMsg()}
+							 disabled={this.state.btnDisabled}
 							style={styles.postBtn}>
 							<Ionicons
 								name="md-send"
@@ -150,6 +291,12 @@ export default class ChatDetailScreen extends React.Component {
 					</View>
 					{/*Second Section END*/}
 				</KeyboardAvoidingView>
+				<ProgressDialog
+						visible={this.state.progressVisible}
+						 message="Please wait"
+						activityIndicatorSize="large"
+						activityIndicatorColor="blue"
+											 />
 			</Container>
 		);
 	}
