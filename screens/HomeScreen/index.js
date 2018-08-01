@@ -1,5 +1,7 @@
 import React from 'react';
 import { Image, TouchableOpacity, View,  FlatList,ActivityIndicator } from 'react-native';
+// For creating Actions. Will move out to external file later
+import { NavigationActions } from 'react-navigation';
 import {
   Container,
   Content,
@@ -50,6 +52,12 @@ const GET_LOGIN_STATUS = gql`
            jwt_token
         }`;
 
+const NA_homeToLogin = NavigationActions.navigate({
+    routeName: 'loginScreen',
+    params: { previous_screen: 'homeScreen' },
+    //action: NavigationActions.navigate({ routeName: 'NEXT_SCREEN' }),
+  })
+
 const drawerStatus = 'locked-closed';
 
 const App = () => (
@@ -75,12 +83,28 @@ const App = () => (
 
 export default class HomeScreen extends React.Component {
 
-static navigationOptions = () => ({
-  drawerLockMode: drawerStatus,
-});
+  static navigationOptions = () => ({
+    drawerLockMode: drawerStatus,
+  });
 
   constructor(props) {
     super(props);
+    this.props.navigation.addListener(
+      'didFocus',
+      payload => {
+        console.log('willFocus: ', payload);
+        if ( this.props.navigation.state && this.props.navigation.state.params && this.props.navigation.state.params.doAction == 'openDrawer' ) {
+          console.log("doAction contained openDrawer")
+          if ( log_status == true ) {
+            console.log("log_status was true")
+            this.props.navigation.openDrawer()
+          } else {
+            console.log("log_status was false")
+          }
+        }
+      }
+    )
+
     this.onEndReachedCalledDuringMomentum = true;
     this.visitedOnEndReachedCalledDuringMomentum = true;
     this.likedOnEndReachedCalledDuringMomentum=true;
@@ -93,7 +117,7 @@ static navigationOptions = () => ({
       mostLikedList:[],
       yourLikedList:[],
       yourVisitedList:[],
-	  countryCode:"",
+      countryCode:"",
       yourList:[],
       LoggedinState:'locked-closed',
       active: false,
@@ -366,7 +390,6 @@ static navigationOptions = () => ({
 
   componentWillReceiveProps(nextProps) {
     console.log(nextProps);
-
  }
 _retrieveCountry = async () => {
       try {
@@ -384,7 +407,7 @@ _retrieveCountry = async () => {
        }
     }
   componentDidMount(){
-	  this._retrieveCountry();
+      this._retrieveCountry();
       this._resetAllApiValues();
       this.setState({
           progressVisible: true,
@@ -397,15 +420,13 @@ _retrieveCountry = async () => {
     }, 350);
     console.log("Login Status",log_status);
     setTimeout(() => {
-      if( log_status == true )
-      {
+      if( log_status == true ) {
         this._fetchUserPostedListing();
         this._fetchUserLikedListing();
         this._fetchUserVisitedListing();
       }
         console.log("Login Status",log_status);
-			}, 350);
-
+    }, 350);
   }
 
   _resetAllApiValues(){
@@ -444,41 +465,35 @@ _retrieveCountry = async () => {
 
   checkLogin = () =>{
     console.log("Log Status: " + log_status);
-
-    if( log_status == false )
-    {
+    if( log_status == false ) {
       this.props.navigation.navigate('loginScreen');
-    }
-    else{
+    } else{
       this.props.navigation.navigate('createNewItemScreen')
     }
   }
-  checkLoginChat = () =>{
-    console.log("Log Status: " + log_status);
 
-    if( log_status == false )
-    {
+  checkLoginChat = () => {
+    console.log("Log Status: " + log_status);
+    if( log_status == false ) {
       this.props.navigation.navigate('loginScreen');
-    }
-    else{
+    } else {
       this.props.navigation.navigate('chatListScreen')
     }
   }
+
   checkLoginMenu=() =>{
     if(log_status==true){
       this.props.navigation.openDrawer()
    //   this._handleMenu('DrawerOpen');
     }
     else{
-      this.props.navigation.navigate('loginScreen');
-
+      this.props.navigation.dispatch(NA_homeToLogin)
+      //this.props.navigation.navigate('loginScreen');
     }
   }
-  /*
-  _handleMenu(menuitem) {
-    this.props.navigation.navigate(menuitem);
-  }
-  */
+  //_handleMenu(menuitem) {
+  //  this.props.navigation.navigate(menuitem);
+  //}
 
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')
@@ -491,10 +506,20 @@ _retrieveCountry = async () => {
       <View style={styles.imagesSubView}>
 
         <View>
-
-        {item.primaryImage===null || item.primaryImage.imageKey===null ?   <Image  source={Images.trollie} style={styles.rowImage} /> :
-            <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
+        { item.primaryImage===null || item.primaryImage.imageKey===null
+          ? <Image  source={Images.trollie} style={styles.rowImage} />
+          : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
         }
+<Text>{
+/*
+          TODO: Pressing favorite should make a call to:
+            likeListing(
+              listingId: Int!
+              like: Boolean = true
+            ): Boolean
+            ----------------> listingId = item.id
+*/
+}</Text>
           <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert("https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+"")}>
           <View >
 
@@ -507,7 +532,7 @@ _retrieveCountry = async () => {
             />
           </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()}>
+          <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()/* TODO: No checking, use a NavigationAction or StackAction. Auth checking should be done in ChatScreen and ChatListScreen */}>
           <View >
             <BBBIcon
               name="Chat"
@@ -526,7 +551,7 @@ _retrieveCountry = async () => {
             {item.user.profileImage===null || item.user.profileImage.imageKey===null ?   <Image  source={Images.tempUser} style={styles.userProfile} /> :
                 <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
             }
-            
+
             <View style={item.user.online ? styles.userOnline : styles.userOffline} />
           </View>
           <View style={styles.userNameSec}>
@@ -556,7 +581,7 @@ _retrieveCountry = async () => {
             <Text style={styles.ratingmsgct}> ({item.user.sellerRatingCount}) </Text>
           </View>
           <View style={styles.priceSec}>
-            <Text style={styles.pricetext}>{item.saleMode.currency.currencySymbol}{item.saleMode.price}</Text>
+            <Text style={styles.pricetext}>{item.saleMode.currency!==null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
           </View>
         </View>
 
@@ -566,6 +591,7 @@ _retrieveCountry = async () => {
 
   render() {
     var leftComponent = (
+      // TODO: Experiment-> Maybe we can openDrawer directly and pass params that will then navigate to LoginScreen
       <Button transparent onPress={() => this.checkLoginMenu() }>
         <BBBIcon
           name="Menu"
@@ -599,12 +625,14 @@ _retrieveCountry = async () => {
           <View>
             <View style={styles.searchSec}>
               <Item regular style={styles.searchItem}>
+      {/* TODO: Link with searchResultScreen where searchListings will be called */}
                 <Input
                   placeholder="What are you looking for?"
                   style={styles.mainSearch}
                   keyboardType="default"
                   returnKeyType="search"
-                  onSubmitEditing={() =>
+                  onSubmitEditing={(content) =>
+                    /* TODO: this.props.navigation.navigate('searchResultScreen', { searchTerms: content }) */
                     this.props.navigation.navigate('strollersScreen')
                   }
                 />
@@ -769,7 +797,7 @@ _retrieveCountry = async () => {
           style={styles.fabStyle}
           position="bottomRight"
           onPress={() => this.checkLogin()}
-        /*onPress={() => this.props.navigation.navigate('createNewItemScreen')}*/
+      /*onPress={() => this.props.navigation.navigate('createNewItemScreen')}*/
           >
           <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
         </Fab>

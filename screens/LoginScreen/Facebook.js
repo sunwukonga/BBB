@@ -13,7 +13,7 @@ import { Layout, Colors } from '../../constants/';
 import {Alert, Image, ImageBackground } from 'react-native';
 
 
-import { NavigationActions } from 'react-navigation';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 
 var facebook_jwt= null;
@@ -24,6 +24,25 @@ const FACEBOOK_LOGIN = gql`
   }
 `;
 
+// NA -> navigation Action
+
+const NA_LoginToHome = NavigationActions.navigate({
+    routeName: 'homeScreen',
+    params: { previous_screen: 'loginScreen'
+            , doAction: 'openDrawer' },
+    //action: NavigationActions.navigate({ routeName: 'NEXT_SCREEN' }),
+})
+const SA_LoginToHome = StackActions.reset({
+    index: 0
+  , actions: [
+        NavigationActions.navigate({
+            routeName: 'mainScreen'
+          , params: { previous_screen: 'loginScreen'
+                    , doAction: 'openDrawer' }
+          , action: NavigationActions.back()
+        })
+    ]
+})
 
 export default LoggedinState = graphql(gql`
   mutation logstatus {
@@ -65,8 +84,10 @@ export default LoggedinState = graphql(gql`
 
                 await this.onLoggedinState();
 
-                this.props.navigation.navigate('homeScreen');
-                
+                //this.props.navigation.navigate('homeScreen');
+                //this.props.navigation.dispatch(NA_loginToHome)
+                console.log("Our status should be logged in")
+                this.props.navigation.dispatch(NA_LoginToHome)
               }
               else{
                 console.log("login failed");
