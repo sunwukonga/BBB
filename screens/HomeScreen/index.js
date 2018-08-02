@@ -108,6 +108,8 @@ export default class HomeScreen extends React.Component {
   
   constructor(props) {
     super(props);
+    console.log("HOME Constructor Ran.")
+    this.drawerBackHandler = null
     const defaultGetStateForAction = MainDrawer.router.getStateForAction;
     MainDrawer.router.getStateForAction = (action, state) => {
       console.log('getStateForAction called');
@@ -447,6 +449,7 @@ _retrieveCountry = async () => {
        }
     }
   componentDidMount(){
+    console.log("HOME componentDidMount Ran.")
       this._retrieveCountry();
       this._resetAllApiValues();
       this.setState({
@@ -535,21 +538,16 @@ _retrieveCountry = async () => {
   checkLoginMenu=() =>{
     if(log_status==true){
       this.props.navigation.openDrawer()
-   //   this._handleMenu('DrawerOpen');
     }
     else{
       this.props.navigation.dispatch(NA_HomeToLoginToDrawer)
-      //this.props.navigation.navigate('loginScreen');
     }
   }
-  //_handleMenu(menuitem) {
-  //  this.props.navigation.navigate(menuitem);
-  //}
 
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')
   }
-//  item.user.profileImage.imageURL
+
   _renderItem = ({ item }) => (
 
       <TouchableOpacity
@@ -654,7 +652,8 @@ _retrieveCountry = async () => {
     );
 
     var rightComponent = (
-      <Button transparent onPress={() => this._handleMenu('categoryScreen')}>
+      <Button transparent onPress={() => this.props.navigation.navigate( 'categoryScreen' )}>
+      
         <BBBIcon
           name="CategoryIcon"
           size={Layout.moderateScale(18)}

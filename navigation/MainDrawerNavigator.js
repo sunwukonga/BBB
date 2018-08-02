@@ -25,10 +25,20 @@ import DrawerContainer from '../screens/DrawerContainer/';
 
 
 // drawer stack
-const DrawerStack = createDrawerNavigator(
+const DrawerNavigator = createDrawerNavigator(
   {
-//    loginscreen: { screen:LoginScreen },
     homeScreen: { screen: HomeScreen },
+  },
+  {
+    gesturesEnabled: false,
+    drawerWidth: Layout.WIDTH * 0.82,
+    contentComponent: props => <DrawerContainer {...props} />,
+  }
+);
+
+export default createStackNavigator(
+  {
+    homeDrawer: { screen: DrawerNavigator },
     favoriteScreen: { screen: FavoriteScreen },
     notificationScreen: { screen: NotificationScreen },
     settingScreen: { screen: SettingScreen },
@@ -44,18 +54,8 @@ const DrawerStack = createDrawerNavigator(
     profileScreen: { screen: ProfileScreen },
   },
   {
-    gesturesEnabled: false,
-    drawerWidth: Layout.WIDTH * 0.82,
-    contentComponent: props => <DrawerContainer {...props} />,
-  }
-);
-
-export default createStackNavigator(
-  {
-    DrawerStack: { screen: DrawerStack },
-  },
-  {
     headerMode: 'none',
+    initialRouteName: 'homeDrawer',
     navigationOptions: ({ navigation }) => ({
       gesturesEnabled: false,
     }),
