@@ -40,10 +40,14 @@ var listingId;
 var recUserId;
 var chatId_;
 var chatExists;
+var itemDetails;
+var user_Name:"",productTitle:"",productImg:"",userImg:"";
+var chatDetail;
+var isFromChat=false;
 export default class ChatDetailScreen extends React.Component {
 	constructor(props) {
 		super(props);
-		console.log(props);
+		console.log(this.props.navigation.state.params);
 		console.log(this.props.navigation.state.params.listingId);
 		console.log(this.props.navigation.state.params.recUserId);
 		console.log(this.props.navigation.state.params.isChatExists);
@@ -52,12 +56,19 @@ export default class ChatDetailScreen extends React.Component {
 		recUserId=this.props.navigation.state.params.recUserId;
 		chatId_=this.props.navigation.state.params.chatId;
 		chatExists=this.props.navigation.state.params.isChatExists;
+		if(this.props.navigation.state.params.itemDetails != 'undefined' && this.props.navigation.state.params.itemDetails != undefined){
+			itemDetails=this.props.navigation.state.params.itemDetails;
+		}
+		if(this.props.navigation.state.params.chatDetail != 'undefined' && this.props.navigation.state.params.chatDetail != undefined){
+			isFromChat=true;
+			chatDetail=this.props.navigation.state.params.chatDetail;
+		}
+		this.setHeaderDetails();
 		this.scroll = null;
 		this.state = {
 			newPost: '',
 			btnDisabled:false,
 			chatMessageList:[],
-
 		};
 	}
 
@@ -87,9 +98,11 @@ export default class ChatDetailScreen extends React.Component {
 			});
 		});
 	} else {
+			console.log("Chat Exists");
 			chatIds.push({chatId:chatId_});
 			this.updateChatList();
  	}
+	this.setHeaderDetails();
 }
 
   updateChatList(){
@@ -100,7 +113,7 @@ export default class ChatDetailScreen extends React.Component {
 				}
     }, 1500);*/
 	}
-	
+
 
 	getChatMsg(){
 		var variables={
@@ -174,28 +187,77 @@ export default class ChatDetailScreen extends React.Component {
 					btnDisabled:false,
 				});
 			});
+	}
 
+	setHeaderDetails(){
+		if(itemDetails!=null){
+				var _pImg="";
+				var _uImg="";
+				if(itemDetails.user.profileImage===null || itemDetails.user.profileImage.imageKey===null){
 
+				} else {
+					_uImg=itemDetails.user.profileImage.imageKey;
+				}
 
+				if(itemDetails.primaryImage===null || itemDetails.primaryImage.imageKey===null){
+
+				} else {
+					_pImg=itemDetails.primaryImage.imageKey;
+				}
+				user_Name=itemDetails.user.profileName;
+				productTitle=itemDetails.title;
+				productImg=_pImg;
+				userImg=_uImg;
+			}
+			else if(chatDetail!=null) {
+				var _pImg="";
+				var _uImg="";
+				if(chatDetail.recUser.profileImage===null || chatDetail.recUser.profileImage.imageKey===null){
+
+				} else {
+					_uImg=chatDetail.recUser.profileImage.imageKey;
+				}
+
+				if(chatDetail.listing.primaryImage===null || chatDetail.listing.imageKey===null){
+
+				} else {
+					_pImg=chatDetail.listing.primaryImage.imageKey;
+				}
+				user_Name=chatDetail.recUser.profileName;
+				productTitle=chatDetail.listing.title;
+				productImg=_pImg;
+				userImg=_uImg;
+		}
 	}
 	openMenu(id) {
     Alert.alert("Trest"+id)
   };
 
-	itemClicked(item){
+	deleteItem(item){
 		var msgId=item.id;
-		  console.log(msgId);
+		 Alert.alert("Delete "+msgId);
+	}
+
+	onBack(){
+			if(isFromChat){
+				this.props.navigation.push('ChatListScreen')
+			} else {
+				this.props.navigation.push('homeScreen')
+			}
 	}
 
 	render() {
 		var titleComponent = (
 			<View style={styles.body}>
-				<Image source={Images.tempUser} style={styles.profileImage} />
-				<Title style={styles.headerTitle}>Leza Klenk</Title>
+			{ userImg==="" ||  userImg===null
+				? <Image  source={Images.tempUser} style={styles.profileImage} />
+				: <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+userImg+""}} style={styles.profileImage} />
+			}
+				<Title style={styles.headerTitle}>{user_Name}</Title>
 			</View>
 		);
 		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
+			<Button transparent onPress={() => this.onBack()}>
 				<BBBIcon
 					name="BackArrow"
 					size={Layout.moderateScale(18)}
@@ -210,9 +272,15 @@ export default class ChatDetailScreen extends React.Component {
 					leftComponent={leftComponent}
 				/>
 				<View style={styles.notifyContainer}>
-					<Image source={Images.trollie} style={styles.notifyImage} />
+
+				{ productImg==="" || productImg===null
+					? <Image  source={Images.trollie} style={styles.notifyImage} />
+					: <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+productImg+""}} style={styles.notifyImage} />
+				}
+
+
 					<Text style={styles.regularSmall}>
-						Pre-loved stroller. Used twice and kept in storage.
+					{productTitle}
 					</Text>
 				</View>
 				<ScrollView
@@ -222,7 +290,7 @@ export default class ChatDetailScreen extends React.Component {
 
 					{this.state.chatMessageList.map((item, index) => {
 						return (
-							<TouchableOpacity onLongPress={this.itemClicked(item)}>
+							<TouchableOpacity 	key={index} onLongPress={()=> this.deleteItem(item)}>
 							<View
 								key={index}
 								style={{ marginHorizontal: Layout.moderateScale(10) }}>

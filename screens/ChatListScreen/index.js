@@ -21,8 +21,8 @@ import BBBIcon from '../../components/BBBIcon';
 //style
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
-
-
+import { ProgressDialog } from 'react-native-simple-dialogs';
+import getChatMessages from './GetChatMessages';
 
 export default class ChatListScreen extends React.Component {
 
@@ -30,33 +30,86 @@ export default class ChatListScreen extends React.Component {
 		super(props)
 		this.state = {
 			data: [],
+			chatMessageList:[],
 		}
 	}
 
+	componentDidMount(){
+		this.setState({
+			progressVisible: true,
+		});
+		this.getChatMsg();
+	}
+	getChatMsg(){
+		var variables={
+			"chatIndexes":[]
+		}
+		getChatMessages(variables).then((res)=>{
+				chatMessageList=res.data.getChatMessages;
 
+				this.setState({
+					chatMessageList:chatMessageList,
+					progressVisible: false,
+				})
+
+		})
+		.catch(error => {
+			console.log("Error:" + error.message);
+			this.setState({
+				progressVisible: false,
+			});
+		});
+	}
+
+	openChatDetailScreen = (item) => {
+      var recUserId_=item.recUser.id;
+      var listingId_=item.listing.id;
+      var chatId_=item.id;
+      var chatExists=chatId_!=null;
+      var chatDetail_ = item;
+      this.props.navigation.navigate('chatDetailScreen', {
+              recUserId: recUserId_,
+              listingId: listingId_,
+              isChatExists:chatExists,
+              chatId:chatId_,
+              chatDetail:chatDetail_,
+            });
+  }
+
+// 	style={item.counts == '0' ? styles.mainlist : styles.mainlists}
 	_renderItem = ({ item }) => (
 		<List
-			style={item.counts == '0' ? styles.mainlist : styles.mainlists}
+			style={styles.mainlist}
 			key={item.id}>
 			<ListItem
 				avatar
-				onPress={() => this.props.navigation.navigate('chatDetailScreen')}>
+				onPress={() => this.openChatDetailScreen(item)}>
 				<Left style={styles.left}>
 					<View style={styles.bebyview}>
-						<Image source={Images.tempUser} style={styles.userImage} />
+
+						{ item.recUser.profileImage===null ||  item.recUser.profileImage.imageKey===null
+							? <Image  source={Images.tempUser} style={styles.userImage} />
+							: <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.recUser.profileImage.imageKey+""}} style={styles.userImage} />
+						}
+
 					</View>
 				</Left>
 				<Body style={styles.bodys}>
 					<View style={styles.titleview}>
-						<Image source={Images.trollie} style={styles.rowImage} />
-						<Text style={styles.title}>{item.title}</Text>
+
+					{ item.listing.primaryImage===null ||  item.listing.primaryImage.imageKey===null
+						? <Image  source={Images.trollie} style={styles.rowImage} />
+						: <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.listing.primaryImage.imageKey+""}} style={styles.rowImage} />
+					}
+
+						<Text style={styles.title}>{item.listing.title}</Text>
 					</View>
 					<View style={styles.bottomline} />
 					<View style={styles.namecount}>
-						<Text style={styles.name}>{item.name}</Text>
-						{item.counts == '0' ? null : (
-							<Text style={styles.count}>{item.counts}</Text>
-						)}
+						<Text style={styles.name}>{item.recUser.profileName}</Text>
+							{item.chatMessages.length==0?null:(
+								<Text style={styles.count}>{item.chatMessages.length}</Text>
+							)}
 					</View>
 				</Body>
 			</ListItem>
@@ -64,68 +117,7 @@ export default class ChatListScreen extends React.Component {
 	);
 
 	render() {
-		var listItemData = [
-			{
-				id: 1,
-				name: 'Leza  Klenk',
-				counts: '4',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 2,
-				name: 'Leza  Klenk',
-				counts: '4',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 3,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 4,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 5,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 6,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 7,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 8,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 9,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-			{
-				id: 10,
-				name: 'Leza  Klenk',
-				counts: '0',
-				title: 'Pre-loved stoller. Used twise and kept in storage',
-			},
-		];
+
 		var leftComponent = (
 			<Button
 				transparent
@@ -141,13 +133,18 @@ export default class ChatListScreen extends React.Component {
 			<Container style={styles.container}>
 				<BBBHeader title="Chats" leftComponent={leftComponent} />
 				<Content>
-				
+
 					<FlatList
-						data={listItemData}
+						data={this.state.chatMessageList}
 						keyExtractor={listItemData => listItemData.id}
 						renderItem={this._renderItem}
 					/>
 				</Content>
+				<ProgressDialog
+            visible={this.state.progressVisible}
+             message="Please Wait..."
+            activityIndicatorSize="large"
+                       />
 			</Container>
 		);
 	}
