@@ -32,6 +32,11 @@ const NA_LoginToHome = NavigationActions.navigate({
             , doAction: 'openDrawer' },
     //action: NavigationActions.navigate({ routeName: 'NEXT_SCREEN' }),
 })
+const NA_LoginToCreate = NavigationActions.navigate({
+    routeName: 'createNewItemScreen',
+    params: { previous_screen: 'loginScreen'
+            }
+})
 const SA_LoginToHome = StackActions.reset({
     index: 0
   , actions: [
@@ -84,13 +89,23 @@ export default LoggedinState = graphql(gql`
 
                 await this.onLoggedinState();
 
-                //this.props.navigation.navigate('homeScreen');
-                //this.props.navigation.dispatch(NA_loginToHome)
                 console.log("Our status should be logged in")
-                this.props.navigation.dispatch(NA_LoginToHome)
-              }
-              else{
-                console.log("login failed");
+                if ( this.props.navigation.state && this.props.navigation.state.params ) {
+                  // Arriving from Home -> drawerOpen
+                  if ( this.props.navigation.state.params.dest == 'openDrawer' ) {
+                    this.props.navigation.dispatch(NA_LoginToHome)
+                  }
+                  // Arriving from Home -> CreateNewItemScreen
+                  if ( this.props.navigation.state.params.dest == 'createNewItemScreen' ) {
+                    this.props.navigation.dispatch(NA_LoginToCreate)
+                  }
+                }
+                // Arriving from Home(drawerOpen) -> chatList
+                // Arriving from Home -> chatDetail
+                // Arriving from productDetail -> chatDetail
+                // Arriving from 
+              } else {
+                console.log("login failed")
               }
             }}
           />
