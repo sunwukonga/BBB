@@ -62,13 +62,13 @@ const GET_LOGIN_STATUS = gql`
 
 const NA_HomeToLoginToDrawer = NavigationActions.navigate({
   routeName: 'loginScreen'
-, params: { previous_screen: 'homeScreen'
-          , finalDestination: 'drawer'}
+, params: { source: 'homeScreen'
+          , dest: 'openDrawer'}
 })
 const NA_HomeToLoginToCreate = NavigationActions.navigate({
   routeName: 'loginScreen'
-, params: { previous_screen: 'homeScreen'
-          , finalDestination: 'createNewItemScreen'}
+, params: { source: 'homeScreen'
+          , dest: 'createNewItemScreen'}
 })
 
 const drawerStatus = 'locked-closed';
@@ -111,6 +111,8 @@ export default class HomeScreen extends React.Component {
     const defaultGetStateForAction = MainDrawer.router.getStateForAction;
     MainDrawer.router.getStateForAction = (action, state) => {
       console.log('getStateForAction called');
+      console.log("ACTION: ", action)
+      console.log("STATE: ", state)
       if (state && action.type === 'Navigation/OPEN_DRAWER') {
           console.log('<===============>DrawerOpen');
         this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
@@ -126,14 +128,18 @@ export default class HomeScreen extends React.Component {
     this.props.navigation.addListener(
       'didFocus',
       payload => {
-        console.log('willFocus: ', payload);
-        if ( this.props.navigation.state && this.props.navigation.state.params && this.props.navigation.state.params.doAction == 'openDrawer' ) {
-          console.log("doAction contained openDrawer")
-          if ( log_status == true ) {
-            console.log("log_status was true")
-            this.props.navigation.openDrawer()
-          } else {
-            console.log("log_status was false")
+        console.log('didFocus: ', payload);
+        if ( this.props.navigation.state && this.props.navigation.state.params ) {
+          if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
+            console.log("DOACTION->nav.state :", this.props.navigation.state)
+            this.props.navigation.state.params = null
+            console.log("DOACTION->nav.state CLEARED :", this.props.navigation.state)
+            if ( log_status == true ) {
+              console.log("log_status was true")
+              this.props.navigation.openDrawer()
+            } else {
+              console.log("log_status was false")
+            }
           }
         }
       }
@@ -510,7 +516,7 @@ _retrieveCountry = async () => {
   checkLoginChat = (item) => {
     console.log("Log Status: " + log_status);
     if( log_status == false ) {
-      this.props.navigation.navigate('loginScreen');
+      this.props.navigation.dispatch(NA_HomeToLoginToDrawer);
     } else {
       var recUserId_=item.user.id;
       var listingId_=item.id;
