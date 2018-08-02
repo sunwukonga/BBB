@@ -191,6 +191,7 @@ export default class HomeScreen extends React.Component {
       yourLimit:10,
       yourLoadMoreCompleted:false,
       yourLoadingMore:false,
+	searchTerms:'',
 
     };
   }
@@ -681,9 +682,14 @@ _retrieveCountry = async () => {
                   style={styles.mainSearch}
                   keyboardType="default"
                   returnKeyType="search"
-                  onSubmitEditing={(content) =>
-                    /* TODO: this.props.navigation.navigate('searchResultScreen', { searchTerms: content }) */
-                    this.props.navigation.navigate('strollersScreen')
+                     onChangeText={(text) => {
+                      console.log("Title",text);
+                      this.setState({ searchTerms:text});
+                  }}
+                  onSubmitEditing={(content) =>{
+                     this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})}
+                     /*this.props.navigation.navigate('strollersScreen', { searchTerms: content })*/
+                    /*this.props.navigation.navigate('strollersScreen')*/
                   }
                 />
                 <BBBIcon name="Search" style={styles.searchicon} />
