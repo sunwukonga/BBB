@@ -43,7 +43,7 @@ var chatExists;
 export default class ChatDetailScreen extends React.Component {
 	constructor(props) {
 		super(props);
-		console.log(props);
+		console.log("PROPS: ",props);
 		console.log(this.props.navigation.state.params.listingId);
 		console.log(this.props.navigation.state.params.recUserId);
 		console.log(this.props.navigation.state.params.isChatExists);

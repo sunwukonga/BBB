@@ -538,21 +538,16 @@ _retrieveCountry = async () => {
   checkLoginMenu=() =>{
     if(log_status==true){
       this.props.navigation.openDrawer()
-   //   this._handleMenu('DrawerOpen');
     }
     else{
       this.props.navigation.dispatch(NA_HomeToLoginToDrawer)
-      //this.props.navigation.navigate('loginScreen');
     }
   }
-  //_handleMenu(menuitem) {
-  //  this.props.navigation.navigate(menuitem);
-  //}
 
   navigatess = () => {
     this.props.navigation.navigate('productDetailsScreen')
   }
-//  item.user.profileImage.imageURL
+
   _renderItem = ({ item }) => (
 
       <TouchableOpacity
@@ -657,7 +652,8 @@ _retrieveCountry = async () => {
     );
 
     var rightComponent = (
-      <Button transparent onPress={() => this._handleMenu('categoryScreen')}>
+      <Button transparent onPress={() => this.props.navigation.navigate( 'categoryScreen' )}>
+      
         <BBBIcon
           name="CategoryIcon"
           size={Layout.moderateScale(18)}
