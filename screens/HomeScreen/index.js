@@ -108,6 +108,8 @@ export default class HomeScreen extends React.Component {
   
   constructor(props) {
     super(props);
+    console.log("HOME Constructor Ran.")
+    this.drawerBackHandler = null
     const defaultGetStateForAction = MainDrawer.router.getStateForAction;
     MainDrawer.router.getStateForAction = (action, state) => {
       console.log('getStateForAction called');
@@ -447,6 +449,7 @@ _retrieveCountry = async () => {
        }
     }
   componentDidMount(){
+    console.log("HOME componentDidMount Ran.")
       this._retrieveCountry();
       this._resetAllApiValues();
       this.setState({

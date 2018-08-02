@@ -25,9 +25,8 @@ import DrawerContainer from '../screens/DrawerContainer/';
 
 
 // drawer stack
-const DrawerStack = createDrawerNavigator(
+const DrawerNavigator = createDrawerNavigator(
   {
-//    loginscreen: { screen:LoginScreen },
     homeScreen: { screen: HomeScreen },
     favoriteScreen: { screen: FavoriteScreen },
     notificationScreen: { screen: NotificationScreen },
@@ -52,7 +51,7 @@ const DrawerStack = createDrawerNavigator(
 
 export default createStackNavigator(
   {
-    DrawerStack: { screen: DrawerStack },
+    drawerNavigator: { screen: DrawerNavigator },
   },
   {
     headerMode: 'none',

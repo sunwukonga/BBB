@@ -5,14 +5,14 @@ import { createStackNavigator } from 'react-navigation';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 
 // screens
-import MainDrawerNavigator from './MainDrawerNavigator';
+import mainDrawerNavigator from './MainDrawerNavigator';
 
 import LoginScreen from '../screens/LoginScreen';
 import CounrtyScreen from '../screens/CountryScreen';
 
 const RootStackNavigator = createStackNavigator(
   {
-    mainScreen: { screen: MainDrawerNavigator },
+    mainScreen: { screen: mainDrawerNavigator },
     loginScreen: { screen: LoginScreen },
     counrtyScreen: { screen: CounrtyScreen },
   },
