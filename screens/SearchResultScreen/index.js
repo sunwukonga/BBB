@@ -7,6 +7,8 @@ import {
 	TouchableOpacity,
 	View,
 	FlatList,
+	AsyncStorage,
+	ActivityIndicator,
 } from 'react-native';
 import {
 	Container,
@@ -36,37 +38,86 @@ import IdentityVerification from '../../components/IdentityVerification';
 import Stars from '../../components/Stars';
 import getSearchProductList from './SearchListing';
 
-var searchTerms="";
+var mode="SALE",searchTerms="",rating=null,verification=null,priceMax=null,priceMin=null,categories=[],templates=[],tags=[],counterOffer=null,distance=null;
+
 export default class SearchResultScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    console.log(this.props.navigation.state.params);
     searchTerms=this.props.navigation.state.params.searchTerms;
-    this.state = {
+	  this.state = {
       searchList:[],
       progressVisible: false,
       showSearchBox:false,
+			countryCode:'',
+			page:1,
+			limit:10,
+			isLoadingMore:false,
+			loadMoreCompleted:false,
+			data:props.navigation.state.params
     }
   }
 
   componentDidMount(){
+		this._retrieveCountry();
     this.setState({
+			searchList:[],
       progressVisible: true,
     });
+		setTimeout(() => {
     this.searchProductList();
+		  }, 350);
   }
 
+	componentWillReceiveProps(nextProps) {
+		this._retrieveCountry();
+		this.setState({
+			searchList:[],
+			progressVisible: true,
+			loadMoreCompleted:false,
+			isLoadingMore:false,
+			page:1,
+		});
+		console.log("Update Props");
+		this.setState({ data: nextProps.navigation.state.params });
+		mode=nextProps.navigation.state.params.mode;
+	  rating=nextProps.navigation.state.params.rating;
+		verification=nextProps.navigation.state.params.idVerify;
+		setTimeout(() => {
+		this.searchProductList();
+		}, 350);
+	}
+	_retrieveCountry = async () => {
+	      try {
+	          const value = await AsyncStorage.getItem('countryCode');
+	          if (value !== null) {
+	            // We have data!!
+	            console.log(value);
+	            this.setState({
+	              countryCode: value
+	            });
+	          }
+	       } catch (error) {
+	         // Error retrieving data
+	         console.log(error);
+	       }
+	    }
   searchProductList(){
+ 		console.log("country code",this.state.countryCode);
+		if(this.state.loadMoreCompleted){
+			console.log("API Completed");
+			return;
+		}
     var variables={
-            "terms": [searchTerms],
-            "limit": 10,
-            "page": 1,
-            "filter": {"mode": "SALE","countryCode": "SG"}
-          }
+  							"terms": [searchTerms],
+							  "limit": this.state.limit,
+							  "page": this.state.page,
+							  "filter": {"mode": mode,"countryCode": this.state.countryCode,"rating": rating,
+							    "verification": verification,"priceMax": priceMax,"priceMin": priceMin,"categories":categories,
+							    "templates": templates,"tags": tags,"counterOffer": counterOffer,"distance": distance}
+								}
       console.log("popular "+variables);
       getSearchProductList(variables).then((res)=>{
-
         console.log("search Array length-0: "+res.data.searchListings.length);
           if(res.data.searchListings.length==0){
             this.setState({
@@ -75,10 +126,7 @@ export default class SearchResultScreen extends React.Component {
               loadMoreCompleted:true,
             });
           } else {
-          Object.keys(res.data.searchListings).forEach((key,index)=>{
-            console.log(res.data.searchListings[key].title);
 
-          });
           const data = this.state.searchList.concat(res.data.searchListings);
           let _page=this.state.page+1;
           this.setState({
@@ -247,7 +295,6 @@ export default class SearchResultScreen extends React.Component {
 
   		return (
   			<Container style={styles.container}>
-
   				<BBBHeader
   					title="Search Result"
   					leftComponent={leftComponent}
@@ -255,11 +302,17 @@ export default class SearchResultScreen extends React.Component {
   				/>
           <Content>
   					<View style={styles.liststyle}>
-            {this.state.searchList.length==0?null:
+            {this.state.searchList.length==0?(
+								<View style={{flex:1, flexDirection:'row',alignItems:'center',justifyContent:'center'}}><Text>No Result Found.</Text></View>
+						):
             <FlatList
     							data={this.state.searchList}
     							keyExtractor={listItemData => ''+listItemData.id}
     							renderItem={this._renderItem}
+									contentContainerStyle={styles.listContent}
+	                onEndReached={this.onEndReached.bind(this)}
+	                onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
+	                ListFooterComponent={this.renderFooter.bind(this)}
     						/>
             }
   					</View>
@@ -273,4 +326,18 @@ export default class SearchResultScreen extends React.Component {
   		);
   	}
 
+		/* START LOAD MORE LISTING*/
+	  renderFooter () {
+	        return this.state.isLoadingMore && !this.state.loadMoreCompleted ?   <View style={{ flex: 1,  flexDirection: 'column', padding: 10 }}>
+	            <ActivityIndicator size="small" />
+	            </View>  : null
+	    }
+	    onEndReached = ({ distanceFromEnd }) => {
+
+	      if(!this.state.isLoadingMore && !this.state.loadMoreCompleted){
+	          this.setState({ isLoadingMore: true });
+	          this.searchProductList();
+	        }
+	  }
+	/* END LOAD MORE LISTING*/
 }
