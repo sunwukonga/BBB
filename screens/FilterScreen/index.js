@@ -13,7 +13,7 @@ import {
 	Icon,
 } from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import { NavigationActions } from 'react-navigation';
 // custom components
 import Baby from '../../components/Baby';
 import CheckboxBlank from '../../components/CheckboxBlank';
@@ -32,6 +32,7 @@ import { Ionicons } from '@expo/vector-icons';
 // screen style
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
+import FilterConstants from './FilterConstants'
 
 export default class FilterScreen extends React.Component {
 	constructor(props) {
@@ -41,12 +42,59 @@ export default class FilterScreen extends React.Component {
 			truefalse: false,
 			typography: 'Please select',
 			SliderValue: 0,
+			mode:null,
+			modeItemList:FilterConstants.modeItems,
+			ratingItemList:FilterConstants.ratingItems,
+			idVerificationList:FilterConstants.idVerifications,
+			rating:null,
+			idVerification:null,
 		};
 	}
 
 	onClick(data) {
 		data.checked = !data.checked;
 		// let msg = data.checked ? 'you checked ' : 'you unchecked ';
+	}
+
+	onClickMode(data) {
+		var tmpList=this.state.modeItemList;
+		for(var i=0;i<tmpList.length;i++){
+			tmpList[i].checked=false;
+			if(data.id==tmpList[i].id){
+				tmpList[i].checked=true;
+			}
+		}
+		this.setState({
+			mode:data.title.toUpperCase(),
+			modeItemList:tmpList,
+		});
+	}
+	onClickRating(data) {
+		var tmpList=this.state.ratingItemList;
+		for(var i=0;i<tmpList.length;i++){
+			tmpList[i].checked=false;
+			if(data.id==tmpList[i].id){
+				tmpList[i].checked=true;
+			}
+		}
+		this.setState({
+			rating:data.ratingvalue,
+			ratingItemList:tmpList,
+		});
+	}
+
+	onClickIdentify(data) {
+		var tmpList=this.state.idVerificationList;
+		for(var i=0;i<tmpList.length;i++){
+			tmpList[i].checked=false;
+			if(data.id==tmpList[i].id){
+				tmpList[i].checked=true;
+			}
+		}
+		this.setState({
+			idVerification:data.ratingvalue,
+			idVerificationList:tmpList,
+		});
 	}
 
 	identifyFn(data) {
@@ -104,45 +152,20 @@ export default class FilterScreen extends React.Component {
 		const { segment } = this.state;
 
 		if (segment === 1) {
-			var items = [
-				{
-					id: 1,
-					title: 'All',
-					checked: false,
-				},
-				{
-					id: 2,
-					title: 'Sale',
-					checked: false,
-				},
-				{
-					id: 3,
-					title: 'Barter',
-					checked: false,
-				},
-				{
-					id: 4,
-					title: 'Donate',
-					checked: false,
-				},
-				{
-					id: 5,
-					title: 'Sale & Barter',
-					checked: false,
-				},
-			];
+
 			return (
 				<View key={'Mode_list'}>
 					<View style={styles.fltrTitleText}>
 						<Text style={styles.filterDetailsTitle}>Mode</Text>
 					</View>
 					<View>
-						{items.map((item, index) => {
+						{this.state.modeItemList.map((item, index) => {
 							return (
 								<View style={styles.offersListItem} key={'mode_' + index}>
 									<CheckBox
 										style={styles.chboxRemember}
-										onClick={() => this.onClick(item)}
+										isChecked={item.checked}
+										onClick={() => this.onClickMode(item)}
 										checkBoxColor={'#fff'}
 										rightText={item.title}
 										rightTextStyle={{
@@ -257,40 +280,14 @@ export default class FilterScreen extends React.Component {
 				</View>
 			);
 		} else if (segment === 3) {
-			var items = [
-				{
-					id: 1,
-					ratingvalue: 1,
-					checked: false,
-				},
-				{
-					id: 2,
-					ratingvalue: 2,
-					checked: false,
-				},
-				{
-					id: 3,
-					ratingvalue: 3,
-					checked: false,
-				},
-				{
-					id: 4,
-					ratingvalue: 4,
-					checked: false,
-				},
-				{
-					id: 5,
-					ratingvalue: 5,
-					checked: false,
-				},
-			];
+
 			return (
 				<View key={'ratings'}>
 					<View style={styles.fltrTitleText}>
 						<Text style={styles.filterDetailsTitle}>Ratings</Text>
 					</View>
 					<View>
-						{items.map((item, index) => {
+						{this.state.ratingItemList.map((item, index) => {
 							return (
 								<List
 									style={[styles.offersListItem, { flexDirection: 'row' }]}
@@ -301,7 +298,8 @@ export default class FilterScreen extends React.Component {
 										}}>
 										<CheckBox
 											style={styles.chboxRemember}
-											onClick={() => this.onClick(item)}
+											isChecked={item.checked}
+											onClick={() => this.onClickRating(item)}
 											checkBoxColor={'#fff'}
 											rightText={item.ratingvalue + ' Star'}
 											rightTextStyle={{
@@ -334,45 +332,20 @@ export default class FilterScreen extends React.Component {
 				</View>
 			);
 		} else if (segment === 4) {
-			var items = [
-				{
-					id: 1,
-					ratingvalue: 1,
-					checked: false,
-				},
-				{
-					id: 2,
-					ratingvalue: 2,
-					checked: false,
-				},
-				{
-					id: 3,
-					ratingvalue: 3,
-					checked: false,
-				},
-				{
-					id: 4,
-					ratingvalue: 4,
-					checked: false,
-				},
-				{
-					id: 5,
-					ratingvalue: 5,
-					checked: false,
-				},
-			];
+
 			return (
 				<View key={'identify'}>
 					<View style={styles.fltrTitleText}>
 						<Text style={styles.filterDetailsTitle}>Identify Verification</Text>
 					</View>
 					<View>
-						{items.map((item, index) => {
+						{this.state.idVerificationList.map((item, index) => {
 							return (
 								<View style={styles.offersListItem} key={'identify_' + index}>
 									<CheckBox
 										style={styles.chboxRemember}
-										onClick={() => this.onClick(item)}
+										isChecked={item.checked}
+										onClick={() => this.onClickIdentify(item)}
 										checkBoxColor={'#fff'}
 										rightTextView={this.identifyFn(item.ratingvalue)}
 										rightTextStyle={{
@@ -921,55 +894,18 @@ export default class FilterScreen extends React.Component {
 
 		var rightComponent = (
 			<View style={styles.rightComponentStyle}>
-				<TouchableOpacity onPress={() => alert('RESET Clicked')}>
+				<TouchableOpacity onPress={() => this.resetAllValues()}>
 					<Text style={styles.headerText}>RESET</Text>
 				</TouchableOpacity>
 				<TouchableOpacity
 					style={{ marginLeft: Layout.moderateScale(8) }}
-					onPress={() => alert('APPLY Clicked')}>
+					onPress={() => this.returnToSearchList()}>
 					<Text style={styles.headerText}>APPLY</Text>
 				</TouchableOpacity>
 			</View>
 		);
 
-		var filterItem = [
-			{
-				id: 1,
-				name: 'ModeSvg',
-			},
-			{
-				id: 2,
-				name: 'DateTimeSvg',
-			},
-			{
-				id: 3,
-				name: 'StarSvg',
-			},
-			{
-				id: 4,
-				name: 'IdentitySvg',
-			},
-			{
-				id: 5,
-				name: 'DistanceSvg',
-			},
-			{
-				id: 6,
-				name: 'CategoriesSvg',
-			},
-			{
-				id: 7,
-				name: 'TemplateSvg',
-			},
-			{
-				id: 8,
-				name: 'TagsSvg',
-			},
-			{
-				id: 9,
-				name: 'OfferSvg',
-			},
-		];
+
 
 		return (
 			<Container style={styles.container}>
@@ -982,7 +918,7 @@ export default class FilterScreen extends React.Component {
 				<View style={styles.mainContent}>
 					<Content style={styles.contents}>
 						<View style={styles.filterContentSec}>
-							{filterItem.map((item, index) => {
+							{FilterConstants.filterItem.map((item, index) => {
 								return (
 									<TouchableOpacity
 										onPress={() => this.setState({ segment: item.id })}
@@ -1019,4 +955,48 @@ export default class FilterScreen extends React.Component {
 			</Container>
 		);
 	}
+
+	returnToSearchList(){
+		this.props.navigation.navigate({
+		    routeName: 'searchResultScreen',
+		    params: { previous_screen: 'filterScreen',mode:this.state.mode,rating:this.state.rating,idVerify:this.state.idVerification}
+		});
+	}
+
+	resetAllValues(){
+
+		this.setState({
+			mode:null,
+			rating:null,
+			idVerification:null,
+		});
+		this.resetAllListValues();
+		
+	}
+
+	resetAllListValues(){
+		var modeTmpList=this.state.modeItemList;
+		for(var i=0;i<modeTmpList.length;i++){
+			modeTmpList[i].checked=false;
+		}
+
+		var ratingTmpList=this.state.ratingItemList;
+		for(var i=0;i<ratingTmpList.length;i++){
+			ratingTmpList[i].checked=false;
+		}
+
+		var idTmpList=this.state.idVerificationList;
+		for(var i=0;i<idTmpList.length;i++){
+			idTmpList[i].checked=false;
+		}
+
+		this.setState({
+			modeItemList:modeTmpList,
+			ratingItemList:ratingTmpList,
+			idVerificationList:idTmpList,
+		});
+
+	}
+
+
 }
