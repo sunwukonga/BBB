@@ -54,22 +54,35 @@ export default client = new ApolloClient({
   },
   clientState: {
     defaults: {
-        isConnected: true,
-        logged_in: false,
-        jwt_token: default_token,
+      isConnected: true
+    , logged_in: false
+    , jwt_token: default_token
+    , myProfile: {
+        __typename: 'Profile'
+      , profileName: ""
+      , profileImageURL: ""
+      }
     },
     resolvers: {
+      // Seems that queries work automatically if the data is available.
+      /*
+      Query: {
+        getProfile: (_, args, {cache}) => {
+          return myProfile
+        },
+      },
+      */
       Mutation: {
-        logstatus: (_, args, { cache }) => {
-          console.log('logstatus query fired');
-          cache.writeData({ data: { logged_in: true, jwt_token: token }});
+        setAuthStatus: (_, args, { cache }) => {
+          console.log('setLoggedIn client-side mutation fired');
+          cache.writeData({ data: { logged_in: true, jwt_token: token, myProfile: {__typename: 'Profile', profileName: args.profileName, profileImageURL: args.profileImageURL }}});
           return null;
         },
-        logout: (_, args, { cache }) => {
-        console.log('logout query fired');
-        cache.writeData({ data: { logged_in: false, jwt_token: default_token }});
-        return null;
-    }
+        unsetAuthStatus: (_, args, { cache }) => {
+          console.log('logout query fired');
+          cache.writeData({ data: { logged_in: false, jwt_token: default_token, myProfile: {__typename: 'Profile', profileName: "", profileImageURL }}});
+          return null;
+        },
       }
     }
   },
