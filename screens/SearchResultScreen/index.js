@@ -166,10 +166,14 @@ export default class SearchResultScreen extends React.Component {
 
   }
 
+
   _renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.imagesSubView}
-      onPress={() => this.props.navigation.navigate('productDetailsScreen')}>
+      onPress={() =>   this.props.navigation.navigate({
+		        routeName: 'productDetailsScreen',
+		        params: { previous_screen: 'searchResultScreen',item:item}
+		    })}>
       <View>
       { item.primaryImage===null || item.primaryImage.imageKey===null
         ? <Image  source={Images.trollie} style={styles.rowImage} />
