@@ -556,7 +556,8 @@ _retrieveCountry = async () => {
 
         <View>
         { item.primaryImage===null || item.primaryImage.imageKey===null
-          ? <Image  source={Images.trollie} style={styles.rowImage} />
+         // ? <Image  source={Images.trollie} style={styles.rowImage} />
+          ? <Baby style={styles.rowImage} />
           : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
         }
 <Text>{
@@ -597,8 +598,10 @@ _retrieveCountry = async () => {
           <View style={styles.userProfileSec}>
 
 
-            {item.user.profileImage===null || item.user.profileImage.imageKey===null ?   <Image  source={Images.tempUser} style={styles.userProfile} /> :
-                <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+            {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
+                //<Image  source={Images.tempUser} style={styles.userProfile} /> 
+                <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
             }
 
             <View style={item.user.online ? styles.userOnline : styles.userOffline} />
