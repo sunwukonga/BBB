@@ -50,7 +50,7 @@ import getUserPostedList from './GetUserPostedListings';
 
 import getQuickMostRecentList from './GetQuickMostRecentListings';
 import getProfile from './GetProfile';
-
+import likeProductApi from './LikeProductApi';
 import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 
@@ -198,6 +198,50 @@ export default class HomeScreen extends React.Component {
 
     };
   }
+  sendLikeRequest(item){
+		this.setState({
+				progressVisible:true,
+		})
+
+    var _like=!item.liked;
+    console.log("Is Liked",_like);
+		var variables={"listingId": item.id,"like": _like}
+		likeProductApi(variables).then((res)=>{
+
+        if(res.data.likeListing){
+          var mostVisitedList=this.state.mostVisitedList;
+          for(var i=0;i<mostVisitedList.length;i++){
+            if(mostVisitedList[i].id==item.id){
+              console.log("Selected Id: ",item.id);
+                console.log("Is Liked - 1: ",_like);
+                console.log("Selected Item Id","ID:"+item.id+", ID:"+mostVisitedList[i].id+", liked value : "+mostVisitedList[i].liked);
+              mostVisitedList[i].liked=_like;
+              console.log(mostVisitedList[i]);
+            }
+          }
+
+          var _count=this.state.count+1;
+
+            this.setState({
+              mostVisitedList:mostVisitedList,
+              progressVisible:false,
+              count:_count,
+            })
+
+        //  this._resetAllListValues();
+
+        }
+
+		})
+		.catch(error => {
+      this.setState({
+				progressVisible: false,
+			});
+			console.log("Error:" + error.message);
+			Toast.show(error.message,Toast.SHORT);
+
+		});
+	}
 
   _fetchMostRecentListing = async () => {
 
@@ -551,7 +595,10 @@ _retrieveCountry = async () => {
   _renderItem = ({ item }) => (
 
       <TouchableOpacity
-        onPress={ () => this.props.navigation.navigate('productDetailsScreen', { item: item })}>
+        onPress={ () => this.props.navigation.navigate({
+        routeName: 'productDetailsScreen',
+        params: { previous_screen: 'homeScreen',item:_item}
+    }) }>
       <View style={styles.imagesSubView}>
 
         <View>
@@ -570,7 +617,7 @@ _retrieveCountry = async () => {
             ----------------> listingId = item.id
 */
 }</Text>
-          <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert("favorite")}>
+          <TouchableOpacity style={styles.favoriteIconSec} onPress={() => this.sendLikeRequest(item)}>
           <View >
 
             <BBBIcon
