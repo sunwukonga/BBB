@@ -59,20 +59,21 @@ const SA_LoginToHome = StackActions.reset({
 })
 
 export default LoggedinState = graphql(gql`
-  mutation setAuthStatus( $profileName: String!, $profileImageURL: String ) {
-    setAuthStatus( profileName: $profileName, profileImageURL: $profileImageURL ) @client
+  mutation setAuthStatus( $token: String!, $profileName: String!, $profileImageURL: String ) {
+    setAuthStatus( token: $token, profileName: $profileName, profileImageURL: $profileImageURL ) @client
   }
 `)(
   class extends Component {
 
-    onLoggedinState = ( user ) => {
+    onLoggedinState = ( data ) => {
+      let user = data.user
       if (user.profileImage.imageKey) {
         // Image is stored with us, need s3Url + imageKey
-        this.props.mutate({ variables: {__typename: 'Profile', profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
+        this.props.mutate({ variables: {token: data.token, profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
       } else if (user.profileImage.imageURL) {
-        this.props.mutate({ variables: {__typename: 'Profile', profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
+        this.props.mutate({ variables: {token: data.token, profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
       } else {
-        this.props.mutate({ variables: {__typename: 'Profile', profileName: user.profileName, profileImageURL: null}});
+        this.props.mutate({ variables: {token: data.token, profileName: user.profileName, profileImageURL: null}});
       }
     };
 
@@ -102,8 +103,7 @@ export default LoggedinState = graphql(gql`
                 Expo.SecureStore.setItemAsync('token', data.data.loginFacebook.token);
 
                 console.log('data.data.loginFacebook '+JSON.stringify(data.data.loginFacebook));
-
-                await this.onLoggedinState(data.data.loginFacebook.user);
+                await this.onLoggedinState(data.data.loginFacebook);
 
                 console.log("Our status should be logged in")
                 if ( this.props.navigation.state && this.props.navigation.state.params ) {
