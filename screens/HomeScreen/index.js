@@ -48,6 +48,7 @@ import getUserVisitedList from './GetUserVisitedListings';
 import getUserLikedList from './GetUserLikedListings';
 import getUserPostedList from './GetUserPostedListings';
 
+import getQuickMostRecentList from './GetQuickMostRecentListings';
 import getProfile from './GetProfile';
 
 import MainDrawer from '../../navigation/MainDrawerNavigator'
@@ -208,7 +209,7 @@ export default class HomeScreen extends React.Component {
         "countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page
       }
       console.log("popular "+variables);
-      return getMostRecentList(variables).then((res)=>{
+      return getQuickMostRecentList(variables).then((res)=>{
           if(res.data.getMostRecentListings.length==0){
             this.setState({
               progressVisible: false,
@@ -216,11 +217,9 @@ export default class HomeScreen extends React.Component {
               loadMoreCompleted:true,
             });
           } else {
-          Object.keys(res.data.getMostRecentListings).forEach((key,index)=>{
-            console.log(res.data.getMostRecentListings[key].title);
-
-
-          });
+//          Object.keys(res.data.getMostRecentListings).forEach((key,index)=>{
+//            console.log(res.data.getMostRecentListings[key].title);
+//          });
           const data = this.state.mostRecentList.concat(res.data.getMostRecentListings);
           let _page=this.state.page+1;
           this.setState({
