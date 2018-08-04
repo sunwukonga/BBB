@@ -48,8 +48,11 @@ import getUserVisitedList from './GetUserVisitedListings';
 import getUserLikedList from './GetUserLikedListings';
 import getUserPostedList from './GetUserPostedListings';
 
+import getQuickMostRecentList from './GetQuickMostRecentListings';
+import getProfile from './GetProfile';
 
 import MainDrawer from '../../navigation/MainDrawerNavigator'
+
 
 // Get login status
 var log_status = '';
@@ -113,8 +116,6 @@ export default class HomeScreen extends React.Component {
     const defaultGetStateForAction = MainDrawer.router.getStateForAction;
     MainDrawer.router.getStateForAction = (action, state) => {
       console.log('getStateForAction called');
-      console.log("ACTION: ", action)
-      console.log("STATE: ", state)
       if (state && action.type === 'Navigation/OPEN_DRAWER') {
           console.log('<===============>DrawerOpen');
         this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
@@ -130,15 +131,14 @@ export default class HomeScreen extends React.Component {
     this.props.navigation.addListener(
       'didFocus',
       payload => {
-        console.log('didFocus: ', payload);
         if ( this.props.navigation.state && this.props.navigation.state.params ) {
           if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
-            console.log("DOACTION->nav.state :", this.props.navigation.state)
-            this.props.navigation.state.params = null
-            console.log("DOACTION->nav.state CLEARED :", this.props.navigation.state)
             if ( log_status == true ) {
-              console.log("log_status was true")
-              this.props.navigation.openDrawer()
+              getProfile()
+              .then( myProfile => {
+                this.props.navigation.state.params = myProfile
+                this.props.navigation.openDrawer()
+              })
             } else {
               console.log("log_status was false")
             }
@@ -159,19 +159,23 @@ export default class HomeScreen extends React.Component {
       mostLikedList:[],
       yourLikedList:[],
       yourVisitedList:[],
-      countryCode:"",
       yourList:[],
+
+      countryCode:"",
       LoggedinState:'locked-closed',
       active: false,
       progressVisible:false,
-      limit:10,
+
       page:1,
-      isLoadingMore:false,
-      visitedLoadingMore:false,
+      limit:10,
       loadMoreCompleted:false,
-      visitedLoadMoreCompleted:false,
-      visitedLimit:10,
+      isLoadingMore:false,
+
       visitedPage:1,
+      visitedLimit:10,
+      visitedLoadMoreCompleted:false,
+      visitedLoadingMore:false,
+
       likedPage:1,
       likedLimit:10,
       likedLoadMoreCompleted:false,
@@ -191,12 +195,11 @@ export default class HomeScreen extends React.Component {
       yourLimit:10,
       yourLoadMoreCompleted:false,
       yourLoadingMore:false,
-	searchTerms:'',
 
     };
   }
 
-  _fetchMostRecentListing() {
+  _fetchMostRecentListing = async () => {
 
       if(this.state.loadMoreCompleted){
         console.log("popular Completed");
@@ -206,7 +209,7 @@ export default class HomeScreen extends React.Component {
         "countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page
       }
       console.log("popular "+variables);
-      getMostRecentList(variables).then((res)=>{
+      return getQuickMostRecentList(variables).then((res)=>{
           if(res.data.getMostRecentListings.length==0){
             this.setState({
               progressVisible: false,
@@ -214,11 +217,9 @@ export default class HomeScreen extends React.Component {
               loadMoreCompleted:true,
             });
           } else {
-          Object.keys(res.data.getMostRecentListings).forEach((key,index)=>{
-            console.log(res.data.getMostRecentListings[key].title);
-
-
-          });
+//          Object.keys(res.data.getMostRecentListings).forEach((key,index)=>{
+//            console.log(res.data.getMostRecentListings[key].title);
+//          });
           const data = this.state.mostRecentList.concat(res.data.getMostRecentListings);
           let _page=this.state.page+1;
           this.setState({
@@ -241,7 +242,7 @@ export default class HomeScreen extends React.Component {
       });
   }
 
-  _fetchMostVisitedListing() {
+  _fetchMostVisitedListing = async () => {
 
       if(this.state.visitedLoadMoreCompleted){
         console.log("Visited Completed");
@@ -251,7 +252,7 @@ export default class HomeScreen extends React.Component {
         "countryCode":this.state.countryCode,"limit":this.state.visitedLimit,"page":this.state.visitedPage
       }
       console.log("visited: "+variables);
-      getMostVisitedList(variables).then((res)=>{
+      return getMostVisitedList(variables).then((res)=>{
           if(res.data.getMostVisitedListings.length==0){
             this.setState({
               visitedLoadingMore:false,
@@ -438,8 +439,6 @@ _retrieveCountry = async () => {
       try {
           const value = await AsyncStorage.getItem('countryCode');
           if (value !== null) {
-            // We have data!!
-            console.log(value);
             this.setState({
               countryCode: value
             });
@@ -451,26 +450,26 @@ _retrieveCountry = async () => {
     }
   componentDidMount(){
     console.log("HOME componentDidMount Ran.")
-      this._retrieveCountry();
-      this._resetAllApiValues();
+    this._retrieveCountry()
+    .then( () => {
+      this._resetAllApiValues()
       this.setState({
           progressVisible: true,
-      });
-    setTimeout(() => {
-      this._fetchMostRecentListing();
-      this._fetchMostVisitedListing();
-      this._fetchMostLikedListing();
-
-    }, 350);
-    console.log("Login Status",log_status);
-    setTimeout(() => {
-      if( log_status == true ) {
-        this._fetchUserPostedListing();
-        this._fetchUserLikedListing();
-        this._fetchUserVisitedListing();
-      }
-        console.log("Login Status",log_status);
-    }, 350);
+      })
+      this._fetchMostRecentListing()
+      .then( () => {
+        this._fetchMostVisitedListing()
+        this._fetchMostLikedListing()
+        setTimeout(() => {
+          if( log_status == true ) {
+            this._fetchUserPostedListing()
+            this._fetchUserLikedListing()
+            this._fetchUserVisitedListing()
+          }
+          console.log("Login Status",log_status)
+        }, 350)
+      })
+    })
   }
 
   _resetAllApiValues(){
@@ -552,12 +551,13 @@ _retrieveCountry = async () => {
   _renderItem = ({ item }) => (
 
       <TouchableOpacity
-        onPress={ ()=>this.navigatess()}>
+        onPress={ () => this.props.navigation.navigate('productDetailsScreen', { item: item })}>
       <View style={styles.imagesSubView}>
 
         <View>
         { item.primaryImage===null || item.primaryImage.imageKey===null
-          ? <Image  source={Images.trollie} style={styles.rowImage} />
+         // ? <Image  source={Images.trollie} style={styles.rowImage} />
+          ? <Baby style={styles.rowImage} />
           : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
         }
 <Text>{
@@ -598,8 +598,10 @@ _retrieveCountry = async () => {
           <View style={styles.userProfileSec}>
 
 
-            {item.user.profileImage===null || item.user.profileImage.imageKey===null ?   <Image  source={Images.tempUser} style={styles.userProfile} /> :
-                <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+            {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
+                //<Image  source={Images.tempUser} style={styles.userProfile} /> 
+                <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
             }
 
             <View style={item.user.online ? styles.userOnline : styles.userOffline} />
@@ -641,7 +643,6 @@ _retrieveCountry = async () => {
 
   render() {
     var leftComponent = (
-      // TODO: Experiment-> Maybe we can openDrawer directly and pass params that will then navigate to LoginScreen
       <Button transparent onPress={() => this.checkLoginMenu() }>
         <BBBIcon
           name="Menu"
@@ -662,8 +663,6 @@ _retrieveCountry = async () => {
         />
       </Button>
     );
-    //console.log(this.state.data);
-    //console.log(listItemData);
     return (
       <Container>
       <App />
@@ -682,14 +681,9 @@ _retrieveCountry = async () => {
                   style={styles.mainSearch}
                   keyboardType="default"
                   returnKeyType="search"
-                     onChangeText={(text) => {
-                      console.log("Title",text);
-                      this.setState({ searchTerms:text});
-                  }}
-                  onSubmitEditing={(content) =>{
-                     this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})}
-                     /*this.props.navigation.navigate('strollersScreen', { searchTerms: content })*/
-                    /*this.props.navigation.navigate('strollersScreen')*/
+                  onSubmitEditing={(content) =>
+                    /* TODO: this.props.navigation.navigate('searchResultScreen', { searchTerms: content }) */
+                    this.props.navigation.navigate('strollersScreen')
                   }
                 />
                 <BBBIcon name="Search" style={styles.searchicon} />
@@ -719,131 +713,109 @@ _retrieveCountry = async () => {
                 Post it with us and well give you an audience.
               </Text>
             </View>
-            <View style={styles.imagesMainView}>
-              <View style={styles.populerSec}>
-                <Text style={styles.populerText}>
-                  Most Visited Items
-                </Text>
-              </View>
-              {this.state.mostVisitedList.length == 0 ?
-                <Text style={styles.noDataText}>
-                  No Data Found
-                </Text>
-                :
-              <FlatList
-                horizontal={true}
-                data={this.state.mostVisitedList}
-                renderItem={this._renderItem}
-                contentContainerStyle={styles.listContent}
-                onEndReached={this.visited_onEndReached.bind(this)}
-                onMomentumScrollBegin={() => { this.visitedOnEndReachedCalledDuringMomentum = false; }}
-                keyExtractor={(item, index) => index.toString()}
-                ListFooterComponent={this.visited_renderFooter.bind(this)}
-              />
-              }
-            </View>
 
-            <View style={styles.imagesMainView}>
-              <View style={styles.populerSec}>
-                <Text style={styles.populerText}>
-                  Most Liked Items
-                </Text>
+            { this.state.mostVisitedList.length > 0 &&
+              <View style={styles.imagesMainView}>
+                <View style={styles.populerSec}>
+                  <Text style={styles.populerText}>
+                    Most Visited Items
+                  </Text>
+                </View>
+                <FlatList
+                  horizontal={true}
+                  data={this.state.mostVisitedList}
+                  renderItem={this._renderItem}
+                  contentContainerStyle={styles.listContent}
+                  onEndReached={this.visited_onEndReached.bind(this)}
+                  onMomentumScrollBegin={() => { this.visitedOnEndReachedCalledDuringMomentum = false; }}
+                  keyExtractor={(item, index) => index.toString()}
+                  ListFooterComponent={this.visited_renderFooter.bind(this)}
+                />
               </View>
-              {this.state.mostLikedList.length == 0 ?
-                <Text style={styles.noDataText}>
-                  No Data Found
-                </Text>
-                :
-              <FlatList
-                horizontal={true}
-                data={this.state.mostLikedList}
-                renderItem={this._renderItem}
-                contentContainerStyle={styles.listContent}
-                onEndReached={this.liked_onEndReached.bind(this)}
-                onMomentumScrollBegin={() => { this.likedOnEndReachedCalledDuringMomentum = false; }}
-                keyExtractor={(item, index) => index.toString()}
-                ListFooterComponent={this.liked_renderFooter.bind(this)}
-              />
-              }
-            </View>
+            }
 
-            {log_status == true ?
+            { this.state.mostLikedList.length > 0 &&
+              <View style={styles.imagesMainView}>
+                <View style={styles.populerSec}>
+                  <Text style={styles.populerText}>
+                    Most Liked Items
+                  </Text>
+                </View>
+                <FlatList
+                  horizontal={true}
+                  data={this.state.mostLikedList}
+                  renderItem={this._renderItem}
+                  contentContainerStyle={styles.listContent}
+                  onEndReached={this.liked_onEndReached.bind(this)}
+                  onMomentumScrollBegin={() => { this.likedOnEndReachedCalledDuringMomentum = false; }}
+                  keyExtractor={(item, index) => index.toString()}
+                  ListFooterComponent={this.liked_renderFooter.bind(this)}
+                />
+              </View>
+            }
 
-            <View style={styles.imagesMainView}>
-              <View style={styles.populerSec}>
-                <Text style={styles.populerText}>
-                  Your Recently Visited
-                </Text>
-              </View>
-              {this.state.yourVisitedList.length == 0 ?
-                <Text style={styles.noDataText}>
-                  No Data Found
-                </Text>
-                :
-              <FlatList
-                horizontal={true}
-                data={this.state.yourVisitedList}
-                renderItem={this._renderItem}
-                contentContainerStyle={styles.listContent}
-                onEndReached={this.your_visited_onEndReached.bind(this)}
-                onMomentumScrollBegin={() => { this.yourVisitedOnEndReachedCalledDuringMomentum = false; }}
-                keyExtractor={(item, index) => index.toString()}
-                ListFooterComponent={this.your_visited_renderFooter.bind(this)}
-              />
-              }
-            </View>
-            : null }
-            { log_status ?
-           <View style={styles.imagesMainView}>
-              <View style={styles.populerSec}>
-                <Text style={styles.populerText}>
-                  Your Recently Liked
-                </Text>
-              </View>
-              {this.state.yourLikedList.length == 0 ?
-                <Text style={styles.noDataText}>
-                  No Data Found
-                </Text>
-                :
-              <FlatList
-                horizontal={true}
-                data={this.state.yourLikedList}
-                renderItem={this._renderItem}
-                contentContainerStyle={styles.listContent}
-                onEndReached={this.your_liked_onEndReached.bind(this)}
-                onMomentumScrollBegin={() => { this.yourLikedOnEndReachedCalledDuringMomentum = false; }}
-                keyExtractor={(item, index) => index.toString()}
-                ListFooterComponent={this.your_visited_renderFooter.bind(this)}
-              />
-              }
-            </View>
-            : null }
+            { log_status == true &&
 
-              { log_status ?
-            <View style={styles.imagesMainView}>
-              <View style={styles.populerSec}>
-                <Text style={styles.populerText}>
-                  Your Listings
-                </Text>
-              </View>
-              {this.state.yourList.length == 0 ?
-                <Text style={styles.noDataText}>
-                  No Data Found
-                </Text>
-                :
-              <FlatList
-                horizontal={true}
-                data={this.state.yourList}
-                renderItem={this._renderItem}
-                contentContainerStyle={styles.listContent}
-                onEndReached={this.your_onEndReached.bind(this)}
-                onMomentumScrollBegin={() => { this.yourOnEndReachedCalledDuringMomentum = false; }}
-                keyExtractor={(item, index) => index.toString()}
-                ListFooterComponent={this.your_renderFooter.bind(this)}
-              />
-              }
-            </View>
-            : null }
+              [( this.state.yourVisitedList.length > 0 &&
+                <View style={styles.imagesMainView}>
+                  <View style={styles.populerSec}>
+                    <Text style={styles.populerText}>
+                      Your Recently Visited
+                    </Text>
+                  </View>
+                  <FlatList
+                    horizontal={true}
+                    data={this.state.yourVisitedList}
+                    renderItem={this._renderItem}
+                    contentContainerStyle={styles.listContent}
+                    onEndReached={this.your_visited_onEndReached.bind(this)}
+                    onMomentumScrollBegin={() => { this.yourVisitedOnEndReachedCalledDuringMomentum = false; }}
+                    keyExtractor={(item, index) => index.toString()}
+                    ListFooterComponent={this.your_visited_renderFooter.bind(this)}
+                  />
+                </View>
+              ),
+
+              ( this.state.yourLikedList.length > 0 &&
+                <View style={styles.imagesMainView}>
+                  <View style={styles.populerSec}>
+                    <Text style={styles.populerText}>
+                      Your Recently Liked
+                    </Text>
+                  </View>
+                  <FlatList
+                    horizontal={true}
+                    data={this.state.yourLikedList}
+                    renderItem={this._renderItem}
+                    contentContainerStyle={styles.listContent}
+                    onEndReached={this.your_liked_onEndReached.bind(this)}
+                    onMomentumScrollBegin={() => { this.yourLikedOnEndReachedCalledDuringMomentum = false; }}
+                    keyExtractor={(item, index) => index.toString()}
+                    ListFooterComponent={this.your_visited_renderFooter.bind(this)}
+                  />
+                </View>
+              ),
+
+              ( this.state.yourList.length > 0 &&
+                <View style={styles.imagesMainView}>
+                  <View style={styles.populerSec}>
+                    <Text style={styles.populerText}>
+                      Your Listings
+                    </Text>
+                  </View>
+                  <FlatList
+                    horizontal={true}
+                    data={this.state.yourList}
+                    renderItem={this._renderItem}
+                    contentContainerStyle={styles.listContent}
+                    onEndReached={this.your_onEndReached.bind(this)}
+                    onMomentumScrollBegin={() => { this.yourOnEndReachedCalledDuringMomentum = false; }}
+                    keyExtractor={(item, index) => index.toString()}
+                    ListFooterComponent={this.your_renderFooter.bind(this)}
+                  />
+                </View>
+              )]
+            }
 
           </View>
         </Content>

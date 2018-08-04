@@ -24,7 +24,6 @@ export default StyleSheet.create({
 		marginTop: Layout.moderateScale(10),
 	},
 	userName: {
-		width: Layout.WIDTH * 0.28,
 		textAlign: 'center',
 		color: Colors.secondaryColor,
 		fontSize: Layout.moderateScale(16),

@@ -8,7 +8,7 @@ import BBBIcon from '../../components/BBBIcon';
 
 // screen style
 import styles from './styles';
-import { Layout, Images, Colors } from '../../constants/';
+import { Layout, Images, Colors, Urls } from '../../constants/';
 
 
 //apollo client
@@ -24,13 +24,41 @@ import { withClientState } from "apollo-link-state";
 
 //reset the appolo cache
 export default LoggedinState = graphql(gql`
-  mutation logout {
-    logout @client
+  mutation unsetAuthStatus {
+    unsetAuthStatuslogout @client
   }
 `)(
   class extends Component {
     constructor(props) {
       super(props)
+      /*
+      this.props.navigation.addListener(
+        'willFocus',
+        payload => {
+          console.log("BBBBBBBBBBBBBBBBBBBBBBBB")
+          getProfile()
+          .then( res => {
+            console.log("AAAAAAAAAAAAA: ", res)
+              if (res.data.getProfile.profileName == 0) {
+                this.setState({
+                  profileName: res.data.getProfile.profileName,
+                })
+              }
+              if (res.data.getProfile.profileImage) {
+                this.setState({
+                  profileImageURL:  Urls.s3ImagesUrl + res.data.getProfile.profileImage.imageKey,
+                })
+              }
+          })
+        }
+      )
+*/
+      /*
+      this.state({
+        profileName: ""
+      , profileImage: null
+      })
+      */
 /*
       const defaultGetStateForAction = MainDrawer.router.getStateForAction;
       MainDrawer.router.getStateForAction = (action, state) => {
@@ -50,9 +78,8 @@ export default LoggedinState = graphql(gql`
 */
       /*
       this.props.navigation.addListener(
-        'didFocus',
+        'willFocus',
         payload => {
-      console.log("Drawer BackHandler added")
           BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
         }
       )
@@ -67,9 +94,24 @@ export default LoggedinState = graphql(gql`
     }
     /*
     componentDidMount() {
-      console.log("Drawer BackHandler added")
-      BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
+      console.log("BBBBBBBBBBBBBBBBBBBBBBBB")
+      getProfile()
+      .then( res => {
+        console.log("AAAAAAAAAAAAA: ", res)
+          if (res.data.getProfile.profileName == 0) {
+            this.setState({
+              profileName: res.data.getProfile.profileName,
+            })
+          }
+          if (res.data.getProfile.profileImage) {
+            this.setState({
+              profileImageURL:  Urls.s3ImagesUrl + res.data.getProfile.profileImage.imageKey,
+            })
+          }
+      })
     }
+*/
+    /*
     componentWillUnmount() {
       console.log("Drawer BackHandler removed")
       BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
@@ -94,20 +136,33 @@ export default LoggedinState = graphql(gql`
       this.onLoggedinState();
     }
 
+    doesProfileExist = ( name ) => {
+      if (this.props.navigation.state.routes && this.props.navigation.state.routes.length > 0) {
+        if (this.props.navigation.state.routes[0].params && this.props.navigation.state.routes[0].params.data && this.props.navigation.state.routes[0].params.data.myProfile ) {
+          if (this.props.navigation.state.routes[0].params.data.myProfile[name]) {
+            return true
+          }
+        }
+      }
+      return false
+    }
+
     render() {
       const { navigation } = this.props;
       return (
         <Container style={styles.container} {...this.props}>
             <View style={styles.usersDetailsSec}>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('ProfileScreen')}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('profileScreen')}>
               <Image style={styles.userImage}
-                   source={Images.tempUser} />
+                   source={this.doesProfileExist('profileImageURL') ? {uri: navigation.state.routes[0].params.data.myProfile.profileImageURL} : Images.tempUser} />
             </TouchableOpacity>
             <View style={styles.usersDetails}>
-              <Text style={styles.userName}>Leza Klenk</Text>
+              <Text style={styles.userName}>{this.doesProfileExist('profileName') ? navigation.state.routes[0].params.data.myProfile.profileName : ""}</Text>
+              {/*
               <Text style={styles.tokenText}>
                 BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>
               </Text>
+              */}
             </View>
           </View>
           <Content style={styles.content}>

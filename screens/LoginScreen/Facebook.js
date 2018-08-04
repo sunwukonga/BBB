@@ -9,7 +9,7 @@ import { ApolloLink } from "apollo-link";
 import gql from "graphql-tag";
 
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Layout, Colors } from '../../constants/';
+import { Layout, Colors, Urls } from '../../constants/';
 import {Alert, Image, ImageBackground } from 'react-native';
 
 
@@ -20,7 +20,16 @@ var facebook_jwt= null;
 
 const FACEBOOK_LOGIN = gql`
   mutation loginFacebook($token: String!) {
-    loginFacebook(token: $token)
+    loginFacebook(token: $token) {
+      token
+      user {
+        profileName
+        profileImage {
+          imageKey
+          imageURL
+        }
+      }
+    }
   }
 `;
 
@@ -50,14 +59,21 @@ const SA_LoginToHome = StackActions.reset({
 })
 
 export default LoggedinState = graphql(gql`
-  mutation logstatus {
-    logstatus @client
+  mutation setAuthStatus( $profileName: String!, $profileImageURL: String ) {
+    setAuthStatus( profileName: $profileName, profileImageURL: $profileImageURL ) @client
   }
 `)(
   class extends Component {
 
-    onLoggedinState = () => {
-      this.props.mutate({});
+    onLoggedinState = ( user ) => {
+      if (user.profileImage.imageKey) {
+        // Image is stored with us, need s3Url + imageKey
+        this.props.mutate({ variables: {__typename: 'Profile', profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
+      } else if (user.profileImage.imageURL) {
+        this.props.mutate({ variables: {__typename: 'Profile', profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
+      } else {
+        this.props.mutate({ variables: {__typename: 'Profile', profileName: user.profileName, profileImageURL: null}});
+      }
     };
 
     render() {
@@ -83,11 +99,11 @@ export default LoggedinState = graphql(gql`
                   variables: { token: token },
                 });
                 //TODO: Add this returned token to securestore and then navigate on.
-                Expo.SecureStore.setItemAsync('token', data.data.loginFacebook);
+                Expo.SecureStore.setItemAsync('token', data.data.loginFacebook.token);
 
-                console.log('jwt from data.data.loginFacebook '+JSON.stringify(data.data.loginFacebook));
+                console.log('data.data.loginFacebook '+JSON.stringify(data.data.loginFacebook));
 
-                await this.onLoggedinState();
+                await this.onLoggedinState(data.data.loginFacebook.user);
 
                 console.log("Our status should be logged in")
                 if ( this.props.navigation.state && this.props.navigation.state.params ) {

@@ -121,9 +121,9 @@ export default class ChatListScreen extends React.Component {
 		var leftComponent = (
 			<Button
 				transparent
-				onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+				onPress={() => this.props.navigation.goBack()}>
 				<BBBIcon
-					name="Menu"
+					name="BackArrow"
 					size={Layout.moderateScale(18)}
 					color={Colors.white}
 				/>
