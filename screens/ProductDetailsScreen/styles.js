@@ -311,4 +311,10 @@ export default StyleSheet.create({
 		fontSize: Layout.moderateScale(14),
 		fontFamily: 'roboto-bold',
 	},
+	activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 80
+  },
 });

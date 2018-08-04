@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, TouchableOpacity, View, ListView ,FlatList} from 'react-native';
+import { Image, TouchableOpacity, View, ListView ,FlatList,ActivityIndicator} from 'react-native';
 import {
 	Container,
 	Content,
@@ -11,13 +11,16 @@ import {
 } from 'native-base';
 import Swiper from 'react-native-swiper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import { NavigationActions } from 'react-navigation';
+import { ProgressDialog } from 'react-native-simple-dialogs';
+import Toast from 'react-native-simple-toast';
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
 import IdentityVerification2 from '../../components/IdentityVerification2';
+import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
-
+import Stars from '../../components/Stars';
 // style
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
@@ -30,6 +33,9 @@ import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider, graphql,Mutation } from "react-apollo";
 import { withClientState } from "apollo-link-state";
+
+import getProductDetails from './GetProductDetails';
+import likeProductApi from './LikeProductApi';
 
 
 // Get login status
@@ -71,17 +77,23 @@ const App = () => (
   }}
 </Query>
 )
-
-
+const NA_HomeToLoginToDrawer = NavigationActions.navigate({
+  routeName: 'loginScreen'
+, params: { source: 'productDetailsScreen'
+          , dest: 'productDetailsScreen'}
+})
+var itemDetails;
 export default class ProductDetailsScreen extends React.Component {
 
 	static navigationOptions = () => ({
 	  drawerLockMode: drawerStatus,
 	});
 
-
 	constructor(props) {
 		super(props);
+
+	//	console.log(this.props.navigation.state.params.item);
+		itemDetails=this.props.navigation.state.params.item;
 		const rowHasChanged = (r1, r2) => r1 !== r2;
 		const dataObjects = [
 			{ id: 'aimg0001', source: Images.trollie, flag: false },
@@ -94,20 +106,118 @@ export default class ProductDetailsScreen extends React.Component {
 		this.state = {
 			dataSource: ds.cloneWithRows(dataObjects),
 			active: false,
+			itemData:itemDetails,
+			progressVisible:false,
+			swipeImageList:[],
+			dataLoaded:false,
+			isLiked:false,
 		};
 	}
 
-	checkLoginChat = () =>{
-		console.log("Log Status: " + log_status);
-
-		if( log_status == false )
-		{
-			this.props.navigation.navigate('loginScreen');
-		}
-		else{
-			this.props.navigation.navigate('chatListScreen')
-		}
+	componentDidMount(){
+		this.setState({
+			progressVisible:true,
+		})
+		setTimeout(() => {
+			this.getItemDetails();
+		}, 250);
 	}
+
+
+	getItemDetails(){
+		var variables={"id": itemDetails.id}
+		getProductDetails(variables).then((res)=>{
+
+				var data=res.data.getListing;
+				console.log("Response");
+				console.log(data);
+				this.setState({
+						itemData:data,
+						progressVisible:false,
+						dataLoaded:true,
+				})
+			setTimeout(() => {
+					this.populateData();
+				}, 150);
+		})
+		.catch(error => {
+			console.log("Error:" + error.message);
+			this.setState({
+				progressVisible: false,
+			});
+		});
+	}
+
+	sendLikeRequest(item){
+		this.setState({
+
+				progressVisible:true,
+
+		})
+		var variables={"listingId": item.id,"like": !this.state.isLiked}
+
+		likeProductApi(variables).then((res)=>{
+
+				var like=!this.state.isLiked;
+				//res.data.likeListing;
+
+				this.setState({
+						isLiked:like,
+				})
+
+				this.setState({
+							progressVisible:false,
+					})
+		})
+		.catch(error => {
+			console.log("Error:" + error.message);
+			Toast.show(error.message,Toast.SHORT);
+			this.setState({
+				progressVisible: false,
+			});
+		});
+	}
+
+	populateData(){
+		var tmpImgList=[];
+		if(this.state.itemData.primaryImage!=null){ // && this.state.itemData.primaryImage.imageKey!=null
+			tmpImgList.push({id:this.state.itemData.primaryImage.id,post:this.state.itemData.primaryImage.imageKey});
+		}
+		if(this.state.itemData.secondaryImages!=null){
+				for(var i=0;i<this.state.itemData.secondaryImages.length;i++){
+					tmpImgList.push({id:this.state.itemData.secondaryImages[i].id,post:this.state.itemData.secondaryImages[i].imageKey});
+				}
+		}
+		console.log("Image length",tmpImgList.length);
+		if(tmpImgList.length==0){
+				tmpImgList.push({id:1,post:null});
+		}
+		var like=this.state.itemData.liked;
+		this.setState({
+			swipeImageList:tmpImgList,
+			isLiked:like,
+		})
+	}
+
+
+	checkLoginChat = (item) => {
+    console.log("Log Status: " + log_status);
+    if( log_status == false ) {
+      this.props.navigation.dispatch(NA_HomeToLoginToDrawer);
+    } else {
+      var recUserId_=item.user.id;
+      var listingId_=item.id;
+      var chatId_=item.chatId;
+      var chatExists=chatId_!=null;
+      this.props.navigation.navigate('chatDetailScreen', {
+              recUserId: recUserId_,
+              listingId: listingId_,
+              isChatExists:chatExists,
+              chatId:chatId_,
+            });
+
+    }
+  }
 
 
 	_handleMenu(menuName) {
@@ -131,7 +241,7 @@ export default class ProductDetailsScreen extends React.Component {
 							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 						/>
 					</View>
-					  <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat()}>
+					  <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(item)}>
 					<View >
 						<BBBIcon
 							name="Chat"
@@ -202,43 +312,14 @@ export default class ProductDetailsScreen extends React.Component {
 			</TouchableOpacity>
 );
 
-	starRating() {
-		var temp = [];
-		for (var i = 0; i < 5; i++) {
-			temp.push(
-				<BBBIcon
-					key={i}
-					name="Star"
-					size={Layout.moderateScale(14)}
-					style={styles.starstyle}
-				/>
-			);
-		}
-		return temp;
-	}
 
 	render() {
-		var data = [
-			{
-				id: 1,
-				post: Images.trollie,
-			},
-			{
-				id: 2,
-				post: Images.trollie,
-			},
-			{
-				id: 3,
-				post: Images.trollie,
-			},
-			{
-				id: 4,
-				post: Images.trollie,
-			},
-		];
 
+		var imageData = this.state.swipeImageList;
+		var productData=this.state.itemData;
+		console.log(imageData);
 		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.navigate('homeScreen')}>
+			<Button transparent onPress={() => this.props.navigation.goBack()}>
 				<BBBIcon
 					name="BackArrow"
 					size={Layout.moderateScale(18)}
@@ -256,61 +337,92 @@ export default class ProductDetailsScreen extends React.Component {
 				/>
 			</Button>
 		);
-		var listItemData = [
-			{ id: '1', source: Images.trollie, flag: false },
-			{ id: '2', source: Images.trollie, flag: false },
-		];
+		if (!this.state.dataLoaded) {
+		return (
+			<Container style={styles.container}>
+
+				<BBBHeader
+					title={this.state.itemData.title}
+					leftComponent={leftComponent}
+				/>
+
+				<View style={{flex: 1, paddingTop: 20}}>
+					<ActivityIndicator
+						size="large"
+						style={styles.activityIndicator} />
+				</View>
+			</Container>
+		);
+		}
 		return (
 			<Container style={styles.container}>
 			  <App />
+
 				<BBBHeader
-					title="Bebe Bargains"
+					title={this.state.itemData.title}
 					leftComponent={leftComponent}
-					rightComponent={rightComponent}
 				/>
+
+
 				<Content style={styles.contentStyle}>
 					<Content style={styles.contentSwiper}>
 						<Swiper
 							style={styles.swiperSec}
 							dot={<View style={styles.dotStyle} />}
 							activeDot={<View style={styles.activeDotStyle} />}>
-							{data.map((item, index) => {
+
+							{imageData.map((item, index) => {
 								return (
 									<View key={index} style={styles.slide}>
-										<Image source={item.post} style={styles.rowImage} />
-										<View style={styles.favoriteIconSec}>
+
+									{item.post===null ?   <Image  source={Images.trollie}  style={styles.rowImage} /> :
+											<Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.post+""}} style={styles.rowImage} />
+									}
+											<TouchableOpacity style={styles.favoriteIconSec} onPress={() => this.sendLikeRequest(productData)}>
+										<View >
 											<BBBIcon
 												name="Favorite"
 												size={Layout.moderateScale(18)}
-												color={Colors.white}
+												color={this.state.isLiked ? Colors.tintColor : Colors.white}
 												style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 											/>
 										</View>
-										<View style={styles.chatIconSec}>
+											</TouchableOpacity>
+										<TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(productData)}>
+
+										<View>
 											<BBBIcon
 												name="Chat"
 												size={Layout.moderateScale(18)}
-												color={Colors.white}
+												color={productData.chatId!=null ? Colors.tintColor : Colors.white}
 												style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 											/>
 										</View>
+											</TouchableOpacity>
 									</View>
 								);
 							})}
+
 						</Swiper>
 					</Content>
 					<View style={styles.profileContainer}>
 						<View style={styles.alignment}>
 							<View style={styles.ImageContainer}>
-								<Image source={Images.tempUser} style={styles.profileImage} />
-								<View style={styles.activeDot} />
+
+
+								{productData.user.profileImage===null || productData.user.profileImage.imageKey===null ?   <Image  source={Images.tempUser} style={styles.userProfile} /> :
+										<Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+productData.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+								}
+								  <View style={productData.user.online ? styles.activeDot : styles.userOffline} />
 							</View>
-							<Text style={styles.mediumFont}>Best Buys</Text>
+							<Text style={styles.mediumFont}>{productData.user.profileName}</Text>
 						</View>
 						<View style={styles.progressStyle}>
-							<IdentityVerification2
+
+							<IdentityVerification
 								width={Layout.moderateScale(30)}
 								height={Layout.moderateScale(30)}
+								level={productData.user.idVerification}
 							/>
 						</View>
 					</View>
@@ -318,109 +430,131 @@ export default class ProductDetailsScreen extends React.Component {
 					<View style={styles.deviderStyle} />
 
 					<Text style={styles.regularSmall}>
-						Pre-loved stroller. Used twice and kept in stoage.
+						{productData.description}
 					</Text>
 					<View style={styles.profileContainer}>
 						<View style={styles.alignment}>
-							{this.starRating()}
-							<Text style={styles.rateCount}>(52)</Text>
+
+							<Stars
+	              size={Layout.moderateScale(14)}
+	              styleOn={{ color: Colors.starcolor, marginTop: Layout.moderateScale(2) }}
+	              styleOff={{ color: Colors.lightGray, marginTop: Layout.moderateScale(2) }}
+	              repeats={productData.user.sellerRating}
+	            />
+							<Text style={styles.rateCount}>({productData.user.sellerRatingCount})</Text>
 						</View>
-						<Text style={styles.skyFontBold}>$250</Text>
+						<Text style={styles.skyFontBold}>
+							{productData.saleMode.currency!==null ? productData.saleMode.currency.currencySymbol : ""}{productData.saleMode.price!==null ? productData.saleMode.price : ""}
+						</Text>
 					</View>
 
 					<View style={styles.alignmentButton}>
+						{productData.saleMode.mode=="BARTER" ? (
 						<TouchableOpacity
 							style={styles.barterButton}
 							onPress={() => alert('BARTER')}>
 							<Text style={styles.regularSmall}>BARTER</Text>
 						</TouchableOpacity>
+							) : null}
+							{productData.saleMode.mode=="COUNTER" ? (
 						<TouchableOpacity
 							style={styles.offerButton}
 							onPress={() => alert('COUNTER OFFER')}>
 							<Text style={styles.regularSmall}>COUNTER OFFER</Text>
 						</TouchableOpacity>
+							) : null}
+							{productData.saleMode.mode=="SALE" ? (
+							<TouchableOpacity
+								style={styles.offerButton}
+								onPress={() => alert('SALE')}>
+								<Text style={styles.regularSmall}>SALE</Text>
+							</TouchableOpacity>
+								) : null}
 					</View>
 
 					<View>
 						<Text style={styles.regularLarge}>Category</Text>
 						<Text style={[styles.regularSmall, styles.tagContainer]}>
-							Baby Stroller
+
+							{productData.category.name}
 						</Text>
-						<Text style={styles.regularLarge}>Template</Text>
-						<View style={styles.tagContainer}>
-							<View style={styles.alignmentTag}>
-								<Text style={styles.regularSmall}>Di-2046</Text>
-								<Icon
-									name="close"
-									size={Layout.moderateScale(10)}
-									style={styles.closeIcon}
-									onPress={() => alert('Close')}
-								/>
+
+						{productData.template==null? null :(
+							<View>
+								<Text style={styles.regularLarge}>Template</Text>
+								<View style={styles.tagContainer}>
+								  <View style={styles.alignmentTag}>
+										<Text style={styles.regularSmall}>{productData.template.title}</Text>
+										<Icon
+											name="close"
+											size={Layout.moderateScale(10)}
+											style={styles.closeIcon}
+											onPress={() => alert(productData.template.description)}
+										/>
+								</View>
 							</View>
-							<View style={styles.alignmentTag}>
-								<Text style={styles.regularSmall}>Di-2047</Text>
-								<Icon
-									name="close"
-									size={Layout.moderateScale(10)}
-									style={styles.closeIcon}
-									onPress={() => alert('Close')}
-								/>
 							</View>
-						</View>
+					)}
 						<Text style={styles.regularLarge}>Tags</Text>
 						<View style={styles.tagContainer}>
-							<View style={styles.alignmentTag}>
-								<Text style={styles.regularSmall}>Stroller</Text>
-								<Icon
-									name="close"
-									size={Layout.moderateScale(10)}
-									style={styles.closeIcon}
-									onPress={() => alert('Close')}
-								/>
-							</View>
-							<View style={styles.alignmentTag}>
-								<Text style={styles.regularSmall}>Stroller-Green</Text>
-								<Icon
-									name="close"
-									size={Layout.moderateScale(10)}
-									style={styles.closeIcon}
-									onPress={() => alert('Close')}
-								/>
-							</View>
+						{productData.tags.map((item, index) => {
+							return (
+								<View style={styles.alignmentTag}>
+									<Text style={styles.regularSmall}>{item.name}</Text>
+									<Icon
+										name="close"
+										size={Layout.moderateScale(10)}
+										style={styles.closeIcon}
+										onPress={() => alert(item.name)}
+									/>
+								</View>
+							)
+						})}
+
 						</View>
 					</View>
 
 					<View style={styles.deviderStyle} />
+
+					{productData.saleMode.exchangeModes==null || productData.saleMode.exchangeModes.length==0? null : (
 
 					<View>
 						<Text style={styles.boldFont}>Delivery Options</Text>
-						<View style={styles.profileContainer}>
-							<View>
-								<Text style={styles.skyFontMedium}>Face to Face</Text>
-								<Text
-									style={[styles.regularSmall, { width: Layout.WIDTH * 0.3 }]}>
-									71 Pilgrim Avenue Chevy Chase, MD 20815
-								</Text>
+
+						{productData.saleMode.exchangeModes.map((item, index) => {
+							return (
+
+								<View style={styles.profileContainer}>
+									<View>
+										<Text style={styles.skyFontMedium}>{item.mode=='FACE'?'Face to Face':'Registered Post'}</Text>
+										<Text
+											style={styles.regularSmall}>
+											{item.mode=='POST' ?
+												'Additional Cost '+item.currency.currencySymbol+" : "+item.price
+											 :
+												item.location.lineOne+", "+item.location.lineTwo+', '+item.location.postcode
+											}
+										</Text>
+									</View>
+									{item.mode=='FACE'?(
+									<Ionicons
+										name="md-locate"
+										size={Layout.moderateScale(20)}
+										color="#1fa6a4"
+									/>
+								):null}
+
+								</View>
+							)
+						})}
+
+							<View style={styles.deviderStyle} />
 							</View>
-							<Ionicons
-								name="md-locate"
-								size={Layout.moderateScale(20)}
-								color="#1fa6a4"
-							/>
-						</View>
-					</View>
 
-					<View style={styles.deviderStyle} />
-
-					<View>
-						<Text style={styles.skyFontMedium}>Registered Post</Text>
-						<Text style={[styles.regularSmall, { width: Layout.WIDTH * 0.3 }]}>
-							Additional Cost USD $3.00
-						</Text>
-					</View>
-
-					<View style={styles.deviderStyle} />
-
+					)}
+					{
+						/*
+						<View style={styles.deviderStyle} />
 					<View style={styles.imagesMainView}>
 						<View style={styles.populerSec}>
 							<Text style={styles.populerText}>Related Products</Text>
@@ -432,25 +566,15 @@ export default class ProductDetailsScreen extends React.Component {
 							renderItem={this._renderItem}
 							contentContainerStyle={styles.listContent}
 						/>
-						{/*
-							<ListView
-							horizontal={true}
-							contentContainerStyle={styles.listContent}
-							dataSource={this.state.dataSource}
-							renderRow={this._renderRow}
-							enableEmptySections
-						/>
+							</View>*/
+					}
 
-						<ListView
-							horizontal={true}
-							contentContainerStyle={styles.listContent}
-							dataSource={this.state.dataSource}
-							renderRow={this._renderRow}
-							enableEmptySections
-						/>
-						*/}
-					</View>
 				</Content>
+				<ProgressDialog
+						visible={this.state.progressVisible}
+						 message="Please Wait..."
+						activityIndicatorSize="large"
+											 />
 			</Container>
 		);
 	}
