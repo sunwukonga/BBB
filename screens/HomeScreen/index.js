@@ -551,7 +551,7 @@ _retrieveCountry = async () => {
   _renderItem = ({ item }) => (
 
       <TouchableOpacity
-        onPress={ ()=>this.navigatess()}>
+        onPress={ () => this.props.navigation.navigate('productDetailsScreen', { item: item })}>
       <View style={styles.imagesSubView}>
 
         <View>
