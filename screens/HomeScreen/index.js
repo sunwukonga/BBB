@@ -63,6 +63,159 @@ const GET_LOGIN_STATUS = gql`
            jwt_token
         }`;
 
+// TESTING Incremental Loading with fetchMore
+const GET_MOST_RECENT_LIST = gql`
+query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
+  getMostRecentListings(countryCode:$countryCode,limit:$limit,page:$page){
+
+    id
+    title
+    description
+    primaryImage {
+      id
+      imageKey
+    }
+    secondaryImages {
+      id
+      imageKey
+    }
+    saleMode {
+      price
+      counterOffer
+      currency {
+        symbolPrepend
+        disabled
+        currencyName
+        currencySymbol
+      }
+      mode
+      exchangeModes {
+        price
+      }
+    }
+    template {
+      id
+      title
+      description
+      primaryImage {
+        id
+      }
+      secondaryImages {
+        id
+      }
+      tags{
+        name
+      }
+    }
+
+    tags{
+      name
+    }
+
+    viewers
+    likes
+    liked
+    chatId
+    user {
+      id
+      firstName
+      lastName
+      profileName
+      profileImage {
+        id
+        imageURL
+        imageKey
+      }
+      chats {
+        id
+      }
+      sellerRating
+      sellerRatingCount
+      online
+      idVerification
+    }
+  }
+}`;
+/*
+              <FlatList
+                horizontal={true}
+                data={this.state.mostRecentList}
+                renderItem={this._renderItem}
+                contentContainerStyle={styles.listContent}
+                onEndReached={this.onEndReached.bind(this)}
+                onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
+                keyExtractor={(item, index) => index.toString()}
+                ListFooterComponent={this.renderFooter.bind(this)}
+              />
+              */
+
+    //{({ data, fetchMore, networkStatus }) => {
+const ListRecentListings = ( variables, renderFunc ) => (
+  <Query
+    query = {GET_MOST_RECENT_LIST}
+    variables = {variables}
+    fetchPolicy="cache-and-network"
+  >
+    {({ data, fetchMore, networkStatus, refetch, error, variables }) => {
+      //console.log("Data: ", JSON.stringify(data))
+      if (networkStatus === 1) {
+        return <ActivityIndicator size="large" />;
+      }
+
+      if (error) {
+        return <Text>Error: {error.message}</Text>;
+      }
+      console.log("networkStatus: ", networkStatus)
+      console.log("error: ", error)
+      console.log("variables: ", variables)
+      console.log("New page: ", (data.getMostRecentListings.length / variables.limit >> 0) + 1)
+      return (
+        <FlatList
+          horizontal = {true}
+          contentContainerStyle={styles.listContent}
+          //onEndReached={this.onEndReached.bind(this)}
+          //onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
+          keyExtractor={(item, index) => index.toString()}
+          //ListFooterComponent={this.renderFooter.bind(this)}
+
+          data = {data.getMostRecentListings || []}
+          renderItem={renderFunc}
+          //renderItem={({ item }) =>
+          //   <PureListItem item={item} />
+          //}
+         // renderItem={this._renderItem}
+          onEndReachedThreshold={0.5}
+          refreshing={networkStatus === 4}
+          onRefresh={() => refetch()}
+          onEndReached={() =>
+            fetchMore({
+              variables: {
+              //  countryCode: variables.countryCode,
+              //  limit: variables.limit,
+                page: (data.getMostRecentListings.length / variables.limit >> 0) + 1
+              },
+              updateQuery: (prev, { fetchMoreResult }) => {
+          //console.log("PREV: ", JSON.stringify(prev))
+          //console.log("fetchMoreResult: ", JSON.stringify(fetchMoreResult))
+                console.log("*****************************updateQuery called")
+                if (!fetchMoreResult) return prev
+                return { 
+                  getMostRecentListings:
+                    prev.getMostRecentListings
+                    .concat(fetchMoreResult.getMostRecentListings)
+                    .filter( (item, index, items) => {
+                      return !index || item.id != items[index - 1].id     
+                    })
+                }
+              }
+            })
+          }
+        />
+      )
+    }}
+  </Query>
+)
+
 const NA_HomeToLoginToDrawer = NavigationActions.navigate({
   routeName: 'loginScreen'
 , params: { source: 'homeScreen'
@@ -497,11 +650,13 @@ _retrieveCountry = async () => {
     this._retrieveCountry()
     .then( () => {
       this._resetAllApiValues()
+/*
       this.setState({
           progressVisible: true,
       })
-      this._fetchMostRecentListing()
-      .then( () => {
+      */
+      //this._fetchMostRecentListing()
+      //.then( () => {
         this._fetchMostVisitedListing()
         this._fetchMostLikedListing()
         setTimeout(() => {
@@ -512,7 +667,7 @@ _retrieveCountry = async () => {
           }
           console.log("Login Status",log_status)
         }, 350)
-      })
+     // })
     })
   }
 
@@ -741,16 +896,9 @@ _retrieveCountry = async () => {
               <View style={styles.populerSec}>
                 <Text style={styles.populerText}>Most Recent Items</Text>
               </View>
-              <FlatList
-                horizontal={true}
-                data={this.state.mostRecentList}
-              	renderItem={this._renderItem}
-                contentContainerStyle={styles.listContent}
-                onEndReached={this.onEndReached.bind(this)}
-                onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
-                keyExtractor={(item, index) => index.toString()}
-                ListFooterComponent={this.renderFooter.bind(this)}
-              />
+
+              { ListRecentListings( {"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}, this._renderItem )}
+
             </View>
             <View style={styles.adSec}>
               <Text style={styles.mainadText}>
