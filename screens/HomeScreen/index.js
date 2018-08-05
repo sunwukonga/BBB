@@ -49,15 +49,21 @@ import getUserLikedList from './GetUserLikedListings';
 import getUserPostedList from './GetUserPostedListings';
 
 import ListRecentListings from './ListRecentListings'
+import ListVisitedListings from './ListVisitedListings'
+import ListLikedListings from './ListLikedListings'
+import ListUserVisitedListings from './ListUserVisitedListings'
+import ListUserLikedListings from './ListUserLikedListings'
+import ListUserPostedListings from './ListUserPostedListings'
 
 import getQuickMostRecentList from './GetQuickMostRecentListings';
 import getProfile from './GetProfile';
 import likeProductApi from './LikeProductApi';
 import MainDrawer from '../../navigation/MainDrawerNavigator'
 
+import UpdateLoginState from './UpdateLoginState'
 
 // Get login status
-var log_status = '';
+//var login_status = '';
 var mostRecentList=[];
 const GET_LOGIN_STATUS = gql`
      query log @client{
@@ -78,26 +84,6 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
 
 const drawerStatus = 'locked-closed';
 
-const App = () => (
-<Query query={GET_LOGIN_STATUS}>
-  {({ loading, error, data }) => {
-     if (loading) return <Text>{`Loading...`}</Text>;
-     if (error) return <Text>{`Error: ${error}`}</Text>;
-
-      log_status = data.logged_in;
-	//	drawerStatus = 'unlocked';
-      if(log_status==true){
-        drawerStatus = 'unlocked';
-      }
-      else{
-      drawerStatus = 'locked-closed';
-      }
-    return (
-      <View/>
-    )
-  }}
-</Query>
-)
 
 export default class HomeScreen extends React.Component {
 
@@ -135,14 +121,15 @@ export default class HomeScreen extends React.Component {
       payload => {
         if ( this.props.navigation.state && this.props.navigation.state.params ) {
           if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
-            if ( log_status == true ) {
+            if ( this.state.loginStatus ) {
+              console.log("loginStatus was true")
               getProfile()
               .then( myProfile => {
                 this.props.navigation.state.params = myProfile
                 this.props.navigation.openDrawer()
               })
             } else {
-              console.log("log_status was false")
+              console.log("loginStatus was false")
             }
           }
         }
@@ -162,6 +149,8 @@ export default class HomeScreen extends React.Component {
       yourLikedList:[],
       yourVisitedList:[],
       yourList:[],
+
+      loginStatus: false,
 
       countryCode:"",
       LoggedinState:'locked-closed',
@@ -198,8 +187,43 @@ export default class HomeScreen extends React.Component {
       yourLoadMoreCompleted:false,
       yourLoadingMore:false,
 
-    };
+    }
   }
+
+  setLoginState = ( logged ) => {
+    if (typeof(logged) == typeof(true)) {
+      //Object.assign(this.state, { loginStatus: logged })
+      this.setState({
+        loginStatus: logged
+      })
+    }
+  }
+/*
+  App = () => (
+    <Query query={GET_LOGIN_STATUS}>
+      {({ loading, error, data }) => {
+         if (loading) return <Text>{`Loading...`}</Text>;
+         if (error) return <Text>{`Error: ${error}`}</Text>;
+
+          this.setState({
+            loginStatus: data.logged_in
+          })
+      //	drawerStatus = 'unlocked';
+      
+          if(login_status==true){
+            drawerStatus = 'unlocked';
+          }
+          else{
+          drawerStatus = 'locked-closed';
+          }
+          
+        return (
+          <View/>
+        )
+      }}
+    </Query>
+  )
+*/
   sendLikeRequest(item){
 		this.setState({
 				progressVisible:true,
@@ -506,16 +530,17 @@ _retrieveCountry = async () => {
       */
       //this._fetchMostRecentListing()
       //.then( () => {
-        this._fetchMostVisitedListing()
-        this._fetchMostLikedListing()
+      //  this._fetchMostVisitedListing()
+      //  this._fetchMostLikedListing()
+      /*
         setTimeout(() => {
-          if( log_status == true ) {
+          if( this.state.loginStatus == true ) {
             this._fetchUserPostedListing()
             this._fetchUserLikedListing()
-            this._fetchUserVisitedListing()
+           // this._fetchUserVisitedListing()
           }
-          console.log("Login Status",log_status)
         }, 350)
+        */
      // })
     })
   }
@@ -555,8 +580,8 @@ _retrieveCountry = async () => {
 
 
   checkLogin = () =>{
-    console.log("Log Status: " + log_status);
-    if( log_status == false ) {
+    console.log("Log Status: " + this.state.loginStatus);
+    if( this.state.loginStatus == false ) {
       this.props.navigation.dispatch(NA_HomeToLoginToCreate);
     } else{
       this.props.navigation.navigate('createNewItemScreen')
@@ -565,8 +590,8 @@ _retrieveCountry = async () => {
 
  
   checkLoginChat = (item) => {
-    console.log("Log Status: " + log_status);
-    if( log_status == false ) {
+    console.log("Log Status: " + this.state.loginStatus);
+    if( this.state.loginStatus == false ) {
       this.props.navigation.dispatch(NA_HomeToLoginToDrawer);
     } else {
       var recUserId_=item.user.id;
@@ -584,7 +609,7 @@ _retrieveCountry = async () => {
   }
 
   checkLoginMenu=() =>{
-    if(log_status==true){
+    if(this.state.loginStatus==true){
       this.props.navigation.openDrawer()
     }
     else{
@@ -714,9 +739,11 @@ _retrieveCountry = async () => {
         />
       </Button>
     );
+        //<UpdateLoginState setLoginStateTrue={this.setLoginStateTrue.bind(this)} setLoginStateFalse={this.setLoginStateFalse.bind(this)}/>
+        //<UpdateLoginState setLoginState={this.setLoginState.bind(this)} />
     return (
       <Container>
-      <App />
+        <UpdateLoginState setLoginState={this.setLoginState} />
         <BBBHeader
           title="Bebe Bargains"
           leftComponent={leftComponent}
@@ -741,125 +768,27 @@ _retrieveCountry = async () => {
               </Item>
             </View>
 
-            <View style={styles.imagesMainView}>
-              <View style={styles.populerSec}>
-                <Text style={styles.populerText}>Most Recent Items</Text>
-              </View>
-              <ListRecentListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
-            </View>
+            <ListRecentListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
 
             <View style={styles.adSec}>
               <Text style={styles.mainadText}>
                 Do you have something to sell or give away?
               </Text>
               <Text style={styles.subtitle}>
-                Post it with us and well give you an audience.
+                Post it with us and we'll give you an audience.
               </Text>
+              <Text> {console.log("LoginStatus:... ", this.state.loginStatus)}</Text>
             </View>
 
-            { this.state.mostVisitedList.length > 0 &&
-              <View style={styles.imagesMainView}>
-                <View style={styles.populerSec}>
-                  <Text style={styles.populerText}>
-                    Most Visited Items
-                  </Text>
-                </View>
-                <FlatList
-                  horizontal={true}
-                  data={this.state.mostVisitedList}
-                  renderItem={this._renderItem}
-                  contentContainerStyle={styles.listContent}
-                  onEndReached={this.visited_onEndReached.bind(this)}
-                  onMomentumScrollBegin={() => { this.visitedOnEndReachedCalledDuringMomentum = false; }}
-                  keyExtractor={(item, index) => index.toString()}
-                  ListFooterComponent={this.visited_renderFooter.bind(this)}
-                />
-              </View>
+            <ListVisitedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
+            <ListLikedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
+            { this.state.loginStatus == true &&
+            <View>
+              <ListUserVisitedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
+              <ListUserLikedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
+              <ListUserPostedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
+            </View>
             }
-
-            { this.state.mostLikedList.length > 0 &&
-              <View style={styles.imagesMainView}>
-                <View style={styles.populerSec}>
-                  <Text style={styles.populerText}>
-                    Most Liked Items
-                  </Text>
-                </View>
-                <FlatList
-                  horizontal={true}
-                  data={this.state.mostLikedList}
-                  renderItem={this._renderItem}
-                  contentContainerStyle={styles.listContent}
-                  onEndReached={this.liked_onEndReached.bind(this)}
-                  onMomentumScrollBegin={() => { this.likedOnEndReachedCalledDuringMomentum = false; }}
-                  keyExtractor={(item, index) => index.toString()}
-                  ListFooterComponent={this.liked_renderFooter.bind(this)}
-                />
-              </View>
-            }
-
-            { log_status == true &&
-
-              [( this.state.yourVisitedList.length > 0 &&
-                <View style={styles.imagesMainView}>
-                  <View style={styles.populerSec}>
-                    <Text style={styles.populerText}>
-                      Your Recently Visited
-                    </Text>
-                  </View>
-                  <FlatList
-                    horizontal={true}
-                    data={this.state.yourVisitedList}
-                    renderItem={this._renderItem}
-                    contentContainerStyle={styles.listContent}
-                    onEndReached={this.your_visited_onEndReached.bind(this)}
-                    onMomentumScrollBegin={() => { this.yourVisitedOnEndReachedCalledDuringMomentum = false; }}
-                    keyExtractor={(item, index) => index.toString()}
-                    ListFooterComponent={this.your_visited_renderFooter.bind(this)}
-                  />
-                </View>
-              ),
-
-              ( this.state.yourLikedList.length > 0 &&
-                <View style={styles.imagesMainView}>
-                  <View style={styles.populerSec}>
-                    <Text style={styles.populerText}>
-                      Your Recently Liked
-                    </Text>
-                  </View>
-                  <FlatList
-                    horizontal={true}
-                    data={this.state.yourLikedList}
-                    renderItem={this._renderItem}
-                    contentContainerStyle={styles.listContent}
-                    onEndReached={this.your_liked_onEndReached.bind(this)}
-                    onMomentumScrollBegin={() => { this.yourLikedOnEndReachedCalledDuringMomentum = false; }}
-                    keyExtractor={(item, index) => index.toString()}
-                    ListFooterComponent={this.your_visited_renderFooter.bind(this)}
-                  />
-                </View>
-              ),
-
-              ( this.state.yourList.length > 0 &&
-                <View style={styles.imagesMainView}>
-                  <View style={styles.populerSec}>
-                    <Text style={styles.populerText}>
-                      Your Listings
-                    </Text>
-                  </View>
-                  <FlatList
-                    horizontal={true}
-                    data={this.state.yourList}
-                    renderItem={this._renderItem}
-                    contentContainerStyle={styles.listContent}
-                    onEndReached={this.your_onEndReached.bind(this)}
-                    onMomentumScrollBegin={() => { this.yourOnEndReachedCalledDuringMomentum = false; }}
-                    keyExtractor={(item, index) => index.toString()}
-                    ListFooterComponent={this.your_renderFooter.bind(this)}
-                  />
-                </View>
-              )]
-            }
-
           </View>
         </Content>
         <Fab

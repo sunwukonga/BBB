@@ -10,58 +10,43 @@ import styles from './styles';
 import { withNavigation } from 'react-navigation'
 
 import {
-  GET_MOST_RECENT_LIST
+  GET_USER_VISITED_LIST
 } from '../../graphql/Queries'
 import PureListItem from './PureListItem'
 
 
-class ListRecentListings extends Component {
+class ListUserVisitedListings extends Component {
   constructor(props) {
     super(props);
   }
 
 
   render() {
-    let variables = this.props.variables
     return (
       <Query
-        query = {GET_MOST_RECENT_LIST}
-        variables = {variables}
+        query = {GET_USER_VISITED_LIST}
+        variables = {this.props.variables}
         fetchPolicy="cache-and-network"
       >
-        {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
+        {({ data, fetchMore, networkStatus, refetch, error, variables }) => {
           if (networkStatus === 1) {
             return <ActivityIndicator size="large" />;
           }
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
-          /*
-          renderFooter = (loading) => {
-            return loading ?
-              <View style={{ flex: 1,  flexDirection: 'row', padding: 10 }}>
-                <ActivityIndicator size="small" />
-              </View>
-              : null
-          }
-          */
-          /*
-          console.log("networkStatus: ", networkStatus)
-          console.log("error: ", error)
-          console.log("variables: ", variables)
-          console.log("New page: ", (data.getMostRecentListings.length / variables.limit >> 0) + 1)
-          */
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
-                <Text style={styles.populerText}>Most Recent Items</Text>
+                <Text style={styles.populerText}>
+                  Your Visited Items
+                </Text>
               </View>
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
                 keyExtractor={(item, index) => index.toString()}
-                //ListFooterComponent={renderFooter(networkStatus === 4 || networkStatus === 3)}
-                data = {data.getMostRecentListings || []}
+                data = {data.getUserVisitedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} />
                 }
@@ -71,15 +56,14 @@ class ListRecentListings extends Component {
                 onEndReached={() =>
                   fetchMore({
                     variables: {
-                      page: (data.getMostRecentListings.length / variables.limit >> 0) + 1
+                      page: (data.getUserVisitedListings.length / variables.limit >> 0) + 1
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
-                      console.log("*****************************updateQuery called")
                       if (!fetchMoreResult) return prev
-                      return { 
-                        getMostRecentListings:
-                          prev.getMostRecentListings
-                          .concat(fetchMoreResult.getMostRecentListings)
+                      return {
+                        getUserVisitedListings:
+                          prev.getUserVisitedListings
+                          .concat(fetchMoreResult.getUserVisitedListings)
                           .filter( (item, index, items) => {
                             return !index || item.id != items[index - 1].id
                           })
@@ -96,4 +80,4 @@ class ListRecentListings extends Component {
   }
 }
 
-export default withNavigation(ListRecentListings)
+export default withNavigation(ListUserVisitedListings)
