@@ -48,6 +48,8 @@ import getUserVisitedList from './GetUserVisitedListings';
 import getUserLikedList from './GetUserLikedListings';
 import getUserPostedList from './GetUserPostedListings';
 
+import ListRecentListings from './ListRecentListings'
+
 import getQuickMostRecentList from './GetQuickMostRecentListings';
 import getProfile from './GetProfile';
 import likeProductApi from './LikeProductApi';
@@ -63,6 +65,7 @@ const GET_LOGIN_STATUS = gql`
            jwt_token
         }`;
 
+//ListRecentListings( {"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}, this._renderItem )
 // TESTING Incremental Loading with fetchMore
 const GET_MOST_RECENT_LIST = gql`
 query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
@@ -150,7 +153,7 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
               */
 
     //{({ data, fetchMore, networkStatus }) => {
-const ListRecentListings = ( variables, renderFunc ) => (
+const ListRecentListings2 = ( variables, renderFunc ) => (
   <Query
     query = {GET_MOST_RECENT_LIST}
     variables = {variables}
@@ -897,7 +900,7 @@ _retrieveCountry = async () => {
                 <Text style={styles.populerText}>Most Recent Items</Text>
               </View>
 
-              { ListRecentListings( {"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}, this._renderItem )}
+              <ListRecentListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} renderFunc={this._renderItem} />
 
             </View>
             <View style={styles.adSec}>
