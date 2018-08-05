@@ -44,10 +44,12 @@ class ListRecentListings extends Component {
               : null
           }
           */
+          /*
           console.log("networkStatus: ", networkStatus)
           console.log("error: ", error)
           console.log("variables: ", variables)
           console.log("New page: ", (data.getMostRecentListings.length / variables.limit >> 0) + 1)
+          */
           return (
             <FlatList
               horizontal = {true}

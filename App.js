@@ -8,7 +8,6 @@ import client from './config/Client';
 
 console.disableYellowBox = true;
 
-const default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTI1NTA2MjEyfQ.daamAG6JGC8LnlFRAsN4ppB23HhN_BtiuRA7QnXBqrU';
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
@@ -56,8 +55,6 @@ export default class App extends React.Component {
         Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
         icomoon: require('./assets/fonts/icomoon.ttf'),
       }),
-      Expo.SecureStore.setItemAsync('defaultToken', default_token),
-      Expo.SecureStore.setItemAsync('token', default_token),
     ]);
   };
 
