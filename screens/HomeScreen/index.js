@@ -90,6 +90,7 @@ export default class HomeScreen extends React.Component {
       countryCode:"",
       limit:10,
       page:1,
+	  searchTerms:'',
     }
 
     console.log("HOME Constructor Ran.")
@@ -308,14 +309,18 @@ export default class HomeScreen extends React.Component {
             <View style={styles.searchSec}>
               <Item regular style={styles.searchItem}>
       {/* TODO: Link with searchResultScreen where searchListings will be called */}
-                <Input
+                  <Input
                   placeholder="What are you looking for?"
                   style={styles.mainSearch}
                   keyboardType="default"
                   returnKeyType="search"
+                  onChangeText={(text) => {
+                      console.log("Title",text);
+                      this.setState({ searchTerms:text});
+                  }}
                   onSubmitEditing={(content) =>
-                    /* TODO: this.props.navigation.navigate('searchResultScreen', { searchTerms: content }) */
-                    this.props.navigation.navigate('strollersScreen')
+                    this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})
+
                   }
                 />
                 <BBBIcon name="Search" style={styles.searchicon} />
