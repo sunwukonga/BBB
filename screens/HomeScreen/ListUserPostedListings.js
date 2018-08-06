@@ -35,6 +35,9 @@ class ListUserPostedListings extends Component {
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
+          if (!data.getUserPostedListings || data.getUserPostedListings.length == 0) {
+            return null
+          }
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>

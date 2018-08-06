@@ -36,9 +36,9 @@ class ListLikedListings extends Component {
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
-       /*   if (!data.getMosteLikedListings || data.getMostLikedListings.length == 0) {
+          if (!data.getMostLikedListings || data.getMostLikedListings.length == 0) {
             return null
-          }*/
+          }
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
