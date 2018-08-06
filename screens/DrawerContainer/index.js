@@ -25,7 +25,7 @@ import { withClientState } from "apollo-link-state";
 //reset the appolo cache
 export default LoggedinState = graphql(gql`
   mutation unsetAuthStatus {
-    unsetAuthStatuslogout @client
+    unsetAuthStatus @client
   }
 `)(
   class extends Component {

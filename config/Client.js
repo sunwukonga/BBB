@@ -23,6 +23,7 @@ const httpLink = new HttpLink({
       credentials: 'include'
      }, */
 const middlewareLink = new ApolloLink((operation, forward) => {
+  // Possibly put `readQuery` here to fetch token, instead of keeping it in var `token`
   operation.setContext({
     headers: {
      authorization: 'Bearer ' + token
@@ -69,7 +70,7 @@ const stateLink = withClientState({
       },
       unsetAuthStatus: (_, args, { cache }) => {
         console.log('unsetAuthStatus client-side mutation fired');
-        cache.writeData({ data: { logged_in: false, jwt_token: default_token, myProfile: {__typename: 'Profile', profileName: "", profileImageURL }}});
+        cache.writeData({ data: { logged_in: false, jwt_token: default_token, myProfile: {__typename: 'Profile', profileName: "", profileImageURL: "" }}});
         return null;
       },
     }
