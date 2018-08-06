@@ -25,7 +25,7 @@ import { withClientState } from "apollo-link-state";
 //reset the appolo cache
 export default LoggedinState = graphql(gql`
   mutation unsetAuthStatus {
-    unsetAuthStatuslogout @client
+    unsetAuthStatus @client
   }
 `)(
   class extends Component {
@@ -125,15 +125,9 @@ export default LoggedinState = graphql(gql`
     }
     */
 
-    onLoggedinState = () => {
-      this.props.mutate({});
-      console.log('onLoggedinState done');
-    }
-
     logout = async () => {
       this.props.navigation.closeDrawer()
-      console.log('clicked on logout');
-      this.onLoggedinState();
+      this.props.mutate({});
     }
 
     doesProfileExist = ( name ) => {

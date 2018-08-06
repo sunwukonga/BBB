@@ -225,4 +225,10 @@ export default StyleSheet.create({
     borderRadius: Layout.moderateScale(24),
     backgroundColor: Colors.primaryColor,
   },
+  hr: {
+    borderWidth: 0.5,
+    borderColor: 'black',
+    width: '80%',
+    margin: '10%',
+  },
 });
