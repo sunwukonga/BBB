@@ -8,6 +8,7 @@ import {
   GET_LOGIN_STATUS
 } from '../../graphql/Queries'
 
+// This component violates the principle of never updating state from within render.
 class UpdateLoginState extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {

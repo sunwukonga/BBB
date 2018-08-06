@@ -125,15 +125,9 @@ export default LoggedinState = graphql(gql`
     }
     */
 
-    onLoggedinState = () => {
-      this.props.mutate({});
-      console.log('onLoggedinState done');
-    }
-
     logout = async () => {
       this.props.navigation.closeDrawer()
-      console.log('clicked on logout');
-      this.onLoggedinState();
+      this.props.mutate({});
     }
 
     doesProfileExist = ( name ) => {
