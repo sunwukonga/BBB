@@ -22,11 +22,12 @@ class ListRecentListings extends Component {
 
 
   render() {
-    let variables = this.props.variables
+    let inputVariables = this.props.variables
+    let { countryCode } = this.props.loginStatus
     return (
       <Query
         query = {GET_MOST_RECENT_LIST}
-        variables = {variables}
+        variables = {Object.assign(inputVariables, { countryCode: countryCode })}
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
@@ -36,21 +37,6 @@ class ListRecentListings extends Component {
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
-          /*
-          renderFooter = (loading) => {
-            return loading ?
-              <View style={{ flex: 1,  flexDirection: 'row', padding: 10 }}>
-                <ActivityIndicator size="small" />
-              </View>
-              : null
-          }
-          */
-          /*
-          console.log("networkStatus: ", networkStatus)
-          console.log("error: ", error)
-          console.log("variables: ", variables)
-          console.log("New page: ", (data.getMostRecentListings.length / variables.limit >> 0) + 1)
-          */
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
@@ -60,10 +46,9 @@ class ListRecentListings extends Component {
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
                 keyExtractor={(item, index) => index.toString()}
-                //ListFooterComponent={renderFooter(networkStatus === 4 || networkStatus === 3)}
                 data = {data.getMostRecentListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} />
+                   <PureListItem item={item} loginStatus={this.props.loginStatus} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}

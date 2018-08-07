@@ -16,6 +16,8 @@ import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
 import Stars from '../../components/Stars';
 
+import LikeButton from './LikeButton'
+
 class PureListItem extends Component {
 
   constructor(props) {
@@ -24,52 +26,39 @@ class PureListItem extends Component {
 
   // comparisons of important changes here
   shouldComponentUpdate(nextProps, nextState) {
-    /*if (this.props.color !== nextProps.color) {
+    if (this.props.item.liked !== nextProps.liked) {
       return true;
-    }*/
+    }
     return false;
   }
 
   render() {
     let item = this.props.item
+    let loginStatus = this.props.loginStatus
     return (
-  //  _renderItem = ({ item }) => (
 
         <TouchableOpacity
           onPress={ () => this.props.navigation.navigate({
-          routeName: 'productDetailsScreen',
-          params: { previous_screen: 'homeScreen',item:_item}
-      }) }>
+            routeName: 'productDetailsScreen'
+          , params: {
+              previous_screen: 'homeScreen'
+            , item: item
+            }
+          })}
+        >
         <View style={styles.imagesSubView}>
 
           <View>
-          { item.primaryImage===null || item.primaryImage.imageKey===null
-           // ? <Image  source={Images.trollie} style={styles.rowImage} />
-            ? <Baby style={styles.rowImage} />
-            : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
-          }
-  <Text>{
-  /*
-            TODO: Pressing favorite should make a call to:
-              likeListing(
-                listingId: Int!
-                like: Boolean = true
-              ): Boolean
-              ----------------> listingId = item.id
-  */
-  }</Text>
-            <TouchableOpacity style={styles.favoriteIconSec} onPress={() => this.sendLikeRequest(item)}>
-            <View >
+            { item.primaryImage===null || item.primaryImage.imageKey===null
+             // ? <Image  source={Images.trollie} style={styles.rowImage} />
+              ? <Baby style={styles.rowImage} />
+              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
+            }
 
-              <BBBIcon
-                name="Favorite"
-                size={Layout.moderateScale(18)}
-                //color={Colors.tintColor}
-                color={item.liked ? Colors.tintColor : Colors.white}
-                style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-              />
-            </View>
-            </TouchableOpacity>
+            { loginStatus &&
+              <LikeButton item={item} />
+            }
+
             <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(item)/* TODO: No checking, use a NavigationAction or StackAction. Auth checking should be done in ChatScreen and ChatListScreen */}>
             <View >
               <BBBIcon

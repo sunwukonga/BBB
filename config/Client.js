@@ -12,7 +12,14 @@ var token = default_token
 //var default_token = await Expo.SecureStore.getItemAsync('defaultToken');
 const BBB_BASE_URL = 'http://notify.parker.sg:3000/graphql'
 
-const cache = new InMemoryCache();
+const cache = new InMemoryCache({
+  //cacheRedirects: {
+    //Query: {
+      //movie: (_, { id }, { getCacheKey }) =>
+        //getCacheKey({ __typename: 'Movie', id });
+    //}
+  //}
+});
 const httpLink = new HttpLink({
   uri: BBB_BASE_URL,
 /*  headers: {
@@ -54,6 +61,7 @@ const stateLink = withClientState({
     isConnected: true
   , logged_in: false
   , jwt_token: default_token
+  , countryCode: 'SG'
   , myProfile: {
       __typename: 'Profile'
     , profileName: ""
@@ -73,6 +81,11 @@ const stateLink = withClientState({
         cache.writeData({ data: { logged_in: false, jwt_token: default_token, myProfile: {__typename: 'Profile', profileName: "", profileImageURL: "" }}});
         return null;
       },
+      setCountry: (_, args, { cache }) => {
+        console.log('setCountry client-side mutation fired');
+        cache.writeData({ data: { countryCode: args.countryCode }});
+        return null;
+      },
     }
   },
 });
@@ -81,10 +94,4 @@ const link = ApolloLink.from([errorLink, stateLink, middlewareLink, httpLink]);
 export default client = new ApolloClient({
   link
 , cache
-  //cacheRedirects: {
-    //Query: {
-      //movie: (_, { id }, { getCacheKey }) =>
-        //getCacheKey({ __typename: 'Movie', id });
-    //}
-  //}
 });

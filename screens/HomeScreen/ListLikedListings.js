@@ -22,11 +22,12 @@ class ListLikedListings extends Component {
 
 
   render() {
-    let variables = this.props.variables
+    let inputVariables = this.props.variables
+    let { countryCode } = this.props.loginStatus
     return (
       <Query
         query = {GET_MOST_LIKED_LIST}
-        variables = {variables}
+        variables = {Object.assign(inputVariables, { countryCode: countryCode })}
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {

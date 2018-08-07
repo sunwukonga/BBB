@@ -28,11 +28,6 @@ import { Layout, Colors, Images } from '../../constants/';
 //apollo client
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
-import { ApolloClient } from "apollo-client";
-import { HttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloProvider, graphql,Mutation } from "react-apollo";
-import { withClientState } from "apollo-link-state";
 
 import getProductDetails from './GetProductDetails';
 import likeProductApi from './LikeProductApi';

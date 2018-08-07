@@ -38,25 +38,32 @@ const FACEBOOK_LOGIN = gql`
 const NA_LoginToHome = NavigationActions.navigate({
     routeName: 'homeScreen',
     params: { previous_screen: 'loginScreen'
-            , doAction: 'openDrawer' },
+            , doAction: 'openDrawer'
+            , loginStatus: true },
     //action: NavigationActions.navigate({ routeName: 'NEXT_SCREEN' }),
 })
 const NA_LoginToCreate = NavigationActions.navigate({
     routeName: 'createNewItemScreen',
     params: { previous_screen: 'loginScreen'
-            }
+            , loginStatus: true }
 })
-const SA_LoginToHome = StackActions.reset({
+/*
+const SA_LoginToCreate = StackActions.reset({
     index: 0
   , actions: [
+      NavigationActions.navigate({
+        routeName: 'mainScreen'
+      , actions: [
         NavigationActions.navigate({
-            routeName: 'mainScreen'
-          , params: { previous_screen: 'loginScreen'
-                    , doAction: 'openDrawer' }
-          , action: NavigationActions.back()
+          routeName: 'homeScreen'
+        , params: { loginStatus: true }
         })
+      , NavigationActions.navigate({
+          routeName: 'createNewItemScreen'
+      })
     ]
 })
+*/
 
 export default LoggedinState = graphql(gql`
   mutation setAuthStatus( $token: String!, $profileName: String!, $profileImageURL: String ) {
@@ -105,7 +112,6 @@ export default LoggedinState = graphql(gql`
                 console.log('data.data.loginFacebook '+JSON.stringify(data.data.loginFacebook));
                 await this.onLoggedinState(data.data.loginFacebook);
 
-                console.log("Our status should be logged in")
                 if ( this.props.navigation.state && this.props.navigation.state.params ) {
                   // Arriving from Home -> drawerOpen
                   if ( this.props.navigation.state.params.dest == 'openDrawer' ) {

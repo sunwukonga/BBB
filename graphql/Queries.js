@@ -454,9 +454,18 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
 }`
 
 const GET_LOGIN_STATUS = gql`
-query log @client{
+query loginStatus @client{
   logged_in
+  countryCode
 }`
+
+const GET_COUNTRY_LIST = gql`
+query {
+  allCountries {
+    isoCode
+    name
+  }
+}`;
 
 export {
   GET_MOST_RECENT_LIST
@@ -466,4 +475,5 @@ export {
 , GET_USER_LIKED_LIST
 , GET_USER_POSTED_LIST
 , GET_LOGIN_STATUS
+, GET_COUNTRY_LIST
 }
