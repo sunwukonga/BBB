@@ -22,11 +22,12 @@ class ListVisitedListings extends Component {
 
 
   render() {
-    let variables = this.props.variables
+    let inputVariables = this.props.variables
+    let { countryCode } = this.props.loginStatus
     return (
       <Query
         query = {GET_MOST_VISITED_LIST}
-        variables = {variables}
+        variables = {Object.assign(inputVariables, { countryCode: countryCode })}
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
@@ -52,7 +53,7 @@ class ListVisitedListings extends Component {
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getMostVisitedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} />
+                   <PureListItem item={item} loginStatus={this.props.loginStatus} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}

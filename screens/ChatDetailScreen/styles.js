@@ -3,14 +3,14 @@ import { Layout, Colors } from '../../constants/';
 
 export default StyleSheet.create({
 	container: {
-		height: Layout.HEIGHT,
-		width: Layout.WIDTH,
 		backgroundColor: Colors.white,
+    flex: 1
 	},
 	contentStyle: {
-		// flex: 1,
-		paddingTop: Layout.HEIGHT * 0.01,
-		paddingHorizontal: Layout.moderateScale(10),
+		flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
 	},
 	backarrow: {
 		color: Colors.white,
@@ -26,10 +26,10 @@ export default StyleSheet.create({
 		paddingLeft: Layout.moderateScale(5),
 	},
 	body: {
-		flex: 5,
+    flex: 1,
+		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
-		flexDirection: 'row',
 	},
 	right: {
 		flex: 1,
@@ -53,12 +53,12 @@ export default StyleSheet.create({
 		alignSelf: 'center',
 	},
 	notifyContainer: {
+		backgroundColor: 'blue',
 		paddingVertical: Layout.HEIGHT * 0.01,
 		paddingHorizontal: Layout.WIDTH * 0.05,
 		borderBottomWidth: Layout.moderateScale(1),
 		backgroundColor: Colors.selectedRow,
 		borderColor: Colors.mainBottomBorderColor,
-		flexDirection: 'row',
 	},
 	notifyImage: {
 		height: Layout.HEIGHT * 0.065,
@@ -78,7 +78,6 @@ export default StyleSheet.create({
 		marginVertical: Layout.HEIGHT * 0.01,
 		padding: Layout.HEIGHT * 0.01,
 		backgroundColor: '#e0eaea',
-		alignSelf: 'flex-end',
 		shadowColor: 'rgba(0,0,0,0.6)',
 		shadowOpacity: 0.3,
 		shadowRadius: 1,
@@ -87,6 +86,7 @@ export default StyleSheet.create({
 			width: 0,
 		},
 		elevation: Layout.moderateScale(5),
+		backgroundColor: 'orange',
 	},
 	response: {
 		marginVertical: Layout.HEIGHT * 0.01,
@@ -109,23 +109,23 @@ export default StyleSheet.create({
 		textAlign: 'right',
 	},
 	footerStyle: {
-		width: Layout.WIDTH,
-		height: Layout.HEIGHT * 0.08,
+    flex: 1,
+    minHeight: Layout.HEIGHT * 0.08,
 		borderTopWidth: Layout.moderateScale(1),
 		borderColor: Colors.sendinputborder,
-		justifyContent: 'center',
-		alignItems: 'center',
-		flexDirection: 'row',
+    backgroundColor: 'orange',
 	},
 	newPostStyle: {
+    height: Layout.HEIGHT * 0.08,
+    minWidth: Layout.WIDTH * 0.85,
 		color: Colors.secondaryColor,
 		fontSize: Layout.moderateScale(12),
 		fontFamily: 'roboto-reguler',
-		marginHorizontal: Layout.WIDTH * 0.03,
+		backgroundColor: 'green',
 	},
 	postBtn: {
 		height: Layout.HEIGHT * 0.08,
-		width: Layout.HEIGHT * 0.08,
+		width: Layout.WIDTH * 0.15,
 		backgroundColor: Colors.mainheaderbg,
 		alignItems: 'center',
 		justifyContent: 'center',

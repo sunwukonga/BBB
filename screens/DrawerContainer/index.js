@@ -10,15 +10,9 @@ import BBBIcon from '../../components/BBBIcon';
 import styles from './styles';
 import { Layout, Images, Colors, Urls } from '../../constants/';
 
-
 //apollo client
-import { Query } from "react-apollo";
+import { Query, graphql } from "react-apollo";
 import gql from "graphql-tag";
-import { ApolloClient } from "apollo-client";
-import { HttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloProvider, graphql,Mutation } from "react-apollo";
-import { withClientState } from "apollo-link-state";
 
 //import MainDrawer from '../../navigation/MainDrawerNavigator'
 
@@ -31,6 +25,14 @@ export default LoggedinState = graphql(gql`
   class extends Component {
     constructor(props) {
       super(props)
+      /*
+      if (state) {
+        console.log("DrawerState: ", state)
+      }
+      if (this.state) {
+        console.log("thisDrawerState: ", this.state)
+      }
+      */
       /*
       this.props.navigation.addListener(
         'willFocus',
@@ -125,11 +127,6 @@ export default LoggedinState = graphql(gql`
     }
     */
 
-    logout = async () => {
-      this.props.navigation.closeDrawer()
-      this.props.mutate({});
-    }
-
     doesProfileExist = ( name ) => {
       if (this.props.navigation.state.routes && this.props.navigation.state.routes.length > 0) {
         if (this.props.navigation.state.routes[0].params && this.props.navigation.state.routes[0].params.data && this.props.navigation.state.routes[0].params.data.myProfile ) {
@@ -146,7 +143,10 @@ export default LoggedinState = graphql(gql`
       return (
         <Container style={styles.container} {...this.props}>
             <View style={styles.usersDetailsSec}>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('profileScreen')}>
+            <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('profileScreen')
+              }}>
               <Image style={styles.userImage}
                    source={this.doesProfileExist('profileImageURL') ? {uri: navigation.state.routes[0].params.data.myProfile.profileImageURL} : Images.tempUser} />
             </TouchableOpacity>
@@ -173,7 +173,9 @@ export default LoggedinState = graphql(gql`
             </Item>
             <Item
               style={styles.borderView}
-              onPress={() => this.props.navigation.navigate('chatListScreen')}>
+              onPress={() => {
+                this.props.navigation.navigate('chatListScreen')
+              }}>
               <BBBIcon
                 name="Chat"
                 size={Layout.moderateScale(20)}
@@ -184,7 +186,9 @@ export default LoggedinState = graphql(gql`
             </Item>
             <Item
               style={styles.borderView}
-              onPress={() => navigation.navigate('notificationScreen')}>
+              onPress={() => {
+                navigation.navigate('notificationScreen')
+              }}>
               <BBBIcon
                 name="Notification"
                 size={Layout.moderateScale(20)}
@@ -195,7 +199,9 @@ export default LoggedinState = graphql(gql`
             </Item>
             <Item
               style={styles.borderView}
-              onPress={() => navigation.navigate('favoriteScreen')}>
+              onPress={() => {
+                navigation.navigate('favoriteScreen')
+              }}>
               <BBBIcon
                 name="Favorite"
                 size={Layout.moderateScale(20)}
@@ -206,7 +212,9 @@ export default LoggedinState = graphql(gql`
             </Item>
             <Item
               style={styles.borderView}
-              onPress={() => navigation.navigate('settingScreen')}>
+              onPress={() => {
+                navigation.navigate('settingScreen')
+              }}>
               <BBBIcon
                 name="Settings"
                 size={Layout.moderateScale(20)}
@@ -217,7 +225,9 @@ export default LoggedinState = graphql(gql`
             </Item>
             <Item
               style={styles.borderView}
-              onPress={() => navigation.navigate('supportScreen')}>
+              onPress={() => {
+                navigation.navigate('supportScreen')
+              }}>
               <BBBIcon
                 name="Support"
                 size={Layout.moderateScale(20)}
@@ -234,7 +244,10 @@ export default LoggedinState = graphql(gql`
                   borderBottomColor: Colors.menuitemborder,
                 },
               ]}
-              onPress={this.logout}>
+              onPress={() => {
+                this.props.navigation.closeDrawer()
+                this.props.mutate({});
+              }}>
               <BBBIcon
                 name="Logout"
                 size={Layout.moderateScale(20)}

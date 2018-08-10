@@ -9,11 +9,9 @@ import {
 } from '../../graphql/Queries'
 
 
-//-------------------------------------------------------
-//----------DEPRECATED---------DEPRECATED----------------
-//-------------------------------------------------------
-
-
+//------------------------------------------------------------
+//--UNUSED-------UNUSED--------UNUSED-----------UNUSED--------
+//------------------------------------------------------------
 
 // This component violates the principle of never updating state from within render.
 class UpdateLoginState extends Component {

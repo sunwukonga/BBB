@@ -22,10 +22,15 @@ class ListUserVisitedListings extends Component {
 
 
   render() {
+    let inputVariables = this.props.variables
+    let { loginStatus, countryCode } = this.props.loginStatus
+    if (!loginStatus) {
+      return null
+    }
     return (
       <Query
         query = {GET_USER_VISITED_LIST}
-        variables = {this.props.variables}
+        variables = {Object.assign(inputVariables, { countryCode: countryCode})}
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables }) => {

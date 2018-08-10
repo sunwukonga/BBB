@@ -1,44 +1,34 @@
 import React from 'react';
 import {
-  Image
+  View
+, Text
 , TouchableOpacity
-, View
-, FlatList,ActivityIndicator
 , AsyncStorage
 , BackHandler
 } from 'react-native';
 // For creating Actions. Will move out to external file later
 import { NavigationActions } from 'react-navigation';
 import {
-  Container
-, Content
-, List
-, ListItem
-, Text
+  Icon
 , Button
-, Icon
+, Left
+, Right
+, Header
+, Body
+, Title
 , Item
 , Input
+, Container
+, Content
 , Fab
 } from 'native-base';
 //custom components
 import BBBHeader from '../../components/BBBHeader';
-import Baby from '../../components/Baby';
-import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
-import Stars from '../../components/Stars';
-import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 // style
 import styles from './styles';
+import headerStyles from '../../components/BBBHeader/styles';
 import { Layout, Colors, Images } from '../../constants/';
-//apollo client
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
-import { ApolloClient } from "apollo-client";
-import { HttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloProvider, graphql,Mutation } from "react-apollo";
-import { withClientState } from "apollo-link-state";
 
 // FlatLists with embedded Queries
 import ListRecentListings from './ListRecentListings'
@@ -50,8 +40,7 @@ import ListUserPostedListings from './ListUserPostedListings'
 
 import getProfile from './GetProfile';
 import likeProductApi from './LikeProductApi';
-// As beautiful as this Component is, it violates a principle and must be removed.
-import UpdateLoginState from './UpdateLoginState'
+import LoginStatus from './LoginStatus'
 
 import MainDrawer from '../../navigation/MainDrawerNavigator'
 
@@ -67,108 +56,65 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
           , dest: 'createNewItemScreen'}
 })
 
-const drawerStatus = 'locked-closed';
-
 
 export default class HomeScreen extends React.Component {
 
   static navigationOptions = () => ({
-    drawerLockMode: drawerStatus,
-  });
+    drawerLockMode: 'locked-closed',
+  })
 
   onBackPress = () => {
-    console.log("onBackPress called to close drawer")
     this.props.navigation.closeDrawer()
     return true
   }
-  
+
+  openDrawerAndSetState = () => {
+    this.setState({ drawerOpen: true })
+    this.props.navigation.openDrawer()
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
-      loginStatus: false,
-      countryCode:"",
       limit:10,
       page:1,
-	  searchTerms:'',
+      searchTerms:'',
+      drawerOpen: false,
     }
 
-    console.log("HOME Constructor Ran.")
     this.drawerBackHandler = null
     const defaultGetStateForAction = MainDrawer.router.getStateForAction;
     MainDrawer.router.getStateForAction = (action, state) => {
-      console.log('getStateForAction called');
       if (state && action.type === 'Navigation/OPEN_DRAWER') {
+        this.setState({ drawerOpen: true })
           console.log('<===============>DrawerOpen');
         this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
           console.log('Listener ADDED');
       }
       if (state && action.type === 'Navigation/DRAWER_CLOSED') {
+        this.setState({ drawerOpen: false })
           console.log('<|||||||||||||||>DrawerClose');
         this.drawerBackHandler.remove()
+        this.drawerBackHandler = null
           console.log('Listener REMOVED');
       }
       return defaultGetStateForAction(action, state);
     };
-    this.props.navigation.addListener(
-      'didFocus',
-      payload => {
-        if ( this.props.navigation.state && this.props.navigation.state.params ) {
-          if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
-            if ( this.state.loginStatus ) {
-              console.log("loginStatus was true")
-              getProfile()
-              .then( myProfile => {
-                this.props.navigation.state.params = myProfile
-                this.props.navigation.openDrawer()
-              })
-            } else {
-              console.log("loginStatus was false")
-            }
-          }
-        }
-      }
-    )
   }
 
+  // Proxy method for child component to set this.state
   setLoginState = ( logged ) => {
     if (typeof(logged) == typeof(true)) {
+      // assign does NOT trigger a render
       //Object.assign(this.state, { loginStatus: logged })
       this.setState({
         loginStatus: logged
       })
     }
   }
-/*
-  App = () => (
-    <Query query={GET_LOGIN_STATUS}>
-      {({ loading, error, data }) => {
-         if (loading) return <Text>{`Loading...`}</Text>;
-         if (error) return <Text>{`Error: ${error}`}</Text>;
 
-          this.setState({
-            loginStatus: data.logged_in
-          })
-      //	drawerStatus = 'unlocked';
-      
-          if(login_status==true){
-            drawerStatus = 'unlocked';
-          }
-          else{
-          drawerStatus = 'locked-closed';
-          }
-          
-        return (
-          <View/>
-        )
-      }}
-    </Query>
-  )
-*/
   sendLikeRequest(item){
-		this.setState({
-				progressVisible:true,
-		})
 
     var _like=!item.liked;
     console.log("Is Liked",_like);
@@ -195,7 +141,6 @@ export default class HomeScreen extends React.Component {
               count:_count,
             })
 
-        //  this._resetAllListValues();
 
         }
 
@@ -212,10 +157,10 @@ export default class HomeScreen extends React.Component {
 
   /*
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps)
+    console.log("WillReceiveProps")
   }
   */
-
+/*
   _retrieveCountry = async () => {
       try {
           const value = await AsyncStorage.getItem('countryCode');
@@ -228,29 +173,88 @@ export default class HomeScreen extends React.Component {
          console.log(error);
        }
     }
-  
-  componentDidMount(){
-    console.log("Retrieve country")
-    this._retrieveCountry()
+ */ 
+  componentDidMount() {
+
+    this.willFocusListener = this.props.navigation.addListener(
+      'willFocus'
+    , payload => {
+        console.log('willFocus')
+      }
+    )
+    this.didFocusListener = this.props.navigation.addListener(
+      'didFocus',
+      payload => {
+        console.log('didFocus')
+        if ( this.state.drawerOpen ) {
+          // reattach the listener as we never closed the drawer
+          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
+        }
+        if ( this.props.navigation.state && this.props.navigation.state.params ) {
+          if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
+            getProfile()
+            .then( myProfile => {
+              if ( myProfile ) {
+                /*
+                this.setState((prevState, props) => {
+                  return {counter: prevState.counter + props.step};
+                });
+                */
+                this.props.navigation.state.params = myProfile
+                this.openDrawerAndSetState()
+              }
+            })
+          }
+        }
+      }
+    )
+    this.willBlurListener = this.props.navigation.addListener(
+      'willBlur'
+    , payload => {
+        console.log('didBlur')
+      }
+    )
+    this.didBlurListener = this.props.navigation.addListener(
+      'didBlur'
+    , payload => {
+        console.log('didBlur')
+        if (this.drawerBackHandler) {
+          // Handler still exists. This means that the drawer was not closed before navigating away.
+            // I.e. drawerOpen: true
+          this.drawerBackHandler.remove()
+        }
+      }
+    )
+
+    this.subs = [
+      this.willFocusListener
+    , this.didFocusListener
+    , this.willBlurListener
+    , this.didBlurListener
+    ]
+
+  }
+
+  componentWillUnmount() {
+    console.log('willUnmount')
+    this.subs.forEach((sub) => {
+      sub.remove();
+    });
   }
 
   //-----------------------------------
   // Auth checking functions
   //-----------------------------------
-  checkAuthForCreate = () =>{
-    console.log("Log Status: " + this.state.loginStatus);
-    if( this.state.loginStatus == false ) {
-      this.props.navigation.dispatch(NA_HomeToLoginToCreate);
-    } else{
+  checkAuthForCreate = (loginStatus) => {
+    if( loginStatus.loginStatus ) {
       this.props.navigation.navigate('createNewItemScreen')
+    } else{
+      this.props.navigation.dispatch(NA_HomeToLoginToCreate);
     }
   }
  
-  checkAuthForChat = (item) => {
-    console.log("Log Status: " + this.state.loginStatus);
-    if( this.state.loginStatus == false ) {
-      this.props.navigation.dispatch(NA_HomeToLoginToDrawer);
-    } else {
+  checkAuthForChat = (item, loginStatus) => {
+    if( loginStatus.loginStatus ) {
       var recUserId_ = item.user.id;
       var listingId_ = item.id;
       var chatId_ = item.chatId;
@@ -261,34 +265,41 @@ export default class HomeScreen extends React.Component {
       , isChatExists: chatExists
       , chatId: chatId_
       });
-
+    } else {
+      this.props.navigation.dispatch(NA_HomeToLoginToDrawer);
     }
   }
 
-  checkAuthForDrawer=() =>{
-    if(this.state.loginStatus==true){
+  checkAuthForDrawer = (loginStatus) => {
+    if ( loginStatus.loginStatus ) {
+      //this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
       this.props.navigation.openDrawer()
     }
-    else{
+    else {
       this.props.navigation.dispatch(NA_HomeToLoginToDrawer)
     }
   }
-
+/*
+      <LoginStatus>{ loginStatus => (
+      )}</LoginStatus>
+      ^^^ There can be no gap between  `>` and `{`  OR  `}` and `<`
+      */
   render() {
     var leftComponent = (
-      <Button transparent onPress={() => this.checkAuthForDrawer() }>
-        <BBBIcon
-          name="Menu"
-          size={Layout.moderateScale(18)}
-          color={Colors.white}
-          style={{ color: Colors.white }}
-        />
-      </Button>
+      <LoginStatus>{ loginStatus => (
+        <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
+          <BBBIcon
+            name="Menu"
+            size={Layout.moderateScale(18)}
+            color={Colors.white}
+            style={{ color: Colors.white }}
+          />
+        </Button>
+      )}</LoginStatus>
     );
 
     var rightComponent = (
-      <Button transparent onPress={() => this.props.navigation.navigate( 'categoryScreen' )}>
-      
+      <Button transparent onPress={ () => this.props.navigation.navigate('categoryScreen')}>
         <BBBIcon
           name="CategoryIcon"
           size={Layout.moderateScale(18)}
@@ -296,14 +307,29 @@ export default class HomeScreen extends React.Component {
         />
       </Button>
     );
-    return (
-      <Container>
-        <UpdateLoginState setLoginState={this.setLoginState} />
+
+      /*
+        <LoginStatus>{ loginStatus => {
+          this.loginStatus = loginStatus
+          return null
+        }}</LoginStatus>
+        */
+    /*
         <BBBHeader
           title="Bebe Bargains"
           leftComponent={leftComponent}
           rightComponent={rightComponent}
         />
+        */
+    return (
+      <Container>
+        <Header
+          androidStatusBarColor={Colors.mainheaderbg}
+          style={headerStyles.header}>
+          <Left style={headerStyles.left}>{leftComponent}</Left>
+          <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
+          <Right style={headerStyles.right}>{rightComponent}</Right>
+        </Header>
         <Content style={styles.container}>
           <View>
             <View style={styles.searchSec}>
@@ -327,7 +353,9 @@ export default class HomeScreen extends React.Component {
               </Item>
             </View>
 
-            <ListRecentListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
+            <LoginStatus>{ loginStatus => (
+              <ListRecentListings loginStatus={loginStatus} variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} /> 
+            )}</LoginStatus>
 
             <View style={styles.adSec}>
               <Text style={styles.mainadText}>
@@ -337,28 +365,28 @@ export default class HomeScreen extends React.Component {
                 Post it with us and we'll give you an audience.
               </Text>
             </View>
-
-            <ListVisitedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
-            <ListLikedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
-            { this.state.loginStatus == true &&
-            <View>
-              <View style={styles.hr} />
-              <ListUserVisitedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
-              <ListUserLikedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
-              <ListUserPostedListings variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} />
-            </View>
-            }
+            <LoginStatus>{ loginStatus => (
+              <View>
+                <ListVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
+                <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
+                <View style={styles.hr} />
+                <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
+                <ListUserLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
+                <ListUserPostedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
+              </View>
+            )}</LoginStatus>
           </View>
         </Content>
-        <Fab
-         // active={this.state.active}
-          direction="up"
-          style={styles.fabStyle}
-          position="bottomRight"
-          onPress={() => this.checkAuthForCreate()}
-        >
-          <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
-        </Fab>
+        <LoginStatus>{ loginStatus => (
+          <Fab
+            direction="up"
+            style={styles.fabStyle}
+            position="bottomRight"
+            onPress={() => this.checkAuthForCreate(loginStatus)}
+          >
+            <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
+          </Fab>
+        )}</LoginStatus>
       </Container>
     );
   }

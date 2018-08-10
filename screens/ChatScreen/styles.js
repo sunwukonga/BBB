@@ -37,6 +37,13 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  rowImage: {
+    height: Layout.WIDTH * 0.48,
+    width: Layout.WIDTH * 0.54,
+    borderRadius: Layout.HEIGHT * 0.015,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+  },
   nextarrow: {
     color: Colors.primaryColor,
     fontSize: Layout.moderateScale(18),

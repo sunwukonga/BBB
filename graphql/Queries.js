@@ -42,11 +42,9 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
         name
       }
     }
-
     tags{
       name
     }
-
     viewers
     likes
     liked
@@ -60,9 +58,6 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
         id
         imageURL
         imageKey
-      }
-      chats {
-        id
       }
       sellerRating
       sellerRatingCount
@@ -114,11 +109,9 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int){
         name
       }
     }
-
     tags{
       name
     }
-
     viewers
     likes
     liked
@@ -132,9 +125,6 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int){
         id
         imageURL
         imageKey
-      }
-      chats {
-        id
       }
       sellerRating
       sellerRatingCount
@@ -191,11 +181,9 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int){
         name
       }
     }
-    
     tags{
       name
     }
-
     viewers
     likes
     liked
@@ -209,9 +197,6 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int){
         id
         imageURL
         imageKey
-      }
-      chats {
-        id
       }
       sellerRating
       sellerRatingCount
@@ -269,11 +254,9 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
         name
       }
     }
-  
     tags{
       name
     }
-
     viewers
     likes
     liked
@@ -287,9 +270,6 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
         id
         imageURL
         imageKey
-      }
-      chats {
-        id
       }
       sellerRating
       sellerRatingCount
@@ -346,11 +326,9 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int){
         name
       }
     }
-  
     tags{
       name
     }
-
     viewers
     likes
     liked
@@ -364,9 +342,6 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int){
         id
         imageURL
         imageKey
-      }
-      chats {
-        id
       }
       sellerRating
       sellerRatingCount
@@ -423,11 +398,9 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
         name
       }
     }
-    
     tags{
       name
     }
-
     viewers
     likes
     liked
@@ -442,9 +415,6 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
         imageURL
         imageKey
       }
-      chats {
-        id
-      }
       sellerRating
       sellerRatingCount
       online
@@ -454,8 +424,72 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
 }`
 
 const GET_LOGIN_STATUS = gql`
-query log @client{
-  logged_in
+query loginStatus @client{
+  authorized
+  countryCode
+  myProfile {
+    id
+  }
+}`
+
+const GET_COUNTRY_LIST = gql`
+query {
+  allCountries {
+    isoCode
+    name
+  }
+}`;
+
+const GET_CHAT_MESSAGES = gql`
+query getChatMessages($chatIndexes:[ChatIndex]) {
+  getChatMessages(chatIndexes:$chatIndexes) {
+    id
+    userId
+    listing {
+      id
+      title
+      description
+      user {
+        id
+        profileName
+        profileImage {
+          id
+          imageKey
+        }
+      }
+      primaryImage {
+        id
+        imageKey
+      }
+      template {
+        id
+        title
+        description
+        primaryImage {
+          id
+          imageKey
+        }
+      }
+    }
+    initUser {
+      id
+      profileName
+      profileImage {
+        id
+        imageKey
+      }
+    }
+    chatMessages {
+      id
+      message
+      time
+      authorId
+      image {
+        id
+        imageKey
+      }
+    }
+  }
 }`
 
 export {
@@ -466,4 +500,6 @@ export {
 , GET_USER_LIKED_LIST
 , GET_USER_POSTED_LIST
 , GET_LOGIN_STATUS
+, GET_COUNTRY_LIST
+, GET_CHAT_MESSAGES
 }

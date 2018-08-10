@@ -15,20 +15,14 @@ import BBBIcon from '../../components/BBBIcon';
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
-import FacebookLogin from './Facebook';
+import FacebookOauth from './Facebook';
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      type: '',
-      token: '',
-      ArriverFrom: '',
-    }
   }
 
-
-render() {
+  render() {
     var leftComponent = (
       <Button
         transparent
@@ -39,7 +33,7 @@ render() {
           style={styles.backarrow}
         />
       </Button>
-    );
+    )
     return (
       <Container style={styles.container}>
         <View style={styles.container}>
@@ -70,7 +64,7 @@ render() {
               <View style={styles.socialSec}>
 
                 <View style={styles.facebookSec}>
-                  <FacebookLogin {...this.props}/>
+                  <FacebookOauth {...this.props}/>
                 </View>
 
 

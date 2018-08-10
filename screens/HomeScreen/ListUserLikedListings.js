@@ -22,11 +22,15 @@ class ListUserLikedListings extends Component {
 
 
   render() {
-    let variables = this.props.variables
+    let inputVariables = this.props.variables
+    let { loginStatus, countryCode } = this.props.loginStatus
+    if (!loginStatus) {
+      return null
+    }
     return (
       <Query
         query = {GET_USER_LIKED_LIST}
-        variables = {variables}
+        variables = {Object.assign(inputVariables, { countryCode: countryCode})}
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
@@ -39,6 +43,7 @@ class ListUserLikedListings extends Component {
           if (!data.getUserLikedListings || data.getUserLikedListings.length == 0) {
             return null
           }
+
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
@@ -52,7 +57,7 @@ class ListUserLikedListings extends Component {
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getUserLikedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} />
+                   <PureListItem item={item} loginStatus={loginStatus} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
@@ -64,6 +69,8 @@ class ListUserLikedListings extends Component {
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
                       if (!fetchMoreResult) return prev
+           //           console.log("*****************PREV: ", prev.getUserLikedListings)
+            //          console.log("*****************POST: ", fetchMoreResult.getUserLikedListings)
                       return {
                         getUserLikedListings:
                           prev.getUserLikedListings

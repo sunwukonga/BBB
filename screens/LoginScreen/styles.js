@@ -29,8 +29,8 @@ export default StyleSheet.create({
 		flexDirection: 'row',
 	},
 	facebookSec: {
-		width: Layout.WIDTH * 0.14,
-		height: Layout.WIDTH * 0.14,
+		width: Layout.WIDTH * 0.28,
+		height: Layout.WIDTH * 0.28,
 		marginVertical: Layout.moderateScale(20),
 		backgroundColor: Colors.socialbg,
 		borderWidth: 1,

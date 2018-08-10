@@ -12,7 +12,23 @@ var token = default_token
 //var default_token = await Expo.SecureStore.getItemAsync('defaultToken');
 const BBB_BASE_URL = 'http://notify.parker.sg:3000/graphql'
 
-const cache = new InMemoryCache();
+const cache = new InMemoryCache({
+  /*
+  dataIdFromObject: object => {
+    switch (object.__typename) {
+      case 'profileImage': return object.imageKey;
+      case 'bar': return object.blah; // use `blah` as the priamry key
+      default: return object.id || object._id; // fall back to `id` and `_id` for all other types
+    }
+  }
+  */
+  //cacheRedirects: {
+    //Query: {
+      //movie: (_, { id }, { getCacheKey }) =>
+        //getCacheKey({ __typename: 'Movie', id });
+    //}
+  //}
+});
 const httpLink = new HttpLink({
   uri: BBB_BASE_URL,
 /*  headers: {
@@ -52,10 +68,12 @@ const stateLink = withClientState({
   cache,
   defaults: {
     isConnected: true
-  , logged_in: false
+  , authorized: false
   , jwt_token: default_token
+  , countryCode: 'SG'
   , myProfile: {
       __typename: 'Profile'
+    , id: null
     , profileName: ""
     , profileImageURL: ""
     }
@@ -65,12 +83,17 @@ const stateLink = withClientState({
       setAuthStatus: (_, args, { cache }) => {
         console.log('setAuthStatus client-side mutation fired');
         token = args.token
-        cache.writeData({ data: { logged_in: true, jwt_token: args.token, myProfile: {__typename: 'Profile', profileName: args.profileName, profileImageURL: args.profileImageURL }}});
+        cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'Profile', id: args.id, profileName: args.profileName, profileImageURL: args.profileImageURL }}});
         return null;
       },
       unsetAuthStatus: (_, args, { cache }) => {
         console.log('unsetAuthStatus client-side mutation fired');
-        cache.writeData({ data: { logged_in: false, jwt_token: default_token, myProfile: {__typename: 'Profile', profileName: "", profileImageURL: "" }}});
+        cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'Profile', id: null, profileName: "", profileImageURL: "" }}});
+        return null;
+      },
+      setCountry: (_, args, { cache }) => {
+        console.log('setCountry client-side mutation fired');
+        cache.writeData({ data: { countryCode: args.countryCode }});
         return null;
       },
     }
@@ -81,10 +104,4 @@ const link = ApolloLink.from([errorLink, stateLink, middlewareLink, httpLink]);
 export default client = new ApolloClient({
   link
 , cache
-  //cacheRedirects: {
-    //Query: {
-      //movie: (_, { id }, { getCacheKey }) =>
-        //getCacheKey({ __typename: 'Movie', id });
-    //}
-  //}
 });

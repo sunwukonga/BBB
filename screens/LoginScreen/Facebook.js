@@ -1,11 +1,6 @@
 import React, { Component } from "react";
 import { Button, Platform, StyleSheet, Text, View } from "react-native";
-import { ApolloClient } from "apollo-client";
-import { HttpLink } from "apollo-link-http";
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloProvider, graphql,Mutation } from "react-apollo";
-import { withClientState } from "apollo-link-state";
-import { ApolloLink } from "apollo-link";
+import { graphql,Mutation } from "react-apollo";
 import gql from "graphql-tag";
 
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -14,98 +9,89 @@ import {Alert, Image, ImageBackground } from 'react-native';
 
 
 import { StackActions, NavigationActions } from 'react-navigation';
+import {
+  FACEBOOK_LOGIN
+, SET_AUTH_STATUS
+} from '../../graphql/Mutations'
 
-
-var facebook_jwt= null;
-
-const FACEBOOK_LOGIN = gql`
-  mutation loginFacebook($token: String!) {
-    loginFacebook(token: $token) {
-      token
-      user {
-        profileName
-        profileImage {
-          imageKey
-          imageURL
-        }
-      }
-    }
-  }
-`;
 
 // NA -> navigation Action
-
 const NA_LoginToHome = NavigationActions.navigate({
     routeName: 'homeScreen',
     params: { previous_screen: 'loginScreen'
-            , doAction: 'openDrawer' },
-    //action: NavigationActions.navigate({ routeName: 'NEXT_SCREEN' }),
+            , doAction: 'openDrawer'
+            , loginStatus: true },
 })
 const NA_LoginToCreate = NavigationActions.navigate({
     routeName: 'createNewItemScreen',
     params: { previous_screen: 'loginScreen'
-            }
+            , loginStatus: true }
 })
-const SA_LoginToHome = StackActions.reset({
+/*
+const SA_LoginToCreate = StackActions.reset({
     index: 0
   , actions: [
+      NavigationActions.navigate({
+        routeName: 'mainScreen'
+      , actions: [
         NavigationActions.navigate({
-            routeName: 'mainScreen'
-          , params: { previous_screen: 'loginScreen'
-                    , doAction: 'openDrawer' }
-          , action: NavigationActions.back()
+          routeName: 'homeScreen'
+        , params: { loginStatus: true }
         })
+      , NavigationActions.navigate({
+          routeName: 'createNewItemScreen'
+      })
     ]
 })
+*/
 
-export default LoggedinState = graphql(gql`
-  mutation setAuthStatus( $token: String!, $profileName: String!, $profileImageURL: String ) {
-    setAuthStatus( token: $token, profileName: $profileName, profileImageURL: $profileImageURL ) @client
-  }
-`)(
+export default FacebookOauth = graphql(SET_AUTH_STATUS)(
   class extends Component {
 
-    onLoggedinState = ( data ) => {
-      let user = data.user
+    onBBToken = ( {user, token} ) => {
       if (user.profileImage.imageKey) {
-        // Image is stored with us, need s3Url + imageKey
-        this.props.mutate({ variables: {token: data.token, profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
+        this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
       } else if (user.profileImage.imageURL) {
-        this.props.mutate({ variables: {token: data.token, profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
+        this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
       } else {
-        this.props.mutate({ variables: {token: data.token, profileName: user.profileName, profileImageURL: null}});
+        this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: null}});
       }
     };
 
     render() {
       return (
         <View {...this.props}>
-        <Mutation mutation={FACEBOOK_LOGIN}>
-
+        <Mutation
+          mutation={FACEBOOK_LOGIN}
+          fetchOptions = 'no-cache'
+        >
         {(loginFacebook, { data }) => (
           <FontAwesome
             name="facebook"
-            size={Layout.moderateScale(25)}
+            size={Layout.moderateScale(50)}
             style={{
               color: Colors.fbbgicon,
             }}
             onPress={async () => {
+              let startTime = new Date()
               const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('279793089219775', {
                   permissions: ['public_profile', 'email'],
                 });
+              console.log("Time (ms) to get Facebook Token: ", new Date() - startTime)
 
               if (type === 'success') {
 
+                startTime = new Date()
                 const data = await loginFacebook({
                   variables: { token: token },
                 });
-                //TODO: Add this returned token to securestore and then navigate on.
-                Expo.SecureStore.setItemAsync('token', data.data.loginFacebook.token);
+                console.log("Time (ms) to get BBToken: ", new Date() - startTime)
 
                 console.log('data.data.loginFacebook '+JSON.stringify(data.data.loginFacebook));
-                await this.onLoggedinState(data.data.loginFacebook);
+                startTime = new Date()
+                await this.onBBToken(data.data.loginFacebook)
+                console.log("Time (ms) to store token and profile: ", new Date() - startTime)
 
-                console.log("Our status should be logged in")
                 if ( this.props.navigation.state && this.props.navigation.state.params ) {
                   // Arriving from Home -> drawerOpen
                   if ( this.props.navigation.state.params.dest == 'openDrawer' ) {
