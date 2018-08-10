@@ -14,7 +14,7 @@ class LoginStatus extends Component {
         query = {GET_LOGIN_STATUS}
         fetchOptions = 'cache-only'
       >
-        {({ data }) => this.props.children({loginStatus: data.logged_in, countryCode: data.countryCode}) }
+        {({ data }) => this.props.children({loginStatus: data.authorized, countryCode: data.countryCode, userId: data.userId}) }
       </Query>
     )
   }
@@ -28,7 +28,7 @@ LoginStatus.propTypes = {
 }
 // Don't need for now, I want this function as streamlined as possible. 
           if (typeof children === 'function') {
-            return this.props.children({loginStatus: data.logged_in, countryCode: data.countryCode})
+            return this.props.children({loginStatus: data.authorized, countryCode: data.countryCode})
           } else {
             return (<Text> HI </Text>)
           }

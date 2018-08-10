@@ -1,37 +1,40 @@
 import React from 'react';
 import {
-	Image,
-	Platform,
-	Text,
-	TouchableOpacity,
-	View,
-	KeyboardAvoidingView,ScrollView,Alert,TouchableWithoutFeedback,
+  Image,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+  KeyboardAvoidingView,ScrollView,Alert,TouchableWithoutFeedback,
 } from 'react-native';
 import {
-	Container,
-	Content,
-	Header,
-	Left,
-	Body,
-	Right,
-	Title,
-	Button,
-	Icon,
-	Input,
+  Container,
+  Content,
+  Header,
+  Left,
+  Body,
+  Right,
+  Title,
+  Button,
+  Icon,
+  Input,
 } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
+import Baby from '../../components/Baby';
 
 // screen style
 import styles from './styles';
 import { Layout, Images, Colors } from '../../constants/';
 
+import SendMessageInput from './SendMessageInput'
 import getChatMessages from './GetChatMessages';
 import sendChatMessage from './SendMessage';
-import createChat from './CreateChat';
+//import createChat from './CreateChat';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';
 var chatIds=[];
@@ -45,327 +48,360 @@ var user_Name:"",productTitle:"",productImg:"",userImg:"";
 var chatDetail;
 var isFromChat=false;
 export default class ChatDetailScreen extends React.Component {
-	constructor(props) {
-		super(props);
-		console.log(this.props.navigation.state.params);
-		console.log(this.props.navigation.state.params.listingId);
-		console.log(this.props.navigation.state.params.recUserId);
-		console.log(this.props.navigation.state.params.isChatExists);
-		console.log(this.props.navigation.state.params.chatId);
-		listingId=this.props.navigation.state.params.listingId;
-		recUserId=this.props.navigation.state.params.recUserId;
-		chatId_=this.props.navigation.state.params.chatId;
-		chatExists=this.props.navigation.state.params.isChatExists;
-		if(this.props.navigation.state.params.itemDetails != 'undefined' && this.props.navigation.state.params.itemDetails != undefined){
-			itemDetails=this.props.navigation.state.params.itemDetails;
-		}
-		if(this.props.navigation.state.params.chatDetail != 'undefined' && this.props.navigation.state.params.chatDetail != undefined){
-			isFromChat=true;
-			chatDetail=this.props.navigation.state.params.chatDetail;
-		}
-		this.setHeaderDetails();
-		this.scroll = null;
-		this.state = {
-			newPost: '',
-			btnDisabled:false,
-			chatMessageList:[],
-		};
-	}
-
-	componentDidMount(){
-		this.setState({
-			progressVisible: true,
-		});
-		chatIds=[];
-		if(!chatExists){
-		var createChat_={"recUserId":recUserId,"listingId":listingId};
-		createChat(createChat_).then((res)=>{
-			chatId_=res.data.createChat.id;
-				chatIds.push({chatId:chatId_});
-				console.log(chatIds);
-				this.setState({
-					progressVisible: false,
-					btnDisabled:false,
-				});
-				//this.getChatMsg();
-				this.updateChatList();
-		})
-		.catch(error => {
-			console.log("Error:" + error.message);
-			this.setState({
-				progressVisible: false,
-				btnDisabled:false,
-			});
-		});
-	} else {
-			console.log("Chat Exists");
-			chatIds.push({chatId:chatId_});
-			this.updateChatList();
- 	}
-	this.setHeaderDetails();
+  constructor(props) {
+    super(props);
+    this.state = {
+      scroll: null
+    }
+    /*
+    item.id
+    item.userId
+    item.listing.id
+    item.listing.title
+    item.listing.description
+    item.listing.user.id
+    item.listing.user.profileName
+    item.listing.user.profileImage.imageKey
+    item.listing.primaryImage.id
+    item.listing.primaryImage.imageKey
+    item.initUser.id
+    item.initUser.online
+    item.initUser.profileName
+    item.initUser.profileImage.id
+    item.initUser.profileImage.imageKey
+    item.chatMessages[].id
+    item.chatMessages[].message
+    item.chatMessages[].time
+    item.chatMessages[].authorId
+    item.chatMessages[].image.id
+    item.chatMessages[].image.imageKey
+    */
+    /*
+    console.log(this.props.navigation.state.params);
+    console.log(this.props.navigation.state.params.listingId);
+    console.log(this.props.navigation.state.params.recUserId);
+    console.log(this.props.navigation.state.params.isChatExists);
+    console.log(this.props.navigation.state.params.chatId);
+    listingId=this.props.navigation.state.params.listingId;
+    recUserId=this.props.navigation.state.params.recUserId;
+    chatId_=this.props.navigation.state.params.chatId;
+    chatExists=this.props.navigation.state.params.isChatExists;
+    */
+    /*
+    if(this.props.navigation.state.params.itemDetails != 'undefined' && this.props.navigation.state.params.itemDetails != undefined){
+      itemDetails=this.props.navigation.state.params.itemDetails;
+    }
+    if(this.props.navigation.state.params.chatDetail != 'undefined' && this.props.navigation.state.params.chatDetail != undefined){
+      isFromChat=true;
+      chatDetail=this.props.navigation.state.params.chatDetail;
+    }
+    //this.setHeaderDetails();
+    this.scroll = null;
+    this.state = {
+      newPost: '',
+      btnDisabled:false,
+      chatMessageList:[],
+    };
+    */
+  }
+/*
+  componentDidMount(){
+    this.setState({
+      progressVisible: true,
+    });
+    chatIds=[];
+    if(!chatExists){
+    var createChat_={"recUserId":recUserId,"listingId":listingId};
+    createChat(createChat_).then((res)=>{
+      chatId_=res.data.createChat.id;
+        chatIds.push({chatId:chatId_});
+        console.log(chatIds);
+        this.setState({
+          progressVisible: false,
+          btnDisabled:false,
+        });
+        //this.getChatMsg();
+        this.updateChatList();
+    })
+    .catch(error => {
+      console.log("Error:" + error.message);
+      this.setState({
+        progressVisible: false,
+        btnDisabled:false,
+      });
+    });
+  } else {
+      console.log("Chat Exists");
+      chatIds.push({chatId:chatId_});
+      this.updateChatList();
+   }
+  this.setHeaderDetails();
 }
-
+*/
+  /*
   updateChatList(){
-			this.getChatMsg();
-	/*	this.setInterval( () => {
-				if(chatId_==null){
-					this.getChatMsg();
-				}
-    }, 1500);*/
-	}
+      this.getChatMsg();
+      */
+  /*  this.setInterval( () => {
+        if(chatId_==null){
+          this.getChatMsg();
+        }
+    }, 1500);
+  }*/
 
+/*
+  getChatMsg(){
+    var variables={
+      "chatIndexes":chatIds
+    }
+    getChatMessages(variables).then((res)=>{
 
-	getChatMsg(){
-		var variables={
-			"chatIndexes":chatIds
-		}
-		getChatMessages(variables).then((res)=>{
+        Object.keys(res.data.getChatMessages).forEach((key,index)=>{
+            if(res.data.getChatMessages[key].id==chatId_){
+              chatMessageList=res.data.getChatMessages[key].chatMessages;
+            }
+        });
 
-				Object.keys(res.data.getChatMessages).forEach((key,index)=>{
-						if(res.data.getChatMessages[key].id==chatId_){
-							chatMessageList=res.data.getChatMessages[key].chatMessages;
-						}
-				});
+        this.setState({
+          chatMessageList:chatMessageList,
+          progressVisible: false,
+          btnDisabled:false,
+        })
+        setTimeout(() => {
+            this.scroll.scrollToEnd();
+          }, 150);
 
-				this.setState({
-					chatMessageList:chatMessageList,
-					progressVisible: false,
-					btnDisabled:false,
-				})
-				setTimeout(() => {
-						this.scroll.scrollToEnd();
-					}, 150);
+    })
+    .catch(error => {
+      console.log("Error:" + error.message);
+      this.setState({
+        progressVisible: false,
+        btnDisabled:false,
+      });
+    });
+  }
+  */
+  deleteSelectedMessage(msgId){
+      Alert.alert("Delete:"+msgId)
+  }
+// This needs to be wrapped up as a text input.
+  sendChatMsg(){
 
-		})
-		.catch(error => {
-			console.log("Error:" + error.message);
-			this.setState({
-				progressVisible: false,
-				btnDisabled:false,
-			});
-		});
-	}
-	deleteSelectedMessage(msgId){
-			Alert.alert("Delete:"+msgId)
-	}
+    if(this.state.newPost.length===0){
+      // this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
+      Toast.show("Please Enter Message",Toast.SHORT)
+        return false;
+    }
+    this.setState({
+      progressVisible: false,
+      btnDisabled:true,
+    });
+    var variables={
+                    "chatId": chatId_,
+                    "message": this.state.newPost,
+                    "lastMessageId": 0
+                  }
+      sendChatMessage(variables).then((res)=>{
+          console.log(res);
+          chatMessageList=[]
+          chatMessageList=res.data.sendChatMessage
+          this.setState({
+            chatMessageList:chatMessageList,
+            progressVisible: false,
+            newPost:'',
+            btnDisabled:false,
+          })
+          setTimeout(() => {
+              this.scroll.scrollToEnd();
+            }, 150);
+      })
+      .catch(error =>{
+        console.log("Error:" + error.message);
+        this.setState({
+          progressVisible: false,
+          btnDisabled:false,
+        });
+      });
+  }
 
-	sendChatMsg(){
+  setHeaderDetails(){
+    if(itemDetails!=null){
+        var _pImg="";
+        var _uImg="";
+        if(itemDetails.user.profileImage===null || itemDetails.user.profileImage.imageKey===null){
 
-		if(this.state.newPost.length===0){
-			// this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
-			Toast.show("Please Enter Message",Toast.SHORT)
-				return false;
-		}
-		this.setState({
-			progressVisible: false,
-			btnDisabled:true,
-		});
-		var variables={
-  									"chatId": chatId_,
-  									"message": this.state.newPost,
-  									"lastMessageId": 0
-									}
-			sendChatMessage(variables).then((res)=>{
-					console.log(res);
-					chatMessageList=[]
-					chatMessageList=res.data.sendChatMessage
-					this.setState({
-						chatMessageList:chatMessageList,
-						progressVisible: false,
-						newPost:'',
-						btnDisabled:false,
-					})
-					setTimeout(() => {
-							this.scroll.scrollToEnd();
-						}, 150);
+        } else {
+          _uImg=itemDetails.user.profileImage.imageKey;
+        }
 
-			})
-			.catch(error =>{
-				console.log("Error:" + error.message);
-				this.setState({
-					progressVisible: false,
-					btnDisabled:false,
-				});
-			});
-	}
+        if(itemDetails.primaryImage===null || itemDetails.primaryImage.imageKey===null){
 
-	setHeaderDetails(){
-		if(itemDetails!=null){
-				var _pImg="";
-				var _uImg="";
-				if(itemDetails.user.profileImage===null || itemDetails.user.profileImage.imageKey===null){
+        } else {
+          _pImg=itemDetails.primaryImage.imageKey;
+        }
+        user_Name=itemDetails.user.profileName;
+        productTitle=itemDetails.title;
+        productImg=_pImg;
+        userImg=_uImg;
+      }
+      else if(chatDetail!=null) {
+        var _pImg="";
+        var _uImg="";
+        if(chatDetail.recUser.profileImage===null || chatDetail.recUser.profileImage.imageKey===null){
 
-				} else {
-					_uImg=itemDetails.user.profileImage.imageKey;
-				}
+        } else {
+          _uImg=chatDetail.recUser.profileImage.imageKey;
+        }
 
-				if(itemDetails.primaryImage===null || itemDetails.primaryImage.imageKey===null){
+        if(chatDetail.listing.primaryImage===null || chatDetail.listing.imageKey===null){
 
-				} else {
-					_pImg=itemDetails.primaryImage.imageKey;
-				}
-				user_Name=itemDetails.user.profileName;
-				productTitle=itemDetails.title;
-				productImg=_pImg;
-				userImg=_uImg;
-			}
-			else if(chatDetail!=null) {
-				var _pImg="";
-				var _uImg="";
-				if(chatDetail.recUser.profileImage===null || chatDetail.recUser.profileImage.imageKey===null){
-
-				} else {
-					_uImg=chatDetail.recUser.profileImage.imageKey;
-				}
-
-				if(chatDetail.listing.primaryImage===null || chatDetail.listing.imageKey===null){
-
-				} else {
-					_pImg=chatDetail.listing.primaryImage.imageKey;
-				}
-				user_Name=chatDetail.recUser.profileName;
-				productTitle=chatDetail.listing.title;
-				productImg=_pImg;
-				userImg=_uImg;
-		}
-	}
-	openMenu(id) {
+        } else {
+          _pImg=chatDetail.listing.primaryImage.imageKey;
+        }
+        user_Name=chatDetail.recUser.profileName;
+        productTitle=chatDetail.listing.title;
+        productImg=_pImg;
+        userImg=_uImg;
+    }
+  }
+  openMenu(id) {
     Alert.alert("Trest"+id)
   };
 
-	deleteItem(item){
-		var msgId=item.id;
-		 Alert.alert("Delete "+msgId);
-	}
+  deleteItem(item){
+    var msgId=item.id;
+     Alert.alert("Delete "+msgId);
+  }
 
-	onBack(){
-			if(isFromChat){
-				this.props.navigation.push('ChatListScreen')
-			} else {
-				this.props.navigation.push('homeScreen')
-			}
-	}
+  onBack(){
+      if(isFromChat){
+        this.props.navigation.navigate('ChatListScreen')
+      } else {
+        this.props.navigation.navigate('homeScreen')
+      }
+  }
 
-	render() {
-		var titleComponent = (
-			<View style={styles.body}>
-			{ userImg==="" ||  userImg===null
-				? <Image  source={Images.tempUser} style={styles.profileImage} />
-				: <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+userImg+""}} style={styles.profileImage} />
-			}
-				<Title style={styles.headerTitle}>{user_Name}</Title>
-			</View>
-		);
-		var leftComponent = (
-			<Button transparent onPress={() => this.onBack()}>
-				<BBBIcon
-					name="BackArrow"
-					size={Layout.moderateScale(18)}
-					style={styles.backarrow}
-				/>
-			</Button>
-		);
-		return (
-			<Container style={styles.container}>
-				<BBBHeader
-					titleComponent={titleComponent}
-					leftComponent={leftComponent}
-				/>
-				<View style={styles.notifyContainer}>
+  // Get the other chat participants Image and ProfileName
+  otherImageAndName( chat ) {
+    let profileImage
+    let profileName
 
-				{ productImg==="" || productImg===null
-					? <Image  source={Images.trollie} style={styles.notifyImage} />
-					: <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+productImg+""}} style={styles.notifyImage} />
-				}
+    if ( chat && chat.listing && chat.listing.user && chat.listing.user.id != chat.userId ) {
+      if ( chat.listing.user.profileImage && chat.listing.user.profileImage.imageKey ) {
+        profileImage = <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+      } else {
+        profileImage = <Baby style={styles.profileImage} />
+      }
+      if ( chat.listing.user.profileName ) {
+        profileName = <Title style={styles.headerTitle}>{chat.listing.user.profileName}</Title>
+      } else {
+        profileName = <Text>Nothing to show</Text>
+      }
+    } else if ( chat.initUser != chat.userId ) {
+      if ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey ) {
+        profileImage = <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.initUser.primaryImage.imageKey }} style={styles.profileImage} />
+      } else {
+        profileImage = <Baby style={styles.profileImage} />
+      }
+      if ( chat.initUser.profileName ) {
+        profileName = <Title style={styles.headerTitle}>{chat.initUser.profileName}</Title>
+      } else {
+        profileName = <Text> Nothing to show </Text>
+      }
+    }
+    return (
+      <View style={styles.body}>
+        <View>{ profileImage }</View>
+        <View>{ profileName }</View>
+      </View>
+    )
+  }
+/*
+        {this.otherImageAndName( chat )}
+      */
+  render() {
+    console.log("RENDER CHAT")
+    let { chat } = this.props.navigation.state.params
+    var leftComponent = (
+      <Button transparent onPress={() => this.props.navigation.goBack()}>
+        <BBBIcon
+          name="BackArrow"
+          size={Layout.moderateScale(18)}
+          style={styles.backarrow}
+        />
+      </Button>
+    )
+// ref={(scroll) => {this.scroll = scroll;}}>
+    //  style={(chatMessage.authorId == chat.userId) ? {alignSelf: 'flex-end'} : {alignSelf: 'flex-start'}}>
+          //<KeyboardAvoidingView behavior="padding" contentContainerStyle={{flex: 1, justifyContent: 'space-between' }}>
+      //</KeyboardAvoidingView>
+    return (
+      <View style={{ flex: 1 }}>
+        <BBBHeader
+          titleComponent={ this.otherImageAndName( chat ) }
+          leftComponent={leftComponent}
+        />
+        <View style={styles.notifyContainer}>
 
+          { (chat && chat.listing && chat.listing.primaryImage && chat.listing.primaryImage.imageKey)
+          ? <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.listing.primaryImage.imageKey}} style={styles.notifyImage} />
+          : <Baby style={styles.rowImage} />
+          }
 
-					<Text style={styles.regularSmall}>
-					{productTitle}
-					</Text>
-				</View>
-				<ScrollView
-					ref={(scroll) => {this.scroll = scroll;}}>
-
-				<View style={styles.contentStyle}>
-
-					{this.state.chatMessageList.map((item, index) => {
-						return (
-							<TouchableOpacity 	key={index} onLongPress={()=> this.deleteItem(item)}>
-							<View
-								key={index}
-								style={{ marginHorizontal: Layout.moderateScale(10) }}>
-
-								<View style={item.authorId == "1" ? styles.chat : styles.response}>
-									{item.authorId == 1 ? (
-										<BBBIcon
-											name="MsgRightSvg"
-											color={Colors.avtarBorder}
-											size={Layout.moderateScale(15)}
-											style={{
-												position: 'absolute',
-												right: Layout.moderateScale(-10),
-											}}
-										/>
-									) : (
-										<BBBIcon
-											name="MsgLeftSvg"
-											color="#f5f5f5"
-											size={Layout.moderateScale(15)}
-											style={{
-												position: 'absolute',
-												left: Layout.moderateScale(-12.5),
-											}}
-										/>
-									)}
-									<Text style={styles.regularSmall}>{item.message}</Text>
-									<Text style={styles.timeStyle}>Today</Text>
-								</View>
-
-							</View>
-	</TouchableOpacity >
-						);
-					})}
-
-				</View>
-	</ScrollView>
-				<KeyboardAvoidingView behavior="padding">
-					{/*Second Section START*/}
-					<View style={styles.footerStyle}>
-						<Input
-							value={this.state.newPost}
-							style={styles.newPostStyle}
-							editable={true}
-							keyboardType="default"
-							returnKeyType="done"
-							autoCapitalize="none"
-							autoCorrect={false}
-							text={this.state.newPost}
-							onChangeText={newPost => this.setState({ newPost })}
-							underlineColorAndroid="transparent"
-							placeholder="Send Message"
-							placeholderTextColor="#7d7d7d"
-						/>
-
-						<TouchableOpacity
-							onPress={() => this.sendChatMsg()}
-							 disabled={this.state.btnDisabled}
-							style={styles.postBtn}>
-							<Ionicons
-								name="md-send"
-								size={Layout.moderateScale(30)}
-								color={Colors.white}
-							/>
-						</TouchableOpacity>
-					</View>
-					{/*Second Section END*/}
-				</KeyboardAvoidingView>
-				<ProgressDialog
-						visible={this.state.progressVisible}
-						 message="Please wait"
-						activityIndicatorSize="large"
-						activityIndicatorColor="blue"
-											 />
-			</Container>
-		);
-	}
+          <Text style={styles.regularSmall}>
+            { (chat && chat.listing && chat.listing.title)
+            ? (chat.listing.title)
+            : null
+            }
+          </Text>
+        </View>
+          <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: Layout.HEIGHT * 0.5}}>
+            <View style={styles.contentStyle}>
+          {chat.chatMessages.map((chatMessage, index) => {
+            return (
+              <View key={index} style={(chatMessage.authorId == chat.userId) ? {alignSelf: 'flex-end'} : {alignSelf: 'flex-start'}}>
+              <TouchableOpacity key={index} onLongPress={()=> this.deleteItem(chatMessage)}>
+                <View
+                  key={index}
+                  style={[{marginHorizontal: Layout.moderateScale(10)}, styles.chat ]}>
+                    {chatMessage.authorId == chat.userId ? (
+                      <BBBIcon
+                        name="MsgRightSvg"
+                        color={Colors.avtarBorder}
+                        size={Layout.moderateScale(15)}
+                        style={{
+                          position: 'absolute',
+                          right: Layout.moderateScale(-10),
+                        }}
+                      />
+                    ) : (
+                      <BBBIcon
+                        name="MsgLeftSvg"
+                        color="#f5f5f5"
+                        size={Layout.moderateScale(15)}
+                        style={{
+                          position: 'absolute',
+                          left: Layout.moderateScale(-12.5),
+                        }}
+                      />
+                    )}
+                    <Text style={styles.regularSmall}>{chatMessage.message}</Text>
+                    <Text style={styles.timeStyle}>{chatMessage.time}</Text>
+                </View>
+            </TouchableOpacity>
+              </View>
+            );
+          })}
+              </View>
+        </ScrollView>
+        <SendMessageInput variables = {
+          { chatId: chat.id
+          , lastMessageId: (chat.chatMessages.length > 0) ? chat.chatMessages[chat.chatMessages.length-1].id : 0
+          }} />
+      </View>
+    );
+  }
 }
+          //<KeyboardAvoidingView contentContainerStyle={{flex: 1, justifyContent: 'flex-start', backgroundColor: 'purple' }}>
+      //</KeyboardAvoidingView>
+        //<KeyboardAvoidingView contentContainerStyle={{flex: 1, flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'purple' }}>

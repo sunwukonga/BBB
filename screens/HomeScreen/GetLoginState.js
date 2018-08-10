@@ -8,6 +8,11 @@ import {
   GET_LOGIN_STATUS
 } from '../../graphql/Queries'
 
+
+//------------------------------------------------------------
+//--UNUSED-------UNUSED--------UNUSED-----------UNUSED--------
+//------------------------------------------------------------
+
 // This component violates the principle of never updating state from within render.
 class UpdateLoginState extends Component {
 
@@ -28,8 +33,8 @@ class UpdateLoginState extends Component {
             return <View><Text>Error: {error.message}</Text></View>
           }
           if (data) {
-            if (typeof(data.logged_in) == typeof(true)) {
-              this.props.setLoginState( data.logged_in )
+            if (typeof(data.authorized) == typeof(true)) {
+              this.props.setLoginState( data.authorized )
             }
           }
           return null

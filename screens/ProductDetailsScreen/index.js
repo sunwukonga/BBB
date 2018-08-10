@@ -37,7 +37,7 @@ import likeProductApi from './LikeProductApi';
 var log_status = '';
 const GET_LOGIN_STATUS = gql`
      query log @client{
-           logged_in
+           authorized
            jwt_token
         }`;
 
@@ -49,10 +49,10 @@ const App = () => (
      if (loading) return <Text>{`Loading...`}</Text>;
      if (error) return <Text>{`Error: ${error}`}</Text>;
       console.log('get data');
-      console.log('home_query '+data.logged_in);
+      console.log('home_query '+data.authorized);
       console.log('home_query '+data.jwt_token);
 
-      log_status = data.logged_in;
+      log_status = data.authorized;
 
       if(log_status==true){
         drawerStatus = 'unlocked';

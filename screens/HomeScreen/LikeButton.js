@@ -39,7 +39,7 @@ class LikeButton extends Component {
     return (
       <Mutation
         mutation={LIKE_LISTING}
-        update={(cache, { data: { LikeListing } }) => {
+        update={(cache, { data: { likeListing } }) => {
           const { getUserLikedListings } = cache.readQuery({
             query: GET_USER_LIKED_LIST
           , variables: {"countryCode":'SG',"limit":10,"page":1}

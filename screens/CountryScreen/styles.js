@@ -35,13 +35,15 @@ export default StyleSheet.create({
     paddingLeft: Layout.moderateScale(10),
   },
   flagStyle: {
-    height: Layout.HEIGHT * 0.05,
-    width: Layout.HEIGHT * 0.05,
+    height: Layout.HEIGHT * 0.08,
+    width: Layout.HEIGHT * 0.08,
   },
   countryNameTxt: {
     color: Colors.secondaryColor,
     fontSize: Layout.moderateScale(16),
-    fontFamily: 'roboto-medium',
-    alignSelf: 'center'
+    fontFamily: 'roboto-reguler',
+    alignSelf: 'center',
+    marginRight: Layout.WIDTH * 0.10,
+
   },
 });

@@ -1,19 +1,25 @@
 import React from 'react';
 import {
   View
+, Text
+, TouchableOpacity
 , AsyncStorage
 , BackHandler
 } from 'react-native';
 // For creating Actions. Will move out to external file later
 import { NavigationActions } from 'react-navigation';
 import {
-  Container
-, Content
-, Text
+  Icon
 , Button
-, Icon
+, Left
+, Right
+, Header
+, Body
+, Title
 , Item
 , Input
+, Container
+, Content
 , Fab
 } from 'native-base';
 //custom components
@@ -21,6 +27,7 @@ import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 // style
 import styles from './styles';
+import headerStyles from '../../components/BBBHeader/styles';
 import { Layout, Colors, Images } from '../../constants/';
 
 // FlatLists with embedded Queries
@@ -33,8 +40,6 @@ import ListUserPostedListings from './ListUserPostedListings'
 
 import getProfile from './GetProfile';
 import likeProductApi from './LikeProductApi';
-// As beautiful as this Component is, it violates a principle and must be removed.
-import UpdateLoginState from './UpdateLoginState'
 import LoginStatus from './LoginStatus'
 
 import MainDrawer from '../../navigation/MainDrawerNavigator'
@@ -51,40 +56,47 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
           , dest: 'createNewItemScreen'}
 })
 
-//const drawerStatus = 'locked-closed';
-
 
 export default class HomeScreen extends React.Component {
-/*
+
   static navigationOptions = () => ({
-    drawerLockMode: drawerStatus,
-  }); */
+    drawerLockMode: 'locked-closed',
+  })
 
   onBackPress = () => {
     this.props.navigation.closeDrawer()
     return true
   }
-  
+
+  openDrawerAndSetState = () => {
+    this.setState({ drawerOpen: true })
+    this.props.navigation.openDrawer()
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
       limit:10,
       page:1,
-	  searchTerms:'',
+      searchTerms:'',
+      drawerOpen: false,
     }
 
     this.drawerBackHandler = null
     const defaultGetStateForAction = MainDrawer.router.getStateForAction;
     MainDrawer.router.getStateForAction = (action, state) => {
       if (state && action.type === 'Navigation/OPEN_DRAWER') {
+        this.setState({ drawerOpen: true })
           console.log('<===============>DrawerOpen');
         this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
           console.log('Listener ADDED');
       }
       if (state && action.type === 'Navigation/DRAWER_CLOSED') {
+        this.setState({ drawerOpen: false })
           console.log('<|||||||||||||||>DrawerClose');
         this.drawerBackHandler.remove()
+        this.drawerBackHandler = null
           console.log('Listener REMOVED');
       }
       return defaultGetStateForAction(action, state);
@@ -143,10 +155,11 @@ export default class HomeScreen extends React.Component {
 		});
 	}
 
+  /*
   componentWillReceiveProps(nextProps) {
     console.log("WillReceiveProps")
-    console.log(nextProps)
   }
+  */
 /*
   _retrieveCountry = async () => {
       try {
@@ -161,12 +174,8 @@ export default class HomeScreen extends React.Component {
        }
     }
  */ 
-  componentDidMount(){
-/*
-    console.log("Retrieve country")
-    this._retrieveCountry()
-    */
-    
+  componentDidMount() {
+
     this.willFocusListener = this.props.navigation.addListener(
       'willFocus'
     , payload => {
@@ -177,13 +186,22 @@ export default class HomeScreen extends React.Component {
       'didFocus',
       payload => {
         console.log('didFocus')
+        if ( this.state.drawerOpen ) {
+          // reattach the listener as we never closed the drawer
+          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
+        }
         if ( this.props.navigation.state && this.props.navigation.state.params ) {
           if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
             getProfile()
             .then( myProfile => {
               if ( myProfile ) {
+                /*
+                this.setState((prevState, props) => {
+                  return {counter: prevState.counter + props.step};
+                });
+                */
                 this.props.navigation.state.params = myProfile
-                this.props.navigation.openDrawer()
+                this.openDrawerAndSetState()
               }
             })
           }
@@ -200,6 +218,11 @@ export default class HomeScreen extends React.Component {
       'didBlur'
     , payload => {
         console.log('didBlur')
+        if (this.drawerBackHandler) {
+          // Handler still exists. This means that the drawer was not closed before navigating away.
+            // I.e. drawerOpen: true
+          this.drawerBackHandler.remove()
+        }
       }
     )
 
@@ -248,7 +271,8 @@ export default class HomeScreen extends React.Component {
   }
 
   checkAuthForDrawer = (loginStatus) => {
-    if( loginStatus.loginStatus ) {
+    if ( loginStatus.loginStatus ) {
+      //this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
       this.props.navigation.openDrawer()
     }
     else {
@@ -261,10 +285,9 @@ export default class HomeScreen extends React.Component {
       ^^^ There can be no gap between  `>` and `{`  OR  `}` and `<`
       */
   render() {
-    console.log('HomeRender')
     var leftComponent = (
       <LoginStatus>{ loginStatus => (
-        <Button transparent onPress={() => this.checkAuthForDrawer(loginStatus) }>
+        <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
           <BBBIcon
             name="Menu"
             size={Layout.moderateScale(18)}
@@ -276,8 +299,7 @@ export default class HomeScreen extends React.Component {
     );
 
     var rightComponent = (
-      <Button transparent onPress={() => this.props.navigation.navigate( 'categoryScreen' )}>
-      
+      <Button transparent onPress={ () => this.props.navigation.navigate('categoryScreen')}>
         <BBBIcon
           name="CategoryIcon"
           size={Layout.moderateScale(18)}
@@ -292,13 +314,22 @@ export default class HomeScreen extends React.Component {
           return null
         }}</LoginStatus>
         */
-    return (
-      <Container>
+    /*
         <BBBHeader
           title="Bebe Bargains"
           leftComponent={leftComponent}
           rightComponent={rightComponent}
         />
+        */
+    return (
+      <Container>
+        <Header
+          androidStatusBarColor={Colors.mainheaderbg}
+          style={headerStyles.header}>
+          <Left style={headerStyles.left}>{leftComponent}</Left>
+          <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
+          <Right style={headerStyles.right}>{rightComponent}</Right>
+        </Header>
         <Content style={styles.container}>
           <View>
             <View style={styles.searchSec}>

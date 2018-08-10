@@ -6,11 +6,11 @@ import {
 } from 'react-native';
 import {
   ListItem
-, Text
 } from 'react-native-elements'
 import {
   Container
 , Content
+, Text
 } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
 

@@ -87,6 +87,10 @@ query searchListing($terms:[String],$limit:Int,$page:Int,$filter:Filters!){
 
 
 function getSearchProductList(_variables) {
-  return client.query({variables:_variables,query: SEARCH_LIST});
+  return client.query({
+    variables: _variables
+  , query: SEARCH_LIST
+  , fetchPolicy: "no-cache"
+  })
 }
 export default getSearchProductList;
