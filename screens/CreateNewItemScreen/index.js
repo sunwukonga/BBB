@@ -44,6 +44,7 @@ import Toast from 'react-native-simple-toast';
 import getCategoryList from './AllCategoryApi';
 import getTemplateList from './SearchTemplateApi';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
+import LoginStatus from '../HomeScreen/LoginStatus'
 
 
 import Collapsible from 'react-native-collapsible';
@@ -247,13 +248,13 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
 //"barterTemplates":[[{"templateId":"1","quantity":1,"tags":["1","2"]},{"templateId":"2","quantity":2,"tags":["1","2"]}]]
-  saveToServer(){
+  saveToServer( countryCode ){
 
     if(!this._validateAllRequiredFileds()){
         return;
     }
 
-    console.log("Country Code",this.state.countryCode);
+    console.log("Country Code", countryCode);
     var variables = "";
     var post_=null;
     var addr_=null;
@@ -279,7 +280,7 @@ export default class CreateNewItemScreen extends React.Component {
     "category":this.state.category,
     "template":this.state.selectedTemplateId,
     "tags":tagsList,
-    "countryCode":this.state.countryCode
+    "countryCode": countryCode
    }
 
    console.log("Params",variables);
@@ -311,7 +312,6 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   componentDidMount(){
-    this._retrieveCountry();
     this.setState({
       progressVisible: true,
 
@@ -389,6 +389,7 @@ export default class CreateNewItemScreen extends React.Component {
     );
   }
 
+  // REDUNDANT: DO NOT USE
   _retrieveCountry = async () => {
       try {
           const value = await AsyncStorage.getItem('countryCode');
@@ -879,13 +880,16 @@ export default class CreateNewItemScreen extends React.Component {
       </Button>
     );
     var rightComponent = (
-      <Button transparent onPress={() => this.saveToServer()}>
-      <Ionicons
-      name="md-checkmark"
-      size={Layout.moderateScale(25)}
-      style={{ color: '#ffffff' }}
-      />
-      </Button>
+
+      <LoginStatus>{ loginStatus => (
+        <Button transparent onPress={() => this.saveToServer( loginStatus.countryCode )}>
+        <Ionicons
+        name="md-checkmark"
+        size={Layout.moderateScale(25)}
+        style={{ color: '#ffffff' }}
+        />
+        </Button>
+      )}</LoginStatus>
     );
     var _this = this;
     return (

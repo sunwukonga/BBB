@@ -14,7 +14,8 @@ import CategoryScreen from '../screens/CategoryScreen';
 import SearchResultScreen from '../screens/SearchResultScreen';
 import FilterScreen from '../screens/FilterScreen';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
-import ChatDetailScreen from '../screens/ChatDetailScreen';
+// TODO: I'll change the direction eventually
+import ChatScreen from '../screens/ChatDetailScreen';
 import StrollersScreen from '../screens/StrollersScreen';
 import ChatListScreen from '../screens/ChatListScreen';
 import CreateNewItemScreen from '../screens/CreateNewItemScreen';
@@ -35,7 +36,7 @@ const DrawerNavigator = createDrawerNavigator(
     contentComponent: props => <DrawerContainer {...props} />,
   }
 );
-
+// TODO: Change name of chatDetailScreen ...
 export default createStackNavigator(
   {
     homeDrawer: { screen: DrawerNavigator },
@@ -47,7 +48,7 @@ export default createStackNavigator(
     searchResultScreen: { screen: SearchResultScreen },
     filterScreen: { screen: FilterScreen },
     productDetailsScreen: { screen: ProductDetailsScreen },
-    chatDetailScreen: { screen: ChatDetailScreen },
+    chatDetailScreen: { screen: ChatScreen },
     strollersScreen: { screen: StrollersScreen },
     chatListScreen: { screen: ChatListScreen },
     createNewItemScreen: { screen: CreateNewItemScreen },

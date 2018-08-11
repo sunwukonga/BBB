@@ -98,6 +98,7 @@ sendChatMessage($chatId: Int!, $message: String,$image:UploadedImage,$lastMessag
     time
     authorId
     image {
+      id
       imageKey
     }
   }
