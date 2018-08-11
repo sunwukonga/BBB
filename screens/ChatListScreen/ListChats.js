@@ -27,6 +27,8 @@ import { withNavigation } from 'react-navigation'
 import {
   GET_CHAT_MESSAGES
 } from '../../graphql/Queries'
+import { updateChatMessages } from '../../utils/helpers.js'
+import LastMessageIds from './LastMessageIds'
 
 
 class ListChats extends Component {
@@ -67,63 +69,52 @@ class ListChats extends Component {
   }
 
 // TODO: Change target to chatScreen
-  renderChat = ({ item }) => {
+//  renderChat = ( { item }) => {
+  renderChat = ( chats ) => {
+    let { item } = chats
     return (
-      <List
-        style={styles.mainlist}
-        key={item.id}
-      >
-        <ListItem
-          avatar
-          onPress={() => {
-            this.props.navigation.navigate('chatDetailScreen', {
-              chat: item
-            })
-          }}>
-          <Left style={styles.left}>
-            <View style={styles.bebyview}>
-              { this.otherImage( item ) }
-            </View>
-          </Left>
-          <Body style={styles.bodys}>
-            <View style={styles.titleview}>
-            { item.listing.primaryImage===null ||  item.listing.primaryImage.imageKey===null
-              ? <Baby style={styles.rowImage} />
-              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.listing.primaryImage.imageKey}} style={styles.rowImage} />
-            }
-              <Text style={styles.title}>{item.listing.title}</Text>
-            </View>
-            <View style={styles.bottomline} />
-            <View>{ this.otherProfileName( item ) }</View>
-            <View style={styles.namecount}>
-                { item.newMessageCount && item.newMessageCount > 0
-                ? <Text style={styles.count}>{item.newMessageCount}</Text>
-                : null
-                }
-            </View>
-          </Body>
-        </ListItem>
-      </List>
+      <LastMessageIds>{ chatIndexes  => (
+        <List
+          style={styles.mainlist}
+          key={item.id}
+        >
+          <ListItem
+            avatar
+            onPress={() => {
+              this.props.navigation.navigate('chatDetailScreen', {
+                chatId: item.id
+              , chatIndexes: chatIndexes
+              })
+            }}>
+            <Left style={styles.left}>
+              <View style={styles.bebyview}>
+                { this.otherImage( item ) }
+              </View>
+            </Left>
+            <Body style={styles.bodys}>
+              <View style={styles.titleview}>
+              { item.listing.primaryImage===null ||  item.listing.primaryImage.imageKey===null
+                ? <Baby style={styles.rowImage} />
+                : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.listing.primaryImage.imageKey}} style={styles.rowImage} />
+              }
+                <Text style={styles.title}>{item.listing.title}</Text>
+              </View>
+              <View style={styles.bottomline} />
+              <View>{ this.otherProfileName( item ) }</View>
+              <View style={styles.namecount}>
+                  { item.newMessageCount && item.newMessageCount > 0
+                  ? <Text style={styles.count}>{item.newMessageCount}</Text>
+                  : null
+                  }
+              </View>
+            </Body>
+          </ListItem>
+        </List>
+      )}</LastMessageIds>
     )
   }
 
 
-  updateChatMessages = (oldChatList, newChatList) => {
-    let newChats = newChatList.filter( chat => chat.chatMessages.length > 0 )
-                    .map( chat => {
-                    oldChat = oldChatList.find( oldChat => chat.id == oldChat.id )
-                    Object.assign(
-                      chat
-                    , {newMessageCount: chat.chatMessages.length + (oldChat.newMessageCount ? oldChat.newMessageCount : 0)}
-                    )
-                    let combinedChatMessages = chat.chatMessages.concat(oldChat.chatMessages)
-                                               .sort((a, b) => Math.sign(a.id - b.id))
-                                               .filter( (item, index, items) => {
-                                                 return !index || item.id != items[index - 1].id
-                                               })
-                    return Object.assign(chat, {chatMessages: combinedChatMessages})
-                  })
-  }
   // TODO: This is naive. If a message list gets HUGE, it will start to take up
   // too many resources. A better approach is to fetch the preceding 20 messages,
   // then give the option in the ChatScreen to fetch more from the cache as neede.

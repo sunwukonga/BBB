@@ -103,6 +103,7 @@ export default class HomeScreen extends React.Component {
     };
   }
 
+  // REDUNDANT; NOT USED
   // Proxy method for child component to set this.state
   setLoginState = ( logged ) => {
     if (typeof(logged) == typeof(true)) {

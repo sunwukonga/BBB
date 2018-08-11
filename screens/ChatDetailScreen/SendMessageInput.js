@@ -5,6 +5,7 @@ import {
 , TouchableOpacity
 , ScrollView
 , TextInput
+, Keyboard
 } from 'react-native';
 import {
   Container,
@@ -40,21 +41,43 @@ class SendMessageInput extends Component {
     }
   }
 
+              /*text={this.state.message}
+              underlineColorAndroid="transparent"
+              autoCorrect={false}
+              autoCapitalize="none"
+              editable={true}
+              maxLength = {100}
+          <ScrollView scrollable={false}>
+          </ScrollView>
+               */
+
   updateChatMessages = (oldChatList, newChat) => {
-    console.log("OldChatList: ", oldChatList)
-    console.log("NewChat: ", newChat)
+    let spliceIndex
     let oldChat = oldChatList.find( (oldChat, index) => {
       if (newChat.id == oldChat.id) {
-        oldChat.spliceIndex = index
-        oldChat.memo = ''
+        spliceIndex = index
+        //oldChat.memo = ''
         return true
       }
     })
-    if (oldChat) {
-      console.log("OldChat: ", oldChat)
-    }
-    oldChat.chatMessages.push(newChat.chatMessages[0])
-    oldChatList.splice(oldChat.spliceIndex, 1, oldChat)
+    let deepMessageCopies = newChat.chatMessages.map( chatMessage => {
+      let shallowCopy = Object.assign( Object.assign({}, oldChat.chatMessages[0], chatMessage))
+      if (chatMessage.image) {
+        if (oldChat.chatMessages[0].image) {
+          shallowCopy.image = Object.assign({}, oldChat.chatMessages[0].image, chatMessage.image)
+        } else {
+          // There might be missing values I cannot see here @@id for instance.
+          shallowCopy.image = Object.assign(chatMessage.image, {"__typename": "Image"})
+        }
+      } else {
+        shallowCopy.image = null
+      }
+      return shallowCopy
+    })
+    let deepOldMessagesCopy = JSON.parse(JSON.stringify( oldChat.chatMessages ))
+    plusNewMessages = deepOldMessagesCopy.concat(deepMessageCopies)
+    oldChat.chatMessages = plusNewMessages
+    oldChatList.splice(spliceIndex, 1, oldChat)
     return oldChatList
   }
 
@@ -68,30 +91,11 @@ class SendMessageInput extends Component {
           const { getChatMessages } = cache.readQuery({
             query: GET_CHAT_MESSAGES
           })
-          const updatedChats = this.updateChatMessages( getChatMessages, {id: chatId, chatMessages: [sendChatMessage]} )
+          const updatedChats = this.updateChatMessages( getChatMessages, {id: chatId, chatMessages: sendChatMessage} )
           cache.writeQuery({
             query: GET_CHAT_MESSAGES,
             data: { getChatMessages : updatedChats }
           })
-              /*text={this.state.message}
-              underlineColorAndroid="transparent"
-              autoCorrect={false}
-              autoCapitalize="none"
-              editable={true}
-              maxLength = {100}
-            <TouchableOpacity
-              onPress = {sendChatMessage}
-              disabled={this.state.message == ''}
-              style={styles.postBtn}>
-              <Ionicons
-                name="md-send"
-                size={Layout.moderateScale(30)}
-                color={Colors.white}
-              />
-            </TouchableOpacity>
-          <ScrollView scrollable={false}>
-          </ScrollView>
-               */
         }}
       >
         {(sendChatMessage, { data }) => (
@@ -101,9 +105,26 @@ class SendMessageInput extends Component {
               keyboardType='default'
               style={styles.newPostStyle}
               onChangeText={ messageInput => this.setState({ message: messageInput })}
-              onSubmitEditing = {sendChatMessage}
+              onSubmitEditing = { () => {
+                this.setState({ message: ''})
+                sendChatMessage()
+              }}
               returnKeyType="send"
             />
+            <TouchableOpacity
+              onPress = { () => {
+                this.setState({ message: ''})
+                Keyboard.dismiss()
+                sendChatMessage()
+              }}
+              disabled={this.state.message == ''}
+              style={styles.postBtn}>
+              <Ionicons
+                name="md-send"
+                size={Layout.moderateScale(30)}
+                color={Colors.white}
+              />
+            </TouchableOpacity>
           </View>
         )}
       </Mutation>
