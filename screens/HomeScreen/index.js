@@ -38,7 +38,7 @@ import ListUserVisitedListings from './ListUserVisitedListings'
 import ListUserLikedListings from './ListUserLikedListings'
 import ListUserPostedListings from './ListUserPostedListings'
 
-import getProfile from './GetProfile';
+//import getProfile from './GetProfile';
 import likeProductApi from './LikeProductApi';
 import LoginStatus from './LoginStatus'
 
@@ -193,18 +193,17 @@ export default class HomeScreen extends React.Component {
         }
         if ( this.props.navigation.state && this.props.navigation.state.params ) {
           if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
-            getProfile()
+           /* getProfile()
             .then( myProfile => {
-              if ( myProfile ) {
+              if ( myProfile ) { */
                 /*
                 this.setState((prevState, props) => {
                   return {counter: prevState.counter + props.step};
                 });
                 */
-                this.props.navigation.state.params = myProfile
+            //    this.props.navigation.state.params = myProfile
                 this.openDrawerAndSetState()
-              }
-            })
+             // }
           }
         }
       }

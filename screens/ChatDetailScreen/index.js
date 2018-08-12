@@ -11,6 +11,7 @@ import {
 , TouchableWithoutFeedback
 , Keyboard
 , ActivityIndicator
+, InteractionManager
 } from 'react-native';
 import {
   Container
@@ -59,6 +60,7 @@ export default class ChatScreen extends Component {
     this.yOffset = null
     this.scrollEvent = null
     this.textInputHeight = Layout.HEIGHT * 0.08
+
     this.keyboardDidShow = this.keyboardDidShow.bind(this)
     this.keyboardDidHide = this.keyboardDidHide.bind(this)
 
@@ -70,23 +72,27 @@ export default class ChatScreen extends Component {
   keyboardDidShow(e) {
     //this._scrollView.scrollTo({x:0, y: (this.textInputHeight + e.endCoordinates.height), animated: true})
     let newPaddingHeight = (Layout.HEIGHT * 0.08) + e.endCoordinates.height
+    let newScrollOffset = this.yOffset - e.endCoordinates.height
     this.setState({ keyboardPadding: newPaddingHeight })
+    //this._scrollView.scrollTo({x: 0, y: newScrollOffset, animated: true})
   }
 
   keyboardDidHide(e) {
-    this._scrollView.scrollToEnd({animated: true})
     this.setState({ keyboardPadding: Layout.HEIGHT * 0.08 })
+    this._scrollView.scrollToEnd({animated: true})
   }
 
   componentDidMount() {
     console.log("Layout.HEIGHT: ", Layout.HEIGHT)
-    this._scrollView.scrollToEnd({animated: true})
+    InteractionManager.runAfterInteractions(() => {
+      this._scrollView.scrollToEnd({animated: true})
+    })
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide.bind(this))
     this.didFocusListener = this.props.navigation.addListener(
       'didFocus',
       payload => {
         console.log('didFocus-SendMessageInput')
-        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
-        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide.bind(this))
         //this.scrollReporter = setInterval( () => console.log("Scroll.Event: ", this.scrollEvent), 4000)
       }
     )
@@ -96,9 +102,11 @@ export default class ChatScreen extends Component {
         console.log('didBlur-SendMessageInput')
         if ( this.keyboardDidHideLister ) {
           this.keyboardDidHideListener.remove()
+        console.log('didBlur-SendMessageInput: removeHideListener')
         }
         if ( this.keyboardDidShowLister ) {
           this.keyboardDidShowListener.remove()
+        console.log('didBlur-SendMessageInput: removeShowListener')
         }
       }
 
@@ -298,7 +306,7 @@ export default class ChatScreen extends Component {
                 <View style={styles.notifyContainer}>
                   { (chat && chat.listing && chat.listing.primaryImage && chat.listing.primaryImage.imageKey)
                   ? <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.listing.primaryImage.imageKey}} style={styles.notifyImage} />
-                  : <Baby style={styles.rowImage} />
+                  : <Baby style={styles.profileImage} />
                   }
                   <Text style={styles.regularSmall}>
                     { (chat && chat.listing && chat.listing.title)

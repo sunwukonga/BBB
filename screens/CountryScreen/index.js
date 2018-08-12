@@ -72,7 +72,7 @@ export default class CountryScreen extends React.Component {
     return (
       <Query
         query = {GET_COUNTRY_LIST}
-        fetchPolicy = "cache-and-network"
+        fetchPolicy = "network-only"
       >
         {({ data, networkStatus, error }) => {
           if (networkStatus === 1) {

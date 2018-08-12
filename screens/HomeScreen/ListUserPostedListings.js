@@ -68,6 +68,13 @@ class ListUserPostedListings extends Component {
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
                       if (!fetchMoreResult) return prev
+                      console.log("Prev: ", prev)
+                      if (!prev) {
+                        prev = {}
+                      }
+                      if (!prev.getUserPostedListings) {
+                        prev.getUserPostedListings = []
+                      }
                       return {
                         getUserPostedListings:
                           prev.getUserPostedListings

@@ -65,6 +65,12 @@ class ListVisitedListings extends Component {
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
                       if (!fetchMoreResult) return prev
+                      if (!prev) {
+                        prev = {}
+                      }
+                      if (!prev.getMostVisitedListings) {
+                        prev.getMostVisitedListings = []
+                      }
                       return {
                         getMostVisitedListings:
                           prev.getMostVisitedListings

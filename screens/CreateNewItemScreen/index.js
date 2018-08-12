@@ -46,13 +46,14 @@ import getTemplateList from './SearchTemplateApi';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
 import LoginStatus from '../HomeScreen/LoginStatus'
 
+import CreateListing from '../../graphql/mutations/CreateListing'
 
 import Collapsible from 'react-native-collapsible';
 const dataObjectsCates = [];
 const dataObjectsTags = [];
 var tagsList = [];
 var imageList=[];
-var imgList=[];
+var imageUploadList=[];
 /**
 Catgeory List Details
 */
@@ -122,7 +123,6 @@ export default class CreateNewItemScreen extends React.Component {
       // Data for mutation i.e. create item
       mode: SALE,
 
-      imgList: [],
       images: imageList,
       currency: '',
       cost: 0.0,
@@ -150,11 +150,15 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   _validateAllRequiredFileds(){
-    imgList=[];
+    console.log("ImageList: ", imageList)
+    imageList.pop()
     for(var i=1;i<imageList.length;i++){
-      imgList.push({imageId:imageList[i].imageId,
-        imageKey:imageList[i].imageKey,
-        primary:imageList[i].primary,deleted:imageList[i].deleted})
+      imageUploadList.push({
+        imageId: imageList[i].imageId
+      , imageKey: imageList[i].imageKey
+      , primary: imageList[i].primary
+      , deleted: imageList[i].deleted
+      })
     }
 
     /*if(imgList.length===0){
@@ -248,7 +252,7 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
 //"barterTemplates":[[{"templateId":"1","quantity":1,"tags":["1","2"]},{"templateId":"2","quantity":2,"tags":["1","2"]}]]
-  saveToServer( countryCode ){
+  collateVariables( countryCode ){
 
     if(!this._validateAllRequiredFileds()){
         return;
@@ -266,30 +270,34 @@ export default class CreateNewItemScreen extends React.Component {
       addr_=this.state.address;
     }
 
-    variables={
+    variables = { variables: {
       "mode":this.state.mode,
-    "images":imgList,
-    "currency":this.state.currency,
-    "cost":this.state.cost,
-    "counterOffer":this.state.counterOffer,
-  /*  "barterTemplates":this.state.barterTemplates,*/
-    "address":addr_,
-    "post":post_,
-    "title":this.state.title,
-    "description":this.state.longDesc,
-    "category":this.state.category,
-    "template":this.state.selectedTemplateId,
-    "tags":tagsList,
-    "countryCode": countryCode
-   }
+      "images":imageUploadList,
+      "currency":this.state.currency,
+      "cost":this.state.cost,
+      "counterOffer":this.state.counterOffer,
+    /*  "barterTemplates":this.state.barterTemplates,*/
+      "address":addr_,
+      "post":post_,
+      "title":this.state.title,
+      "description":this.state.longDesc,
+      "category":this.state.category,
+      "template":this.state.selectedTemplateId,
+      "tags":tagsList,
+      "countryCode": countryCode
+    }}
+    variables.fetchPolicy = 'no-cache'
+    console.log(variables)
+    return variables
 
-   console.log("Params",variables);
+    /*
+    console.log("Params",variables);
       this.setState({
         progressVisible: true,
         progressMsg:"Please Wait..."
       });
 
-      createNewItemUrl(variables).then((res)=>{
+    createNewItemUrl(variables).then((res)=>{
       console.log("Response ",res)
 
         this.setState({
@@ -308,6 +316,7 @@ export default class CreateNewItemScreen extends React.Component {
           dialogTitle:"Error!"
         })
     });
+    */
 
   }
 
@@ -622,7 +631,9 @@ export default class CreateNewItemScreen extends React.Component {
     var _id=imageList.length+1;
     var isPrimary=_id===2;
       console.log("Key",imageKey);
+    let inputTile = imageList.pop()
     imageList.push({ id: "_"+_id,imageId:imgId,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false,base_64:base_64 });
+    imageList.push(inputTile)
 
   /*  realm.write(() => {
 
@@ -840,12 +851,10 @@ export default class CreateNewItemScreen extends React.Component {
         value: 'Pear',
       },
     ];
+    // Need to fetch
     let dataCurrency = [
       {
         value: 'USD',
-      },
-      {
-        value: 'INR',
       },
       {
         value: 'SGD',
@@ -882,13 +891,28 @@ export default class CreateNewItemScreen extends React.Component {
     var rightComponent = (
 
       <LoginStatus>{ loginStatus => (
-        <Button transparent onPress={() => this.saveToServer( loginStatus.countryCode )}>
-        <Ionicons
-        name="md-checkmark"
-        size={Layout.moderateScale(25)}
-        style={{ color: '#ffffff' }}
-        />
-        </Button>
+        <CreateListing>{ mutateCreateListing => (
+          <View>
+          <Button transparent onPress={() => {
+            mutateCreateListing( this.collateVariables( loginStatus.countryCode ))
+            .then(({ data }) => {
+              console.log("Listing Created: ", data.createListing)
+              this.props.navigation.navigate({
+                routeName: 'productDetailsScreen'
+              , params: {
+                  item: data.createListing
+                }
+              })
+            })
+          }}>
+          <Ionicons
+          name="md-checkmark"
+          size={Layout.moderateScale(25)}
+          style={{ color: '#ffffff' }}
+          />
+          </Button>
+          </View>
+        )}</CreateListing>
       )}</LoginStatus>
     );
     var _this = this;
@@ -1234,11 +1258,11 @@ export default class CreateNewItemScreen extends React.Component {
         </ScrollView>
 
         <ProgressDialog
-            visible={this.state.progressVisible}
-             message={this.state.progressMsg}
-            activityIndicatorSize="large"
-            activityIndicatorColor="blue"
-                       />
+          visible={this.state.progressVisible}
+          message={this.state.progressMsg}
+          activityIndicatorSize="large"
+          activityIndicatorColor="blue"
+        />
 
        <Dialog
            visible={this.state.showDialog}

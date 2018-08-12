@@ -6,12 +6,12 @@ import client from '../../config/Client';
 const GET_PROFILE = gql`
 query getProfile @client {
   myProfile {
+    id
     profileName
     profileImageURL
   }
 }`;
 
-  //  __typename
 function getProfile() {
 
   return client.query({

@@ -61,6 +61,12 @@ class ListRecentListings extends Component {
                     updateQuery: (prev, { fetchMoreResult }) => {
                       console.log("*****************************updateQuery called")
                       if (!fetchMoreResult) return prev
+                      if (!prev) {
+                        prev = {}
+                      }
+                      if (!prev.getMostRecentListings) {
+                        prev.getMostRecentListings = []
+                      }
                       return { 
                         getMostRecentListings:
                           prev.getMostRecentListings

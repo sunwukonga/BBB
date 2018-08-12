@@ -119,13 +119,12 @@ class ListChats extends Component {
   // too many resources. A better approach is to fetch the preceding 20 messages,
   // then give the option in the ChatScreen to fetch more from the cache as neede.
   // I.e. the user scrolls up.
-  // kkkk
   render() {
-    let { variables } = this.props
+    let { chatIndexes } = this.props
     return (
       <Query
         query = {GET_CHAT_MESSAGES}
-        variables = {variables}
+        variables = {{chatIndexes: chatIndexes}}
         fetchPolicy = "cache-and-network"
         update={(cache, { data: { getChatMessages } }) => {
           const data = cache.readQuery({

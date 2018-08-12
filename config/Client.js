@@ -13,15 +13,14 @@ var token = default_token
 const BBB_BASE_URL = 'http://notify.parker.sg:3000/graphql'
 
 const cache = new InMemoryCache({
-  /*
   dataIdFromObject: object => {
     switch (object.__typename) {
-      case 'profileImage': return object.imageKey;
-      case 'bar': return object.blah; // use `blah` as the priamry key
-      default: return object.id || object._id; // fall back to `id` and `_id` for all other types
+      case 'Country': return object.isoCode
+      case 'Currency': return object.iso4217
+      case 'Language': return object.iso639_2
+      default: return object.id || object._id // fall back to `id` and `_id` for all other types
     }
   }
-  */
   //cacheRedirects: {
     //Query: {
       //movie: (_, { id }, { getCacheKey }) =>
@@ -56,7 +55,7 @@ const errorLink = onError(({ operation, response, graphQLErrors, networkError })
   if (graphQLErrors) {
     graphQLErrors.map(({ message, locations, path }) =>
       console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+        `[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(locations)}, Path: ${path}`,
       ),
     )
   }
@@ -72,7 +71,7 @@ const stateLink = withClientState({
   , jwt_token: default_token
   , countryCode: 'SG'
   , myProfile: {
-      __typename: 'Profile'
+      __typename: 'MyProfile'
     , id: null
     , profileName: ""
     , profileImageURL: ""
@@ -83,12 +82,12 @@ const stateLink = withClientState({
       setAuthStatus: (_, args, { cache }) => {
         console.log('setAuthStatus client-side mutation fired');
         token = args.token
-        cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'Profile', id: args.id, profileName: args.profileName, profileImageURL: args.profileImageURL }}});
+        cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'MyProfile', id: args.id, profileName: args.profileName, profileImageURL: args.profileImageURL }}});
         return null;
       },
       unsetAuthStatus: (_, args, { cache }) => {
         console.log('unsetAuthStatus client-side mutation fired');
-        cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'Profile', id: null, profileName: "", profileImageURL: "" }}});
+        cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: null, profileName: "", profileImageURL: "" }}});
         return null;
       },
       setCountry: (_, args, { cache }) => {

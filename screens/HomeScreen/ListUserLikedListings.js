@@ -68,7 +68,13 @@ class ListUserLikedListings extends Component {
                       page: (data.getUserLikedListings.length / variables.limit >> 0) + 1
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
+                      console.log("PREV: ", prev)
                       if (!fetchMoreResult) return prev
+                      if (!prev.getUserLikedListings) {
+                        return {
+                          getUserLikedListings: fetchMoreResult.getUserLikedListings
+                        }
+                      }
            //           console.log("*****************PREV: ", prev.getUserLikedListings)
             //          console.log("*****************POST: ", fetchMoreResult.getUserLikedListings)
                       return {

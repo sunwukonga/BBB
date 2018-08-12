@@ -65,6 +65,12 @@ class ListLikedListings extends Component {
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
                       if (!fetchMoreResult) return prev
+                      if (!prev) {
+                        prev = {}
+                      }
+                      if (!prev.getMostLikedListings ) {
+                        prev.getMostLikedListings = []
+                      }
                       return {
                         getMostLikedListings:
                           prev.getMostLikedListings

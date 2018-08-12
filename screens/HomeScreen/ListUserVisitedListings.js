@@ -68,6 +68,12 @@ class ListUserVisitedListings extends Component {
                     },
                     updateQuery: (prev, { fetchMoreResult }) => {
                       if (!fetchMoreResult) return prev
+                      if (!prev) {
+                        prev = {}
+                      }
+                      if (!prev.getUserVisitedListings) {
+                        prev.getUserVisitedListings = []
+                      }
                       return {
                         getUserVisitedListings:
                           prev.getUserVisitedListings

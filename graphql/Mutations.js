@@ -39,8 +39,8 @@ mutation loginFacebook($token: String!) {
 }`
 
 const CREATE_CHAT = gql`
-mutation createChat($recUserId: Int!, $listingId: Int!) {
-  createChat(recUserId: $recUserId, listingId: $listingId) {
+mutation createChat($listingId: Int!) {
+  createChat(listingId: $listingId) {
     id
     userId
     listing {
@@ -53,6 +53,7 @@ mutation createChat($recUserId: Int!, $listingId: Int!) {
         profileImage {
           id
           imageKey
+          imageURL
         }
       }
       primaryImage {
@@ -75,6 +76,7 @@ mutation createChat($recUserId: Int!, $listingId: Int!) {
       profileImage {
         id
         imageKey
+        imageURL
       }
     }
     chatMessages {
@@ -104,6 +106,127 @@ sendChatMessage($chatId: Int!, $message: String,$image:UploadedImage,$lastMessag
   }
 }`
 
+const CREATE_LISTING = gql`
+mutation createListing(
+  $mode: String!
+, $images: [UploadedImage]
+, $currency: String!
+, $cost: Float
+, $counterOffer: Boolean
+, $countryCode:String!
+, $barterTemplates: [[TemplateQty]]
+, $address: Address
+, $post: Postage
+, $title: String
+, $description: String
+, $category: Int
+, $template: Int
+, $tags: [Int]) {
+  createListing(
+    mode: $mode
+  , images: $images
+  , currency: $currency
+  , cost: $cost
+  , counterOffer: $counterOffer
+  , countryCode:$countryCode
+  , barterTemplates: $barterTemplates
+  , address: $address
+  , post: $post
+  , title: $title
+  , description: $description
+  , categoryId: $category
+  , templateId: $template
+  , tagIds: $tags) {
+      id
+      title
+      description
+      primaryImage {
+        id
+        imageURL
+        imageKey
+      }
+      secondaryImages {
+        id
+        imageURL
+        imageKey
+      }
+      saleMode {
+        id
+        price
+        counterOffer
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        mode
+        exchangeModes {
+          id
+          mode
+          price
+          currency {
+            iso4217
+            currencyName
+            currencySymbol
+          }
+          location {
+            id
+            lineOne
+            lineTwo
+            postcode
+            long
+            lat
+            directions
+          }
+        }
+      }
+      template {
+        id
+        title
+        description
+        primaryImage {
+          id
+          imageURL
+          imageKey
+        }
+        secondaryImages {
+          id
+          imageURL
+          imageKey
+        }
+        tags{
+          id
+          name
+        }
+      }
+      tags{
+        id
+        name
+      }
+      viewers
+      likes
+      liked
+      chatId
+      user {
+        id
+        firstName
+        lastName
+        profileName
+        profileImage {
+          id
+          imageURL
+          imageKey
+        }
+        sellerRating
+        sellerRatingCount
+        online
+        idVerification
+      }
+  }
+}`
+
+
+
 export {
   LIKE_LISTING
 , CREATE_CHAT
@@ -111,4 +234,5 @@ export {
 , SET_COUNTRY
 , FACEBOOK_LOGIN
 , SEND_MESSAGE
+, CREATE_LISTING
 }

@@ -39,7 +39,7 @@ class ChatListScreen extends Component {
         <BBBHeader title="Chats" leftComponent={leftComponent} />
         <Content>
           <LastMessageIds>{ chatIndexes  => (
-            <ListChats variables={chatIndexes} />
+            <ListChats chatIndexes={chatIndexes} />
           )}</LastMessageIds>
         </Content>
       </Container>

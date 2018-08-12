@@ -67,9 +67,11 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
   }
 }`
 
+
+
 const GET_MOST_VISITED_LIST = gql`
-query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int){
-  getMostVisitedListings(countryCode:$countryCode,limit:$limit,page:$page){
+query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
+  getMostVisitedListings(countryCode:$countryCode,limit:$limit,page:$page) {
     id
     title
     description
@@ -135,8 +137,8 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int){
 }`
 
 const GET_MOST_LIKED_LIST = gql`
-query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int){
-  getMostLikedListings(countryCode:$countryCode,limit:$limit,page:$page){
+query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
+  getMostLikedListings(countryCode:$countryCode,limit:$limit,page:$page) {
     id
     title
     description
@@ -247,6 +249,7 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
         imageKey
       }
       secondaryImages {
+        id
         imageURL
         imageKey
       }
@@ -280,8 +283,8 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
 }`
 
 const GET_USER_POSTED_LIST = gql`
-query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int){
-  getUserPostedListings(countryCode:$countryCode,limit:$limit,page:$page){
+query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
+  getUserPostedListings(countryCode:$countryCode,limit:$limit,page:$page) {
     id
     title
     description
@@ -319,6 +322,7 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int){
         imageKey
       }
       secondaryImages {
+        id
         imageURL
         imageKey
       }
@@ -352,8 +356,8 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int){
 }`
 
 const GET_USER_LIKED_LIST = gql`
-query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
-  getUserLikedListings(countryCode:$countryCode,limit:$limit,page:$page){
+query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
+  getUserLikedListings(countryCode:$countryCode,limit:$limit,page:$page) {
     id
     title
     description
@@ -368,9 +372,11 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
       imageKey
     }
     saleMode {
+      id
       price
       counterOffer
       currency {
+        iso4217
         symbolPrepend
         disabled
         currencyName
@@ -378,7 +384,23 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
       }
       mode
       exchangeModes {
+        id
+        mode
         price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
       }
     }
     template {
@@ -391,6 +413,7 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
         imageKey
       }
       secondaryImages {
+        id
         imageURL
         imageKey
       }
@@ -423,12 +446,15 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int){
   }
 }`
 
+// Remember this is Client data. Not from server, hence strange form.
 const GET_LOGIN_STATUS = gql`
-query loginStatus @client{
+query getLoginStatus @client {
   authorized
   countryCode
   myProfile {
     id
+    profileName
+    profileImageURL
   }
 }`
 
@@ -437,8 +463,17 @@ query {
   allCountries {
     isoCode
     name
+    currencies {
+      iso4217
+      currencyName
+      currencySymbol
+    }
+    languages {
+      iso639_2
+      name
+    }
   }
-}`;
+}`
 
 const GET_CHAT_MESSAGES = gql`
 query getChatMessages($chatIndexes:[ChatIndex]) {
@@ -492,6 +527,20 @@ query getChatMessages($chatIndexes:[ChatIndex]) {
   }
 }`
 
+
+const GET_PROFILE = gql`
+query {
+  getProfile {
+    id
+    profileName
+    profileImage {
+      id
+      imageKey
+    }
+  }
+}`
+
+
 export {
   GET_MOST_RECENT_LIST
 , GET_MOST_VISITED_LIST
@@ -502,4 +551,5 @@ export {
 , GET_LOGIN_STATUS
 , GET_COUNTRY_LIST
 , GET_CHAT_MESSAGES
+, GET_PROFILE
 }

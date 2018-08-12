@@ -13,7 +13,8 @@ import { Layout, Images, Colors, Urls } from '../../constants/';
 //apollo client
 import { Query, graphql } from "react-apollo";
 import gql from "graphql-tag";
-
+import GetCachedProfile from '../../graphql/queries/GetCachedProfile'
+import LoginStatus from '../HomeScreen/LoginStatus'
 //import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 //reset the appolo cache
@@ -25,6 +26,8 @@ export default LoggedinState = graphql(gql`
   class extends Component {
     constructor(props) {
       super(props)
+    }
+
       /*
       if (state) {
         console.log("DrawerState: ", state)
@@ -93,7 +96,6 @@ export default LoggedinState = graphql(gql`
         }
       )
       */
-    }
     /*
     componentDidMount() {
       console.log("BBBBBBBBBBBBBBBBBBBBBBBB")
@@ -137,28 +139,49 @@ export default LoggedinState = graphql(gql`
       }
       return false
     }
+    w = ( root, nested ) => {
+      if (!root) return null
+      return nested.reduce( (acc, cur) => {
+        if (!acc) return null
+        if (acc[cur]) return acc[cur]
+        else return null
+      }, root)
+    }
 
     render() {
       const { navigation } = this.props;
       return (
         <Container style={styles.container} {...this.props}>
-            <View style={styles.usersDetailsSec}>
-            <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('profileScreen')
-              }}>
-              <Image style={styles.userImage}
-                   source={this.doesProfileExist('profileImageURL') ? {uri: navigation.state.routes[0].params.data.myProfile.profileImageURL} : Images.tempUser} />
-            </TouchableOpacity>
-            <View style={styles.usersDetails}>
-              <Text style={styles.userName}>{this.doesProfileExist('profileName') ? navigation.state.routes[0].params.data.myProfile.profileName : ""}</Text>
-              {/*
-              <Text style={styles.tokenText}>
-                BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>
-              </Text>
-              */}
-            </View>
-          </View>
+          <LoginStatus>{ loginStatus => {
+            if (loginStatus.loginStatus) {
+              return (
+                <GetCachedProfile>{ myProfile => {
+                  console.log("GetCachedProfile: myProfile: ", myProfile)
+                  return (
+                  <View style={styles.usersDetailsSec}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.props.navigation.navigate('profileScreen')
+                    }}>
+                  {(this.w(myProfile, ['profileImageURL']))
+                  ? <Image style={styles.userImage} source={{uri: myProfile.profileImageURL}} />
+                  : <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+                  }
+                  </TouchableOpacity>
+                  <View style={styles.usersDetails}>
+                    <Text style={styles.userName}>{(this.w(myProfile, ['profileName'])) ? myProfile.profileName : ""}</Text>
+                    {/*
+                    <Text style={styles.tokenText}>
+                      BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>
+                    </Text>
+                    */}
+                    </View>
+                  </View>
+                  )
+                }}</GetCachedProfile>
+              )
+            } else return null
+          }}</LoginStatus>
           <Content style={styles.content}>
             <Item
               style={styles.borderView}
