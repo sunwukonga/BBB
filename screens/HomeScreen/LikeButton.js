@@ -36,9 +36,8 @@ class LikeButton extends Component {
 
   render() {
     const {item, loginStatus} = this.props
-    console.log("LoginStatus: ", loginStatus)
 
-    if ( loginStatus.loginStatus && (loginStatus.myProfile.id != item.user.id) ) {
+    if ( loginStatus.loginStatus && (loginStatus.userId != item.user.id) ) {
       return (
         <Mutation
           mutation={LIKE_LISTING}

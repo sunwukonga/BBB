@@ -149,23 +149,19 @@ export default class CreateNewItemScreen extends React.Component {
     // this.saveToServer = this.saveToServer.bind(this);
   }
 
-  _validateAllRequiredFileds(){
-    console.log("ImageList: ", imageList)
+  _validateAllRequiredFileds() {
     imageList.pop()
-    for(var i=1;i<imageList.length;i++){
-      imageUploadList.push({
-        imageId: imageList[i].imageId
-      , imageKey: imageList[i].imageKey
-      , primary: imageList[i].primary
-      , deleted: imageList[i].deleted
-      })
-    }
+    imageUploadList = imageList.map( image => {
+      console.log("ImageList: ", image.id, "Primary: ", image.primary)
+      return {
+        imageId: image.imageId
+      , imageKey: image.imageKey
+      , primary: image.primary
+      , deleted: image.deleted
+      }
+    })
 
-    /*if(imgList.length===0){
-        Toast.show("Please Upload Atleast One Image",Toast.SHORT)
-        return false;
-    }*/
-    if(this.state.title.length===0){
+    if (this.state.title.length===0){
         Toast.show("Please Enter Title",Toast.SHORT)
         return false;
     }
@@ -204,8 +200,6 @@ export default class CreateNewItemScreen extends React.Component {
       }
 
     }
-
-
     return true;
   }
 
@@ -488,7 +482,7 @@ export default class CreateNewItemScreen extends React.Component {
           progressVisible: false
         });
         Toast.show("This image already exists",Toast.SHORT)
-        retrun;
+        return;
       }
 
       // https://docs.expo.io/versions/v26.0.0/sdk/imagemanipulator
@@ -629,10 +623,10 @@ export default class CreateNewItemScreen extends React.Component {
 
   storeImageDetails(imageKey,imgId,uri,base_64){
     var _id=imageList.length+1;
-    var isPrimary=_id===2;
+    var isPrimary=_id===1;
       console.log("Key",imageKey);
     let inputTile = imageList.pop()
-    imageList.push({ id: "_"+_id,imageId:imgId,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false,base_64:base_64 });
+    imageList.push({ id: "_"+_id,imageId:imgId,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false });
     imageList.push(inputTile)
 
   /*  realm.write(() => {

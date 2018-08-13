@@ -34,8 +34,53 @@ import likeProductApi from './LikeProductApi';
 
 import LoginStatus from '../HomeScreen/LoginStatus'
 import LikeButton from '../HomeScreen/LikeButton'
+import Listing from '../../components/display/Listing'
 
 
+class ProductDetailsScreen extends React.Component {
+
+	constructor(props) {
+		super(props);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.navigation.state.params.item.liked !== nextProps.navigation.state.params.item.liked) {
+      return true;
+    }
+    return false;
+  }
+
+  render() {
+    let {item, loginStatus} = this.props.navigation.state.params
+
+		var leftComponent = (
+			<Button transparent onPress={() => this.props.navigation.goBack()}>
+				<BBBIcon
+					name="BackArrow"
+					size={Layout.moderateScale(18)}
+					style={styles.backarrow}
+				/>
+			</Button>
+		);
+
+    return (
+      <LoginStatus>{ loginStatus => (
+        <Container style={styles.container}>
+          <BBBHeader
+            title={item.title}
+            leftComponent={leftComponent}
+          />
+          <Content style={styles.contentStyle}>
+            <Listing item={item} loginStatus={loginStatus} />
+          </Content>
+        </Container>
+      )}</LoginStatus>
+    )
+  }
+}
+
+export default ProductDetailsScreen
+/*
 // Get login status
 var log_status = '';
 const GET_LOGIN_STATUS = gql`
@@ -81,6 +126,7 @@ const NA_HomeToLoginToDrawer = NavigationActions.navigate({
           , dest: 'productDetailsScreen'}
 })
 var itemDetails;
+
 export default class ProductDetailsScreen extends React.Component {
 
 	static navigationOptions = () => ({
@@ -543,22 +589,6 @@ export default class ProductDetailsScreen extends React.Component {
 							</View>
 
 					)}
-					{
-						/*
-						<View style={styles.deviderStyle} />
-					<View style={styles.imagesMainView}>
-						<View style={styles.populerSec}>
-							<Text style={styles.populerText}>Related Products</Text>
-						</View>
-						<FlatList
-							horizontal={true}
-							data={listItemData}
-							keyExtractor={listItemData => listItemData.id}
-							renderItem={this._renderItem}
-							contentContainerStyle={styles.listContent}
-						/>
-							</View>*/
-					}
 
 				</Content>
 				<ProgressDialog
@@ -571,6 +601,7 @@ export default class ProductDetailsScreen extends React.Component {
 		);
 	}
 }
+*/
 
 /*
 											<TouchableOpacity style={styles.favoriteIconSec} onPress={() => this.sendLikeRequest(productData)}>
@@ -585,3 +616,17 @@ export default class ProductDetailsScreen extends React.Component {
 											</TouchableOpacity>
 										<TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(productData)}>
 */
+						/*
+						<View style={styles.deviderStyle} />
+					<View style={styles.imagesMainView}>
+						<View style={styles.populerSec}>
+							<Text style={styles.populerText}>Related Products</Text>
+						</View>
+						<FlatList
+							horizontal={true}
+							data={listItemData}
+							keyExtractor={listItemData => listItemData.id}
+							renderItem={this._renderItem}
+							contentContainerStyle={styles.listContent}
+						/>
+							</View>*/

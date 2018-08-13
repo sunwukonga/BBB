@@ -46,6 +46,7 @@ class PureListItem extends Component {
           , params: {
               previous_screen: 'homeScreen'
             , item: item
+            , loginStatus: loginStatus
             }
           })}
         >
@@ -56,44 +57,46 @@ class PureListItem extends Component {
               : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
             }
             <LikeButton item={item} loginStatus={loginStatus} />
-            <LastMessageIds>{ chatIndexes => (
-              <CreateChat>{ mutateCreateChat  => (
-                <GetProfile>{ currentUser => (
-                  <TouchableOpacity
-                    style={styles.chatIconSec}
-                    onPress={() => {
-                      if ( item.chatId ) {
-                        this.props.navigation.navigate('chatDetailScreen', {
-                          chatId: item.chatId
-                        , chatIndexes: chatIndexes
-                        })
-                      } else {
-                        let optimisticResponse = optimisticCreateChat(item, currentUser )
-                        mutateCreateChat({
-                          variables: { listingId: item.id }
-                        , optimisticResponse: optimisticResponse
-                        })
-                        .then( ({ data: { createChat }}) => {
+            { loginStatus.loginStatus &&
+              <LastMessageIds>{ chatIndexes => (
+                <CreateChat>{ mutateCreateChat  => (
+                  <GetProfile>{ currentUser => (
+                    <TouchableOpacity
+                      style={styles.chatIconSec}
+                      onPress={() => {
+                        if ( item.chatId ) {
                           this.props.navigation.navigate('chatDetailScreen', {
-                            chatId: createChat.id
+                            chatId: item.chatId
                           , chatIndexes: chatIndexes
                           })
-                        })
-                      }
-                    }}
-                  >
-                    <View >
-                      <BBBIcon
-                        name="Chat"
-                        size={Layout.moderateScale(18)}
-                        color={item.chatId!==null ? Colors.tintColor : Colors.white}
-                        style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                )}</GetProfile>
-              )}</CreateChat>
-            )}</LastMessageIds>
+                        } else {
+                          let optimisticResponse = optimisticCreateChat(item, currentUser )
+                          mutateCreateChat({
+                            variables: { listingId: item.id }
+                          , optimisticResponse: optimisticResponse
+                          })
+                          .then( ({ data: { createChat }}) => {
+                            this.props.navigation.navigate('chatDetailScreen', {
+                              chatId: createChat.id
+                            , chatIndexes: chatIndexes
+                            })
+                          })
+                        }
+                      }}
+                    >
+                      <View >
+                        <BBBIcon
+                          name="Chat"
+                          size={Layout.moderateScale(18)}
+                          color={item.chatId!==null ? Colors.tintColor : Colors.white}
+                          style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+                        />
+                      </View>
+                    </TouchableOpacity>
+                  )}</GetProfile>
+                )}</CreateChat>
+              )}</LastMessageIds>
+            }
           </View>
 
           <Item style={styles.userItemDetailsSec}>
