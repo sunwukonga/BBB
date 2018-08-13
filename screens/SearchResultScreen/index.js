@@ -78,11 +78,30 @@ export default class SearchResultScreen extends React.Component {
 			isLoadingMore:false,
 			page:1,
 		});
-		console.log("Update Props");
+		categories=[];
+		tags=[];
+		templates=[];
+
+		//console.log(nextProps.navigation.state.params);
 		this.setState({ data: nextProps.navigation.state.params });
 		mode=nextProps.navigation.state.params.mode;
 	  rating=nextProps.navigation.state.params.rating;
 		verification=nextProps.navigation.state.params.idVerify;
+		counterOffer=nextProps.navigation.state.params.counterOffer;
+		priceMax=nextProps.navigation.state.params.maxPrice;
+		priceMin=nextProps.navigation.state.params.minPrice;
+		var category=nextProps.navigation.state.params.categoryId;
+		var templateId=nextProps.navigation.state.params.templateId;
+		var tagId=nextProps.navigation.state.params.tagId;
+		if(templateId!=null){
+			templates.push(templateId);
+		}
+		if(tagId!=null){
+			tags.push(tagId);
+		}
+		if(category!=null){
+			categories.push(category);
+		}
 		setTimeout(() => {
 		this.searchProductList();
 		}, 350);
@@ -91,19 +110,17 @@ export default class SearchResultScreen extends React.Component {
 	      try {
 	          const value = await AsyncStorage.getItem('countryCode');
 	          if (value !== null) {
-	            // We have data!!
 	            console.log(value);
 	            this.setState({
 	              countryCode: value
 	            });
 	          }
 	       } catch (error) {
-	         // Error retrieving data
 	         console.log(error);
 	       }
 	    }
   searchProductList(){
- 		console.log("country code",this.state.countryCode);
+
 		if(this.state.loadMoreCompleted){
 			console.log("API Completed");
 			return;
@@ -116,7 +133,7 @@ export default class SearchResultScreen extends React.Component {
 							    "verification": verification,"priceMax": priceMax,"priceMin": priceMin,"categories":categories,
 							    "templates": templates,"tags": tags,"counterOffer": counterOffer,"distance": distance}
 								}
-      console.log("popular "+variables);
+      console.log(variables);
       getSearchProductList(variables).then((res)=>{
         console.log("search Array length-0: "+res.data.searchListings.length);
           if(res.data.searchListings.length==0){
@@ -296,7 +313,18 @@ export default class SearchResultScreen extends React.Component {
   				</Button>
   			</View>
   		);
-
+			if(this.state.searchList.length==0 && !this.state.progressVisible){
+				return(
+					<Container style={styles.container}>
+						<BBBHeader
+							title="Search Result"
+							leftComponent={leftComponent}
+							rightComponent={rightComponent}
+						/>
+					<View style={{flex:1, flexDirection:'row',alignItems:'center',justifyContent:'center'}}><Text>No Result Found.</Text></View>
+					</Container>
+				);
+			}
   		return (
   			<Container style={styles.container}>
   				<BBBHeader
@@ -305,9 +333,10 @@ export default class SearchResultScreen extends React.Component {
   					rightComponent={rightComponent}
   				/>
           <Content>
+
   					<View style={styles.liststyle}>
             {this.state.searchList.length==0?(
-								<View style={{flex:1, flexDirection:'row',alignItems:'center',justifyContent:'center'}}><Text>No Result Found.</Text></View>
+								null
 						):
             <FlatList
     							data={this.state.searchList}
