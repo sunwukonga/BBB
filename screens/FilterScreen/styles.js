@@ -68,6 +68,12 @@ export default StyleSheet.create({
 		borderBottomWidth: 0.5,
 		borderBottomColor: Colors.mainBottomBorderColor,
 	},
+	minMaxPrice: {
+		paddingLeft: Layout.moderateScale(15),
+		paddingRight: Layout.moderateScale(15),
+		paddingTop: Layout.moderateScale(15),
+		borderRadius: Layout.moderateScale(3),
+	},
 	offersListItem1: {
 		marginHorizontal: Layout.moderateScale(10),
 		marginVertical: Layout.moderateScale(10),

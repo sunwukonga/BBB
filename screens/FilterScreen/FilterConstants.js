@@ -1,29 +1,21 @@
 const modeItems = [
-	/*{
+	{
 		id: 1,
 		title: 'All',
 		checked: false,
-	},*/
+	},
 	{
 		id: 2,
 		title: 'Sale',
 		checked: false,
 	},
-	{
-		id: 3,
-		title: 'Barter',
-		checked: false,
-	},
+
 	{
 		id: 4,
 		title: 'Donate',
 		checked: false,
 	},
-	{
-		id: 5,
-		title: 'Sale & Barter',
-		checked: false,
-	},
+
 ];
 
 const ratingItems = [
@@ -101,7 +93,7 @@ const filterItem = [
   },
   {
     id: 5,
-    name: 'DistanceSvg',
+    name: 'CurrencySvg',
   },
   {
     id: 6,
@@ -121,4 +113,43 @@ const filterItem = [
   },
 ];
 
-export default { modeItems,ratingItems,idVerifications,filterItem};
+const filterDays = [
+	{
+		value: 1,
+	},
+	{
+		value: 2,
+	},
+	{
+		value: 3,
+	},
+	{
+		value: 4,
+	},
+	{
+		value: 5,
+	},
+	{
+		value: 6,
+	},
+	{
+		value: 7,
+	},
+	{
+		value: 8,
+	},
+	{
+		value: 9,
+	},
+	{
+		value: 10,
+	},
+	{
+		value: 11,
+	},
+	{
+		value: 12,
+	},
+];
+
+export default { modeItems,ratingItems,idVerifications,filterItem,filterDays};
