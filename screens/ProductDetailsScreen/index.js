@@ -32,6 +32,9 @@ import gql from "graphql-tag";
 import getProductDetails from './GetProductDetails';
 import likeProductApi from './LikeProductApi';
 
+import LoginStatus from '../HomeScreen/LoginStatus'
+import LikeButton from '../HomeScreen/LikeButton'
+
 
 // Get login status
 var log_status = '';
@@ -195,7 +198,7 @@ export default class ProductDetailsScreen extends React.Component {
 	}
 
 
-	checkLoginChat = (item) => {
+	checkLoginChat = (item, login_status) => {
     console.log("Log Status: " + log_status);
     if( log_status == false ) {
       this.props.navigation.dispatch(NA_HomeToLoginToDrawer);
@@ -236,7 +239,8 @@ export default class ProductDetailsScreen extends React.Component {
 							style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 						/>
 					</View>
-					  <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(item)}>
+            
+					  <TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(item, loginStatus.loginStatus)}>
 					<View >
 						<BBBIcon
 							name="Chat"
@@ -349,7 +353,9 @@ export default class ProductDetailsScreen extends React.Component {
 			</Container>
 		);
 		}
+
 		return (
+      <LoginStatus>{ loginStatus => (
 			<Container style={styles.container}>
 			  <App />
 
@@ -370,20 +376,11 @@ export default class ProductDetailsScreen extends React.Component {
 								return (
 									<View key={index} style={styles.slide}>
 
-									{item.post===null ?   <Image  source={Images.trollie}  style={styles.rowImage} /> :
+                    {item.post===null ?   <Image  source={Images.trollie}  style={styles.rowImage} /> :
 											<Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.post+""}} style={styles.rowImage} />
-									}
-											<TouchableOpacity style={styles.favoriteIconSec} onPress={() => this.sendLikeRequest(productData)}>
-										<View >
-											<BBBIcon
-												name="Favorite"
-												size={Layout.moderateScale(18)}
-												color={this.state.isLiked ? Colors.tintColor : Colors.white}
-												style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-											/>
-										</View>
-											</TouchableOpacity>
-										<TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(productData)}>
+                    }
+
+                    <LikeButton item={item} loginStatus={loginStatus} />
 
 										<View>
 											<BBBIcon
@@ -393,7 +390,6 @@ export default class ProductDetailsScreen extends React.Component {
 												style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
 											/>
 										</View>
-											</TouchableOpacity>
 									</View>
 								);
 							})}
@@ -571,6 +567,21 @@ export default class ProductDetailsScreen extends React.Component {
 						activityIndicatorSize="large"
 											 />
 			</Container>
+      )}</LoginStatus>
 		);
 	}
 }
+
+/*
+											<TouchableOpacity style={styles.favoriteIconSec} onPress={() => this.sendLikeRequest(productData)}>
+										<View >
+											<BBBIcon
+												name="Favorite"
+												size={Layout.moderateScale(18)}
+												color={this.state.isLiked ? Colors.tintColor : Colors.white}
+												style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+											/>
+										</View>
+											</TouchableOpacity>
+										<TouchableOpacity style={styles.chatIconSec} onPress={() => this.checkLoginChat(productData)}>
+*/

@@ -35,36 +35,42 @@ class LikeButton extends Component {
   }
 
   render() {
-    let item = this.props.item
-    return (
-      <Mutation
-        mutation={LIKE_LISTING}
-        update={(cache, { data: { likeListing } }) => {
-          const { getUserLikedListings } = cache.readQuery({
-            query: GET_USER_LIKED_LIST
-          , variables: {"countryCode":'SG',"limit":10,"page":1}
-          })
-          const newUserLikedListings = this.updateUserLikedListings( getUserLikedListings, item )
-          cache.writeQuery({
-            query: GET_USER_LIKED_LIST,
-            data: { getUserLikedListings : newUserLikedListings }
-          })
-        }}
-      >
-        {(likeListing, { data }) => (
-          <TouchableOpacity style={styles.favoriteIconSec} onPress={() => likeListing({ variables: { listingId: item.id, like: !item.liked } }) }>
-            <View >
-              <BBBIcon
-                name="Favorite"
-                size={Layout.moderateScale(18)}
-                color={item.liked ? Colors.tintColor : Colors.white}
-                style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-              />
-            </View>
-          </TouchableOpacity>
-        )}
-      </Mutation>
-    )
+    const {item, loginStatus} = this.props
+    console.log("LoginStatus: ", loginStatus)
+
+    if ( loginStatus.loginStatus && (loginStatus.myProfile.id != item.user.id) ) {
+      return (
+        <Mutation
+          mutation={LIKE_LISTING}
+          update={(cache, { data: { likeListing } }) => {
+            const { getUserLikedListings } = cache.readQuery({
+              query: GET_USER_LIKED_LIST
+            , variables: {"countryCode":'SG',"limit":10,"page":1}
+            })
+            const newUserLikedListings = this.updateUserLikedListings( getUserLikedListings, item )
+            cache.writeQuery({
+              query: GET_USER_LIKED_LIST,
+              data: { getUserLikedListings : newUserLikedListings }
+            })
+          }}
+        >
+          {(likeListing, { data }) => (
+            <TouchableOpacity style={styles.favoriteIconSec} onPress={() => likeListing({ variables: { listingId: item.id, like: !item.liked } }) }>
+              <View >
+                <BBBIcon
+                  name="Favorite"
+                  size={Layout.moderateScale(18)}
+                  color={item.liked ? Colors.tintColor : Colors.white}
+                  style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        </Mutation>
+      )
+    } else {
+      return null
+    }
   }
 }
 

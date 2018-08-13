@@ -37,8 +37,7 @@ class PureListItem extends Component {
   }
 
   render() {
-    let item = this.props.item
-    let loginStatus = this.props.loginStatus
+    let {item, loginStatus} = this.props
     return (
 
         <TouchableOpacity
@@ -56,9 +55,7 @@ class PureListItem extends Component {
               ? <Baby style={styles.rowImage} />
               : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
             }
-            { loginStatus &&
-              <LikeButton item={item} />
-            }
+            <LikeButton item={item} loginStatus={loginStatus} />
             <LastMessageIds>{ chatIndexes => (
               <CreateChat>{ mutateCreateChat  => (
                 <GetProfile>{ currentUser => (

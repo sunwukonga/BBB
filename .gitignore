@@ -102,3 +102,8 @@ ios/RCTTest.podspec
 ios/Podfile.lock
 ios/Pods
 .expo/**/*
+/login/
+
+# Git Related
+commitMessage
+/screens/HomeScreen/Practice.js

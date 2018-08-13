@@ -22,15 +22,14 @@ class ListUserLikedListings extends Component {
 
 
   render() {
-    let inputVariables = this.props.variables
-    let { loginStatus, countryCode } = this.props.loginStatus
-    if (!loginStatus) {
+    let { loginStatus, variables } = this.props
+    if (!loginStatus.loginStatus) {
       return null
     }
     return (
       <Query
         query = {GET_USER_LIKED_LIST}
-        variables = {Object.assign(inputVariables, { countryCode: countryCode})}
+        variables = {Object.assign(variables, { countryCode: loginStatus.countryCode })}
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {

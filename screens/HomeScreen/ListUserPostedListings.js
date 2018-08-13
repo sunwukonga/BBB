@@ -22,15 +22,14 @@ class ListUserPostedListings extends Component {
 
 
   render() {
-    let inputVariables = this.props.variables
-    let { loginStatus, countryCode } = this.props.loginStatus
-    if (!loginStatus) {
+    let { loginStatus, variables } = this.props
+    if (!loginStatus.loginStatus) {
       return null
     }
     return (
       <Query
         query = {GET_USER_POSTED_LIST}
-        variables = {Object.assign(inputVariables, { countryCode: countryCode})}
+        variables = {Object.assign(variables, { countryCode: loginStatus.countryCode })}
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
@@ -56,7 +55,7 @@ class ListUserPostedListings extends Component {
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getUserPostedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} />
+                   <PureListItem item={item} loginStatus={loginStatus} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
