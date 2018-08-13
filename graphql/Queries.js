@@ -6,6 +6,10 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
     id
     title
     description
+    category {
+      id
+      name
+    }
     primaryImage {
       id
       imageKey
@@ -75,6 +79,10 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
     id
     title
     description
+    category {
+      id
+      name
+    }
     primaryImage {
       id
       imageKey
@@ -142,6 +150,10 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
     id
     title
     description
+    category {
+      id
+      name
+    }
     primaryImage {
       id
       imageURL
@@ -215,6 +227,10 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
     id
     title
     description
+    category {
+      id
+      name
+    }
     primaryImage {
       id
       imageURL
@@ -288,6 +304,10 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
     id
     title
     description
+    category {
+      id
+      name
+    }
     primaryImage {
       id
       imageURL
@@ -361,6 +381,10 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
     id
     title
     description
+    category {
+      id
+      name
+    }
     primaryImage {
       id
       imageURL
@@ -484,6 +508,10 @@ query getChatMessages($chatIndexes:[ChatIndex]) {
       id
       title
       description
+      category {
+        id
+        name
+      }
       user {
         id
         profileName

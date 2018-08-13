@@ -21,7 +21,8 @@ export default StyleSheet.create({
 		borderColor: Colors.postmain,
 		marginLeft: Layout.WIDTH * 0.10,
 		marginRight: Layout.WIDTH * 0.10,
-		resizeMode: 'cover',
+    paddingTop: Layout.WIDTH * 0.02,
+    paddingBottom: Layout.WIDTH * 0.02,
 		alignSelf: 'center',
 	},
 	backarrow: {
@@ -263,6 +264,7 @@ export default StyleSheet.create({
 		width: Layout.WIDTH * 0.1,
 		justifyContent: 'flex-end',
 		alignItems: 'flex-end',
+    alignSelf: 'flex-end',
 	},
 	activeuser: {
 		width: Layout.WIDTH * 0.12,

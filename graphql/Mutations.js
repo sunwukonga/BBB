@@ -140,6 +140,10 @@ mutation createListing(
       id
       title
       description
+      category {
+        id
+        name
+      }
       primaryImage {
         id
         imageURL

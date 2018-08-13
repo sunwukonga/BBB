@@ -622,10 +622,9 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   storeImageDetails(imageKey,imgId,uri,base_64){
+    let inputTile = imageList.pop()
     var _id=imageList.length+1;
     var isPrimary=_id===1;
-      console.log("Key",imageKey);
-    let inputTile = imageList.pop()
     imageList.push({ id: "_"+_id,imageId:imgId,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false });
     imageList.push(inputTile)
 
@@ -895,6 +894,7 @@ export default class CreateNewItemScreen extends React.Component {
                 routeName: 'productDetailsScreen'
               , params: {
                   item: data.createListing
+                , loginStatus: loginStatus
                 }
               })
             })

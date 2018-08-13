@@ -82,8 +82,109 @@ console.log("sec only")
           data = { this.collateImages(item) }
           renderItem={({ item }) => this.renderItem( item ) }
         />
+        <View style={{
+          borderWidth:1,
+          borderColor:'rgba(0,0,0,0.0)',
+          alignItems:'flex-end',
+          justifyContent:'flex-start',
+          flexDirection: 'column',
+          width: Layout.WIDTH * 0.2,
+          height:Layout.WIDTH * 0.4,
+          position: 'absolute',
+          top: Layout.WIDTH * 0.02,
+          right: Layout.WIDTH * 0.02,
+          backgroundColor: 'rgba(255, 255, 255, 0)',
+          borderRadius: Layout.moderateScale(8),
+          }}
+        >
+          <LikeButton item={item} loginStatus={loginStatus} />
+          { loginStatus.loginStatus &&
+            <LastMessageIds>{ chatIndexes => (
+              <CreateChat>{ mutateCreateChat  => (
+                <GetProfile>{ currentUser => (
+                  <TouchableOpacity
+                    style={styles.chatIconSec}
+                    onPress={() => {
+                      if ( item.chatId ) {
+                        this.props.navigation.navigate('chatDetailScreen', {
+                          chatId: item.chatId
+                        , chatIndexes: chatIndexes
+                        })
+                      } else {
+                        let optimisticResponse = optimisticCreateChat(item, currentUser )
+                        mutateCreateChat({
+                          variables: { listingId: item.id }
+                        , optimisticResponse: optimisticResponse
+                        })
+                        .then( ({ data: { createChat }}) => {
+                          this.props.navigation.navigate('chatDetailScreen', {
+                            chatId: createChat.id
+                          , chatIndexes: chatIndexes
+                          })
+                        })
+                      }
+                    }}
+                  >
+                    <View >
+                      <BBBIcon
+                        name="Chat"
+                        size={Layout.moderateScale(18)}
+                        color={item.chatId!==null ? Colors.tintColor : Colors.white}
+                        style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                )}</GetProfile>
+              )}</CreateChat>
+            )}</LastMessageIds>
+          }
+        </View>
+        <Item style={styles.userItemDetailsSec}>
+          <View style={styles.userProfileSec}>
+            {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
+                <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+            }
+            <View style={item.user.online ? styles.userOnline : styles.userOffline} />
+          </View>
+          <View style={styles.userNameSec}>
+            <Text style={styles.userName}>{item.user.profileName}</Text>
+          </View>
+          <View style={styles.activeuserSec}>
+            <IdentityVerification
+              width={Layout.moderateScale(30)}
+              height={Layout.moderateScale(30)}
+              level={item.user.idVerification}
+            />
+          </View>
+        </Item>
         <View>
-          <Text> HI </Text>
+          <Text style={styles.postDesc} numberOfLines={3}>{item.description}</Text>
+        </View>
+
+        <View style={styles.productreviewSec}>
+          <View style={styles.ratingSec}>
+            <Stars
+              size={Layout.moderateScale(14)}
+              styleOn={{ color: Colors.starcolor, marginTop: Layout.moderateScale(2) }}
+              styleOff={{ color: Colors.lightGray, marginTop: Layout.moderateScale(2) }}
+              repeats={item.user.sellerRating}
+            />
+            <Text style={styles.ratingmsgct}> ({item.user.sellerRatingCount}) </Text>
+          </View>
+          <View style={styles.priceSec}>
+            <Text style={styles.pricetext}>{item.saleMode.currency!==null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
+          </View>
+        </View>
+
+        <View style={[styles.alignmentButton, {backgroundColor: Colors.offerButton}]}>
+          <Text style={styles.regularSmall}>{item.saleMode.mode.toUpperCase()}</Text>
+        </View>
+        <View>
+          <Text style={styles.regularLarge}>Category</Text>
+          <Text style={[styles.regularSmall, styles.tagContainer]}>
+            {item.category.name}
+          </Text>
         </View>
       </View>
     )
@@ -148,21 +249,6 @@ import LikeButton from '../HomeScreen/LikeButton'
               ? <Baby style={styles.rowImage} />
               : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.imageKey}} style={styles.rowImage} />
             }
-            <View style={{
-              borderWidth:1,
-              borderColor:'rgba(0,0,0,0.2)',
-              alignItems:'flex-end',
-              justifyContent:'flex-start',
-              flexDirection: 'column'
-              width:70,
-              position: 'absolute',
-              bottom: 10,
-              right: 10,
-              height:70,
-              backgroundColor:'#fff',
-              borderRadius:100,
-              }}
-            >
               <LikeButton item={item} loginStatus={loginStatus} />
               <LastMessageIds>{ chatIndexes => (
                 <CreateChat>{ mutateCreateChat  => (
@@ -206,34 +292,11 @@ import LikeButton from '../HomeScreen/LikeButton'
           </View>
         </View>
 
-          // Taken from PureListItem (candidate for its own component)
-          <Item style={styles.userItemDetailsSec}>
-            <View style={styles.userProfileSec}>
-              {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
-                  //<Image  source={Images.tempUser} style={styles.userProfile} /> 
-                  <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-                : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
-              }
-              <View style={item.user.online ? styles.userOnline : styles.userOffline} />
-            </View>
-            <View style={styles.userNameSec}>
-              <Text style={styles.userName}>{item.user.profileName}</Text>
-            </View>
-            <View style={styles.activeuserSec}>
-              <IdentityVerification
-                width={Layout.moderateScale(30)}
-                height={Layout.moderateScale(30)}
-                level={item.user.idVerification}
-              />
-            </View>
-          </Item>
 
-          // Taken from PureListItem (candidate for its own component)
           <View>
             <Text style={styles.postDesc} numberOfLines={3}>{item.description}</Text>
           </View>
 
-          // Taken from PureListItem (candidate for its own component)
           <View style={styles.productreviewSec}>
             <View style={styles.ratingSec}>
               <Stars
@@ -249,13 +312,10 @@ import LikeButton from '../HomeScreen/LikeButton'
             </View>
           </View>
 
-            <View style={styles.priceSec}>
-              <Text style={styles.pricetext}>{item.saleMode.currency!==null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
-            </View>
+          <View style={styles.priceSec}>
+            <Text style={styles.pricetext}>{item.saleMode.currency!==null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
+          </View>
 
-					<View style={styles.priceSec}>
-						<Text style={styles.pricetext}>$250</Text>
-					</View>
 				</View>
 			</View>
 			</TouchableOpacity>
@@ -414,7 +474,6 @@ import LikeButton from '../HomeScreen/LikeButton'
 					<View>
 						<Text style={styles.regularLarge}>Category</Text>
 						<Text style={[styles.regularSmall, styles.tagContainer]}>
-
 							{productData.category.name}
 						</Text>
 
