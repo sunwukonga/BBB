@@ -99,7 +99,7 @@ console.log("sec only")
         >
           <LikeButton item={item} loginStatus={loginStatus} />
           { loginStatus.loginStatus &&
-            <LastMessageIds>{ chatIndexes => (
+            <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
               <CreateChat>{ mutateCreateChat  => (
                 <GetProfile>{ currentUser => (
                   <TouchableOpacity

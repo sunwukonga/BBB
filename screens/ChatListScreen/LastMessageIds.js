@@ -9,6 +9,10 @@ class LastMessageIds extends Component {
     super(props)
   }
   render() {
+    let { loginStatus } = this.props
+    if (!loginStatus.loginStatus) {
+      return this.props.children()
+    }
     return (
       <Query
         query = {GET_CHAT_MESSAGES}

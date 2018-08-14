@@ -129,16 +129,6 @@ export default LoggedinState = graphql(gql`
     }
     */
 
-    doesProfileExist = ( name ) => {
-      if (this.props.navigation.state.routes && this.props.navigation.state.routes.length > 0) {
-        if (this.props.navigation.state.routes[0].params && this.props.navigation.state.routes[0].params.data && this.props.navigation.state.routes[0].params.data.myProfile ) {
-          if (this.props.navigation.state.routes[0].params.data.myProfile[name]) {
-            return true
-          }
-        }
-      }
-      return false
-    }
     w = ( root, nested ) => {
       if (!root) return null
       return nested.reduce( (acc, cur) => {
@@ -148,15 +138,16 @@ export default LoggedinState = graphql(gql`
       }, root)
     }
 
+        //<Container style={styles.container} {...this.props}>
     render() {
       const { navigation } = this.props;
       return (
-        <Container style={styles.container} {...this.props}>
+        <Container style={styles.container} >
           <LoginStatus>{ loginStatus => {
             if (loginStatus.loginStatus) {
               return (
                 <GetCachedProfile>{ myProfile => {
-                  console.log("GetCachedProfile: myProfile: ", myProfile)
+                  console.log("GetCachedProfile")
                   return (
                   <View style={styles.usersDetailsSec}>
                   <TouchableOpacity

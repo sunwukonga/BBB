@@ -22,7 +22,7 @@ class ListUserLikedListings extends Component {
 
 
   render() {
-    let { loginStatus, variables } = this.props
+    let { variables, loginStatus, chatIndexes, currentUser } = this.props
     if (!loginStatus.loginStatus) {
       return null
     }
@@ -56,7 +56,7 @@ class ListUserLikedListings extends Component {
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getUserLikedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} loginStatus={loginStatus} />
+                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}

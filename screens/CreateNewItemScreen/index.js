@@ -280,7 +280,7 @@ export default class CreateNewItemScreen extends React.Component {
       "tags":tagsList,
       "countryCode": countryCode
     }}
-    variables.fetchPolicy = 'no-cache'
+    //variables.fetchPolicy = 'network-only'
     console.log(variables)
     return variables
 

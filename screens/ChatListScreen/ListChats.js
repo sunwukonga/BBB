@@ -68,12 +68,12 @@ class ListChats extends Component {
     }
   }
 
+      //<LastMessageIds>{ chatIndexes  => (
 // TODO: Change target to chatScreen
 //  renderChat = ( { item }) => {
-  renderChat = ( chats ) => {
+  renderChat = ( chats, chatIndexes ) => {
     let { item } = chats
     return (
-      <LastMessageIds>{ chatIndexes  => (
         <List
           style={styles.mainlist}
           key={item.id}
@@ -110,10 +110,10 @@ class ListChats extends Component {
             </Body>
           </ListItem>
         </List>
-      )}</LastMessageIds>
     )
   }
 
+      //)}</LastMessageIds>
 
   // TODO: This is naive. If a message list gets HUGE, it will start to take up
   // too many resources. A better approach is to fetch the preceding 20 messages,
@@ -169,7 +169,7 @@ class ListChats extends Component {
                   contentContainerStyle={styles.listContent}
                   keyExtractor={(item, index) => index.toString()}
                   data = {data.getChatMessages || []}
-                  renderItem={this.renderChat}
+                  renderItem={(item) => this.renderChat(item, chatIndexes)}
                   refreshing={networkStatus === 4 || networkStatus === 3}
                   onRefresh={() => refetch()}
                 />

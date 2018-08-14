@@ -18,6 +18,7 @@ function optimisticCreateChat(listing, user) {
     __typename: "Mutation",
     createChat: {
       __typename: "Chat",
+      id: -1,
       chatMessages: [],
       initUser: {
         __typename: "User",

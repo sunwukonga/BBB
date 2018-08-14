@@ -264,9 +264,9 @@ export default class ChatScreen extends Component {
         />
       </Button>
     )
-    let { chatId } = this.props.navigation.state.params
+    let { chatId, chatIndexes } = this.props.navigation.state.params
+      //<LastMessageIds loginStatus={{loginStatus: true}}>{ chatIndexes => (
     return (
-      <LastMessageIds>{ chatIndexes => (
         <Query
           query = {GET_CHAT_MESSAGES}
           variables = {{ chatIndexes: chatIndexes }}
@@ -391,7 +391,8 @@ export default class ChatScreen extends Component {
             )
           }}
         </Query>
-    )}</LastMessageIds>
     ) // Render Return
   } // Render Method
 } // Class
+
+//)}</LastMessageIds>

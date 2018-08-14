@@ -40,6 +40,8 @@ import ListUserPostedListings from './ListUserPostedListings'
 
 import likeProductApi from './LikeProductApi';
 import LoginStatus from './LoginStatus'
+import LastMessageIds from '../ChatListScreen/LastMessageIds'
+import GetProfile from '../../graphql/queries/GetProfile'
 
 import MainDrawer from '../../navigation/MainDrawerNavigator'
 
@@ -274,6 +276,7 @@ export default class HomeScreen extends React.Component {
       ^^^ There can be no gap between  `>` and `{`  OR  `}` and `<`
       */
   render() {
+    // TODO: Change to a function that accepts loginStatus
     var leftComponent = (
       <LoginStatus>{ loginStatus => (
         <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
@@ -311,72 +314,68 @@ export default class HomeScreen extends React.Component {
         />
         */
     return (
-      <Container>
-        <Header
-          androidStatusBarColor={Colors.mainheaderbg}
-          style={headerStyles.header}>
-          <Left style={headerStyles.left}>{leftComponent}</Left>
-          <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
-          <Right style={headerStyles.right}>{rightComponent}</Right>
-        </Header>
-        <Content style={styles.container}>
-          <View>
-            <View style={styles.searchSec}>
-              <Item regular style={styles.searchItem}>
-      {/* TODO: Link with searchResultScreen where searchListings will be called */}
-                  <Input
-                  placeholder="What are you looking for?"
-                  style={styles.mainSearch}
-                  keyboardType="default"
-                  returnKeyType="search"
-                  onChangeText={(text) => {
-                      console.log("Title",text);
-                      this.setState({ searchTerms:text});
-                  }}
-                  onSubmitEditing={(content) =>
-                    this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})
-
-                  }
-                />
-                <BBBIcon name="Search" style={styles.searchicon} />
-              </Item>
-            </View>
-
-            <LoginStatus>{ loginStatus => (
-              <ListRecentListings loginStatus={loginStatus} variables={{"countryCode":this.state.countryCode,"limit":this.state.limit,"page":this.state.page}} /> 
-            )}</LoginStatus>
-
-            <View style={styles.adSec}>
-              <Text style={styles.mainadText}>
-                Do you have something to sell or give away?
-              </Text>
-              <Text style={styles.subtitle}>
-                Post it with us and we'll give you an audience.
-              </Text>
-            </View>
-            <LoginStatus>{ loginStatus => (
-              <View>
-                <ListVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
-                <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
-                <View style={styles.hr} />
-                <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
-                <ListUserLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
-                <ListUserPostedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} />
-              </View>
-            )}</LoginStatus>
-          </View>
-        </Content>
         <LoginStatus>{ loginStatus => (
-          <Fab
-            direction="up"
-            style={styles.fabStyle}
-            position="bottomRight"
-            onPress={() => this.checkAuthForCreate(loginStatus)}
-          >
-            <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
-          </Fab>
-        )}</LoginStatus>
+          <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
+            <GetProfile loginStatus={loginStatus}>{ currentUser => (
+      <Container>
+              <Header
+                androidStatusBarColor={Colors.mainheaderbg}
+                style={headerStyles.header}>
+                <Left style={headerStyles.left}>{leftComponent}</Left>
+                <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
+                <Right style={headerStyles.right}>{rightComponent}</Right>
+              </Header>
+              <Content style={styles.container}>
+                <View>
+                  <View style={styles.searchSec}>
+                    <Item regular style={styles.searchItem}>
+                      <Input
+                        placeholder="What are you looking for?"
+                        style={styles.mainSearch}
+                        keyboardType="default"
+                        returnKeyType="search"
+                        onChangeText={(text) => {
+                            this.setState({ searchTerms:text});
+                        }}
+                        onSubmitEditing={(content) =>
+                          this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})
+                        }
+                      />
+                      <BBBIcon name="Search" style={styles.searchicon} />
+                    </Item>
+                  </View>
+
+                  <ListRecentListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                  <View style={styles.adSec}>
+                    <Text style={styles.mainadText}>
+                      Do you have something to sell or give away?
+                    </Text>
+                    <Text style={styles.subtitle}>
+                      Post it with us and we'll give you an audience.
+                    </Text>
+                  </View>
+                  <View>
+                    <ListVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                    <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                    <View style={styles.hr} />
+                    <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                    <ListUserLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                    <ListUserPostedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                  </View>
+                </View>
+              </Content>
+              <Fab
+                direction="up"
+                style={styles.fabStyle}
+                position="bottomRight"
+                onPress={() => this.checkAuthForCreate(loginStatus)}
+              >
+                <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
+              </Fab>
       </Container>
+            )}</GetProfile>
+          )}</LastMessageIds>
+        )}</LoginStatus>
     );
   }
 }
