@@ -165,7 +165,7 @@ export default class ChatScreen extends Component {
       } else {
         profileName = <Text>Nothing to show</Text>
       }
-    } else if ( chat.initUser != chat.userId ) {
+    } else if ( chat.initUser.id != chat.userId ) {
       if ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey ) {
         profileImage = <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.initUser.primaryImage.imageKey }} style={styles.profileImage} />
       } else {
@@ -270,7 +270,7 @@ export default class ChatScreen extends Component {
         <Query
           query = {GET_CHAT_MESSAGES}
           variables = {{ chatIndexes: chatIndexes }}
-          fetchPolicy = "cache-and-network"
+          fetchPolicy = "network-only"
           update={(cache, { data: { getChatMessages } }) => {
             const data = cache.readQuery({
               query: GET_CHAT_MESSAGES

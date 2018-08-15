@@ -47,18 +47,47 @@ mutation createChat($listingId: Int!) {
       id
       title
       description
-      user {
+      category {
         id
-        profileName
-        profileImage {
-          id
-          imageKey
-          imageURL
-        }
+        name
       }
       primaryImage {
         id
         imageKey
+      }
+      secondaryImages {
+        id
+        imageKey
+      }
+      saleMode {
+        id
+        price
+        counterOffer
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        mode
+        exchangeModes {
+          id
+          mode
+          price
+          currency {
+            iso4217
+            currencyName
+            currencySymbol
+          }
+          location {
+            id
+            lineOne
+            lineTwo
+            postcode
+            long
+            lat
+            directions
+          }
+        }
       }
       template {
         id
@@ -68,16 +97,53 @@ mutation createChat($listingId: Int!) {
           id
           imageKey
         }
+        secondaryImages {
+          id
+          imageKey
+        }
+        tags{
+          id
+          name
+        }
+      }
+      tags{
+        id
+        name
+      }
+      viewers
+      likes
+      liked
+      chatId
+      user {
+        id
+        firstName
+        lastName
+        profileName
+        profileImage {
+          id
+          imageURL
+          imageKey
+        }
+        sellerRating
+        sellerRatingCount
+        online
+        idVerification
       }
     }
     initUser {
       id
+      firstName
+      lastName
       profileName
       profileImage {
         id
-        imageKey
         imageURL
+        imageKey
       }
+      sellerRating
+      sellerRatingCount
+      online
+      idVerification
     }
     chatMessages {
       id
@@ -146,12 +212,10 @@ mutation createListing(
       }
       primaryImage {
         id
-        imageURL
         imageKey
       }
       secondaryImages {
         id
-        imageURL
         imageKey
       }
       saleMode {
@@ -190,12 +254,10 @@ mutation createListing(
         description
         primaryImage {
           id
-          imageURL
           imageKey
         }
         secondaryImages {
           id
-          imageURL
           imageKey
         }
         tags{

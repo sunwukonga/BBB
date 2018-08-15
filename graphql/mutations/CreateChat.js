@@ -13,11 +13,11 @@ export default CreateChat = graphql(CREATE_CHAT) (
 
     render() {
       let {item, currentUser } = this.props
-      let optimisticResponse = optimisticCreateChat( item, currentUser )
 
+      let optimisticResponse = optimisticCreateChat( item, currentUser )
+// , optimisticResponse: optimisticResponse
       return this.props.children( () => this.props.mutate({
           variables: { listingId: item.id }
-        , optimisticResponse: optimisticResponse
         })
       )
     }

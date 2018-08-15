@@ -45,7 +45,7 @@ class ChatButton extends Component {
   }
 
   render() {
-    const {item, loginStatus, currentUser, chatIndexes} = this.props
+    const {item, loginStatus, chatIndexes, currentUser} = this.props
 
 
     if (loginStatus.userId == item.user.id) {

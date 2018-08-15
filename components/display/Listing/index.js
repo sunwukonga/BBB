@@ -18,9 +18,9 @@ import IdentityVerification from '../../IdentityVerification';
 import BBBIcon from '../../BBBIcon';
 import Stars from '../../Stars';
 
-import LikeButton from '../../../screens/HomeScreen/LikeButton'
-import CreateChat from '../../../graphql/mutations/CreateChat'
+import LikeButton from '../../buttons/LikeButton'
 import ChatButton from '../../buttons/ChatButton'
+import CreateChat from '../../../graphql/mutations/CreateChat'
 import LastMessageIds from '../../../screens/ChatListScreen/LastMessageIds'
 import { optimisticCreateChat } from '../../../graphql/mutations/Optimistic.js'
 import GetProfile from '../../../graphql/queries/GetProfile'

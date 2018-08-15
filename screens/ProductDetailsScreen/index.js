@@ -25,15 +25,7 @@ import Stars from '../../components/Stars';
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 
-//apollo client
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
-
-import getProductDetails from './GetProductDetails';
-import likeProductApi from './LikeProductApi';
-
 import LoginStatus from '../HomeScreen/LoginStatus'
-import LikeButton from '../HomeScreen/LikeButton'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import GetProfile from '../../graphql/queries/GetProfile'
 import Listing from '../../components/display/Listing'
@@ -66,21 +58,19 @@ class ProductDetailsScreen extends React.Component {
 		);
 
     return (
-      <LoginStatus>{ loginStatus => (
-        <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
-            <GetProfile loginStatus={loginStatus}>{ currentUser => (
-              <Container style={styles.container}>
-                <BBBHeader
-                  title={item.title}
-                  leftComponent={leftComponent}
-                />
-                <Content style={styles.contentStyle}>
-                  <Listing item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
-                </Content>
-              </Container>
-            )}</GetProfile>
-        )}</LastMessageIds>
-      )}</LoginStatus>
+      <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
+          <GetProfile loginStatus={loginStatus}>{ currentUser => (
+            <Container style={styles.container}>
+              <BBBHeader
+                title={item.title}
+                leftComponent={leftComponent}
+              />
+              <Content style={styles.contentStyle}>
+                <Listing item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+              </Content>
+            </Container>
+          )}</GetProfile>
+      )}</LastMessageIds>
     )
   }
 }

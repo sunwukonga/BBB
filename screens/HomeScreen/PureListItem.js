@@ -16,7 +16,7 @@ import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
 import Stars from '../../components/Stars';
 
-import LikeButton from './LikeButton'
+import LikeButton from '../../components/buttons/LikeButton'
 import ChatButton from '../../components/buttons/ChatButton'
 import CreateChat from '../../graphql/mutations/CreateChat'
 import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'

@@ -5,15 +5,15 @@ import {
 , TouchableOpacity
 } from 'react-native';
 import styles from './styles';
-import { Layout, Colors } from '../../constants/';
-import BBBIcon from '../../components/BBBIcon';
+import { Layout, Colors } from '../../../constants/';
+import BBBIcon from '../../BBBIcon';
 
 import {
   LIKE_LISTING
-} from '../../graphql/Mutations'
+} from '../../../graphql/Mutations'
 import {
   GET_USER_LIKED_LIST
-} from '../../graphql/Queries'
+} from '../../../graphql/Queries'
 
 
 class LikeButton extends Component {

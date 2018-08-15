@@ -10,6 +10,7 @@ class GetProfile extends Component {
   }
   render() {
     let { loginStatus } = this.props
+
     if (!loginStatus.loginStatus) {
       return this.props.children()
     }
@@ -18,7 +19,7 @@ class GetProfile extends Component {
         query = {GET_PROFILE}
         fetchOptions = 'cache-and-network'
       >
-        {({ getProfile }) => {
+        {({data: {getProfile}}) => {
           if ( getProfile ) {
             return this.props.children( getProfile )
           } else {
