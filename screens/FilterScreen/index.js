@@ -29,11 +29,16 @@ import CheckBox from '../../components/CheckBox';
 import Dropdown from '../../components/Dropdown/dropdown';
 import Slider from '../../components/Slider';
 import { Ionicons } from '@expo/vector-icons';
+
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 // screen style
 import styles from './styles';
 import { Layout, Colors, Images } from '../../constants/';
 import FilterConstants from './FilterConstants'
-
+import getTemplateList from './SearchTemplateApi';
+import ListCategory from './ListCategory';
+var selectedCateId=null;
 export default class FilterScreen extends React.Component {
 	constructor(props) {
 		super(props);
@@ -46,10 +51,66 @@ export default class FilterScreen extends React.Component {
 			modeItemList:FilterConstants.modeItems,
 			ratingItemList:FilterConstants.ratingItems,
 			idVerificationList:FilterConstants.idVerifications,
+			daysList:FilterConstants.filterDays,
 			rating:null,
 			idVerification:null,
+      allCategoryValueList:[],
+      searchTemplateValueList:[],
+			tagValueList:[],
+			progressVisible:false,
+			selectedCateId:null,
+			templateId:null,
+			tagId:null,
+			isCounterOffer:false,
+			minMaxPrice: [0, 25000],
+			isDateTimePickerVisible: false,
+			dateTime:null,
+			selectedDate:null,
 		};
 	}
+
+	minMaxPriceValuesChange = (values) => {
+		console.log(values);
+	    this.setState({
+	      minMaxPrice: values,
+	    });
+	  }
+
+		_showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+
+		_hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+  _handleDatePicked = (date) => {
+    console.log('A date has been picked: ', date.getTime()/1000);
+		this.setState({
+			 isDateTimePickerVisible: false,
+			 dateTime:date.getTime()/1000,
+			 selectedDate:""+date,
+	 	})
+    this._hideDateTimePicker();
+  };
+
+	_getTemplates(){
+		console.log("selected categoryId",selectedCateId);
+    var variables={
+      "terms":[""],"limit":20,"page":1,"categoryId":[selectedCateId]
+    }
+    getTemplateList(variables).then((res)=>{
+
+      var tmpList=[];
+      Object.keys(res.data.searchTemplates).forEach((key,index)=>{
+          tmpList.push({title:res.data.searchTemplates[key].title,id:res.data.searchTemplates[key].id,checked:false,tagList:res.data.searchTemplates[key].tags});
+      });
+        console.log("Array New :" , tmpList.length);
+      this.setState({
+        searchTemplateValueList:tmpList,
+      })
+
+    })
+    .catch(error => {
+      console.log("Error:" + error.message);
+
+    });
+  }
 
 	onClick(data) {
 		data.checked = !data.checked;
@@ -69,6 +130,49 @@ export default class FilterScreen extends React.Component {
 			modeItemList:tmpList,
 		});
 	}
+
+	onClickTemplate(data) {
+		var tmpList=this.state.searchTemplateValueList;
+		var tmpTagList;
+		for(var i=0;i<tmpList.length;i++) {
+			tmpList[i].checked=false;
+			if(data.id==tmpList[i].id) {
+				tmpList[i].checked=true;
+				tmpTagList=tmpList[i].tagList;
+			}
+		}
+
+		this.setState({
+			templateId:data.id,
+			searchTemplateValueList:tmpList,
+			tagValueList:tmpTagList,
+		});
+	}
+	onClickTag(data) {
+		var tmpList=this.state.tagValueList;
+		for(var i=0;i<tmpList.length;i++) {
+			tmpList[i].checked=false;
+			if(data.id==tmpList[i].id) {
+				tmpList[i].checked=true;
+			}
+		}
+
+		this.setState({
+			tagId:data.id,
+			tagValueList:tmpList,
+		});
+	}
+
+	onClickCate(data) {
+		selectedCateId=data.id;
+		this._getTemplates();
+		this.setState({
+			selectedCateId:data.id,
+		});
+
+	}
+
+
 	onClickRating(data) {
 		var tmpList=this.state.ratingItemList;
 		for(var i=0;i<tmpList.length;i++){
@@ -83,6 +187,11 @@ export default class FilterScreen extends React.Component {
 		});
 	}
 
+	onClickOffers(){
+		this.setState({
+			isCounterOffer:!this.state.isCounterOffer
+		})
+	}
 	onClickIdentify(data) {
 		var tmpList=this.state.idVerificationList;
 		for(var i=0;i<tmpList.length;i++){
@@ -194,88 +303,29 @@ export default class FilterScreen extends React.Component {
 				</View>
 			);
 		} else if (segment === 2) {
-			var items = [
-				{
-					value: 1,
-				},
-				{
-					value: 2,
-				},
-				{
-					value: 3,
-				},
-				{
-					value: 4,
-				},
-				{
-					value: 5,
-				},
-				{
-					value: 6,
-				},
-				{
-					value: 7,
-				},
-				{
-					value: 8,
-				},
-				{
-					value: 9,
-				},
-				{
-					value: 10,
-				},
-				{
-					value: 11,
-				},
-				{
-					value: 12,
-				},
-			];
+
 			return (
 				<View key={'dateandtime'}>
 					<View style={styles.fltrTitleText}>
 						<Text style={styles.filterDetailsTitle}>Date & Time</Text>
 					</View>
 					<View style={styles.dateTimeSec}>
-						<View style={styles.dropLayputSec}>
-							<Text style={styles.daysText}>Days</Text>
-							<View>
-								<Dropdown
-									data={items}
-									value={2}
-									labelHeight={0}
-									dropdownPosition={0}
-									baseColor="rgba(0, 0, 0, .00)"
-									containerStyle={styles.dateDropDown}
-								/>
-								{/* <Ionicons
-									name="ios-arrow-down"
-									style={styles.imageDropDownStyle}
-									size={Layout.moderateScale(18)}
-									color="#272727"
-								/> */}
-							</View>
-						</View>
-						<View style={styles.dropLayputSec}>
-							<Text style={styles.daysText}>Hours</Text>
-							<View>
-								<Dropdown
-									data={items}
-									value={8}
-									labelHeight={0}
-									dropdownPosition={0}
-									baseColor="rgba(0, 0, 0, .00)"
-									containerStyle={styles.dateDropDown}
-								/>
-								{/* <Ionicons
-									name="ios-arrow-down"
-									style={styles.imageDropDownStyle}
-									size={Layout.moderateScale(18)}
-									color="#272727"
-								/> */}
-							</View>
-						</View>
+
+					<View style={{ flex: 1 }}>
+			 			<TouchableOpacity onPress={this._showDateTimePicker}>
+				 			<Text>Select Date & Time</Text>
+							{this.state.dateTime!=null ? <Text>{this.state.selectedDate}</Text> :
+										null
+							}
+			 			</TouchableOpacity>
+			 			<DateTimePicker
+				 			isVisible={this.state.isDateTimePickerVisible}
+				 			onConfirm={this._handleDatePicked}
+				 			onCancel={this._hideDateTimePicker}
+							mode={'datetime'}
+			 			/>
+		 			</View>
+
 					</View>
 				</View>
 			);
@@ -426,128 +476,34 @@ export default class FilterScreen extends React.Component {
 		} else if (segment === 5) {
 			return (
 				<View key={'distance'}>
-					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Distance</Text>
-					</View>
-					<View style={styles.distanceSlider}>
-						<Slider
-							minimumValue={0}
-							maximumValue={100}
-							step={25}
-							thumbTintColor="transparent"
-							minimumTrackTintColor="#0f9d58"
-							maximumTrackTintColor="#939393"
-							thumbStyle={styles.thumb}
-							thumbTouchSize={{
-								width: Layout.moderateScale(40),
-								height: Layout.moderateScale(100),
-							}}
-							custom={true}
-							onValueChange={ChangedValue =>
-								this.setState({ SliderValue: parseInt(ChangedValue) })
-							}
-							thumbImageComponent={
-								<View
-									style={{
-										position: 'absolute',
-										top: Layout.moderateScale(-50),
-										left: Layout.moderateScale(-20),
-									}}>
-									<BBBIcon
-										name="DistanceSliderSvg"
-										color="#0f9d58"
-										size={Layout.moderateScale(40)}
-										style={styles.thumbImageStyle}
-									/>
-									<Text
-										style={{
-											color: '#fff',
-											fontSize: Layout.moderateScale(10),
-											top: Layout.moderateScale(-40),
-											left: Layout.moderateScale(-5),
-											textAlign: 'center',
-										}}>
-										{this.state.SliderValue}
-									</Text>
-								</View>
-							}
-						/>
-					</View>
+					<View style={styles.minMaxPrice}>
+							<Text style={{ flex: 1 }}>Price:</Text>
+				<MultiSlider
+				 values={[this.state.minMaxPrice[0], this.state.minMaxPrice[1]]}
+				 onValuesChange={this.minMaxPriceValuesChange}
+				 min={0}
+				 max={25000}
+				 step={500}
+				 allowOverlap
+				 snapped
+			 />
+
+			 <View style={{
+        flex: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+    }}>
+
+						<Text style={{ flex: 1 }}>Min: {this.state.minMaxPrice[0]}</Text>
+						<Text style={{ flex: 0 }}>Max: {this.state.minMaxPrice[1]}</Text>
+				</View>
+
+			 </View>
+
 				</View>
 			);
 		} else if (segment === 6) {
-			var items = [
-				{
-					id: 1,
-					title: 'Baby Strollers',
-					checked: false,
-				},
-				{
-					id: 2,
-					title: 'Baby Food',
-					checked: false,
-				},
-				{
-					id: 3,
-					title: 'Baby Clothes',
-					checked: false,
-				},
-				{
-					id: 4,
-					title: 'Baby Skincare',
-					checked: false,
-				},
-				{
-					id: 5,
-					title: 'Baby Toys',
-					checked: false,
-				},
-				{
-					id: 6,
-					title: 'Baby Books',
-					checked: false,
-				},
-				{
-					id: 7,
-					title: 'Baby Strollers',
-					checked: false,
-				},
-				{
-					id: 8,
-					title: 'Baby Food',
-					checked: false,
-				},
-				{
-					id: 9,
-					title: 'Baby Clothes',
-					checked: false,
-				},
-				{
-					id: 10,
-					title: 'Baby Skincare',
-					checked: false,
-				},
-				{
-					id: 11,
-					title: 'Baby Toys',
-					checked: false,
-				},
-				{
-					id: 12,
-					title: 'Baby Books',
-					checked: false,
-				},
-				{
-					id: 13,
-					title: 'Baby Strollers',
-					checked: false,
-				},
-				{
-					id: 14,
-					title: 'Baby Food',
-					checked: false,
-				},
-			];
+
 			return (
 				<View key={'categories'}>
 					<View style={[styles.fltrTitleText, styles.fltrbtwn]}>
@@ -555,125 +511,26 @@ export default class FilterScreen extends React.Component {
 						<BBBIcon name="Search" style={styles.filterDetailsTitle} />
 					</View>
 					<View>
-						{items.map((item, index) => {
-							return (
-								<View style={styles.offersListItem} key={'categories_' + index}>
-									<CheckBox
-										style={styles.chboxRemember}
-										onClick={() => this.onClick(item)}
-										checkBoxColor={'#fff'}
-										rightText={item.title}
-										rightTextStyle={{
-											color: Colors.secondaryColor,
-											fontSize: Layout.moderateScale(18),
-											marginLeft: Layout.moderateScale(10),
-											fontFamily: 'roboto-reguler',
-										}}
-										unCheckedImage={
-											<CheckboxBlank
-												width={Layout.moderateScale(20)}
-												height={Layout.moderateScale(20)}
-											/>
-										}
-										checkedImage={
-											<CheckboxChecked
-												width={Layout.moderateScale(20)}
-												height={Layout.moderateScale(20)}
-											/>
-										}
-									/>
-								</View>
-							);
-						})}
+						  <ListCategory selectedCateId={this.state.selectedCateId} onClickCategory={(item) => this.onClickCate(item)} />
 					</View>
 				</View>
 			);
 		} else if (segment === 7) {
-			var items = [
-				{
-					id: 1,
-					title: 'Di-2045',
-					checked: false,
-				},
-				{
-					id: 2,
-					title: 'Di-2046',
-					checked: false,
-				},
-				{
-					id: 3,
-					title: 'Di-2047',
-					checked: false,
-				},
-				{
-					id: 4,
-					title: 'Di-2048',
-					checked: false,
-				},
-				{
-					id: 5,
-					title: 'Di-2049',
-					checked: false,
-				},
-				{
-					id: 6,
-					title: 'Di-2050',
-					checked: false,
-				},
-				{
-					id: 7,
-					title: 'Di-2051',
-					checked: false,
-				},
-				{
-					id: 8,
-					title: 'Di-2052',
-					checked: false,
-				},
-				{
-					id: 9,
-					title: 'Di-2053',
-					checked: false,
-				},
-				{
-					id: 10,
-					title: 'Di-2054',
-					checked: false,
-				},
-				{
-					id: 11,
-					title: 'Di-2055',
-					checked: false,
-				},
-				{
-					id: 12,
-					title: 'Di-2056',
-					checked: false,
-				},
-				{
-					id: 13,
-					title: 'Di-2057',
-					checked: false,
-				},
-				{
-					id: 14,
-					title: 'Di-2058',
-					checked: false,
-				},
-			];
 			return (
+
 				<View key={'templates_list'}>
 					<View style={[styles.fltrTitleText, styles.fltrbtwn]}>
 						<Text style={styles.filterDetailsTitle}>Templates</Text>
 						<BBBIcon name="Search" style={styles.filterDetailsTitle} />
 					</View>
 					<View>
-						{items.map((item, index) => {
+						{this.state.searchTemplateValueList.map((item, index) => {
 							return (
 								<View style={styles.offersListItem} key={'template_' + index}>
 									<CheckBox
 										style={styles.chboxRemember}
-										onClick={() => this.onClick(item)}
+										isChecked={item.checked}
+										onClick={() => this.onClickTemplate(item)}
 										checkBoxColor={'#fff'}
 										rightText={item.title}
 										rightTextStyle={{
@@ -702,78 +559,7 @@ export default class FilterScreen extends React.Component {
 				</View>
 			);
 		} else if (segment === 8) {
-			var items = [
-				{
-					id: 1,
-					title: 'All',
-					checked: false,
-				},
-				{
-					id: 2,
-					title: 'Stroller',
-					checked: false,
-				},
-				{
-					id: 3,
-					title: 'Philips',
-					checked: false,
-				},
-				{
-					id: 4,
-					title: 'Duluxe',
-					checked: false,
-				},
-				{
-					id: 5,
-					title: 'Pigeon',
-					checked: false,
-				},
-				{
-					id: 6,
-					title: 'Johnsons',
-					checked: false,
-				},
-				{
-					id: 7,
-					title: 'Walker',
-					checked: false,
-				},
-				{
-					id: 8,
-					title: 'Stroller',
-					checked: false,
-				},
-				{
-					id: 9,
-					title: 'Philips',
-					checked: false,
-				},
-				{
-					id: 10,
-					title: 'Duluxe',
-					checked: false,
-				},
-				{
-					id: 11,
-					title: 'Pigeon',
-					checked: false,
-				},
-				{
-					id: 12,
-					title: 'Johnsons',
-					checked: false,
-				},
-				{
-					id: 13,
-					title: 'Walker',
-					checked: false,
-				},
-				{
-					id: 14,
-					title: 'Duluxe',
-					checked: false,
-				},
-			];
+
 			return (
 				<View key={'tags_list'}>
 					<View style={[styles.fltrTitleText, styles.fltrbtwn]}>
@@ -781,14 +567,15 @@ export default class FilterScreen extends React.Component {
 						<BBBIcon name="Search" style={styles.filterDetailsTitle} />
 					</View>
 					<View>
-						{items.map((item, index) => {
+						{this.state.tagValueList.map((item, index) => {
 							return (
 								<View style={styles.offersListItem} key={'tags_' + index}>
 									<CheckBox
 										style={styles.chboxRemember}
-										onClick={() => this.onClick(item)}
+										isChecked={item.id===this.state.tagId?true:false}
+										onClick={() => this.onClickTag(item)}
 										checkBoxColor={'#fff'}
-										rightText={item.title}
+										rightText={item.name}
 										rightTextStyle={{
 											color: Colors.secondaryColor,
 											fontSize: Layout.moderateScale(18),
@@ -815,12 +602,7 @@ export default class FilterScreen extends React.Component {
 				</View>
 			);
 		} else if (segment === 9) {
-			var item = [
-				{
-					id: 1,
-					checked: false,
-				},
-			];
+
 			return (
 				<View key={'offers'}>
 					<View style={styles.fltrTitleText}>
@@ -829,7 +611,8 @@ export default class FilterScreen extends React.Component {
 					<View style={styles.offersListItem}>
 						<CheckBox
 							style={styles.chboxRemember}
-							onClick={() => this.onClick(item)}
+							isChecked={this.state.isCounterOffer}
+							onClick={() => this.onClickOffers()}
 							checkBoxColor={'#fff'}
 							rightText={'Allow counter offer'}
 							rightTextStyle={{
@@ -856,6 +639,7 @@ export default class FilterScreen extends React.Component {
 			);
 		}
 	};
+
 
 	ratingStarfn(item) {
 		var tempItem = [];
@@ -959,7 +743,9 @@ export default class FilterScreen extends React.Component {
 	returnToSearchList(){
 		this.props.navigation.navigate({
 		    routeName: 'searchResultScreen',
-		    params: { previous_screen: 'filterScreen',mode:this.state.mode,rating:this.state.rating,idVerify:this.state.idVerification}
+		    params: { previous_screen: 'filterScreen',mode:this.state.mode,rating:this.state.rating,
+				idVerify:this.state.idVerification,categoryId:this.state.selectedCateId
+				,templateId:this.state.templateId,tagId:this.state.tagId,counterOffer:this.state.isCounterOffer,minPrice:this.state.minMaxPrice[0],maxPrice:this.state.minMaxPrice[1]}
 		});
 	}
 
@@ -969,9 +755,14 @@ export default class FilterScreen extends React.Component {
 			mode:null,
 			rating:null,
 			idVerification:null,
+			templateId:null,
+			tagId:null,
+			categoryId:null,
+			isCounterOffer:false,
+			minMaxPrice:[0,25000],
 		});
 		this.resetAllListValues();
-		
+
 	}
 
 	resetAllListValues(){
@@ -990,10 +781,25 @@ export default class FilterScreen extends React.Component {
 			idTmpList[i].checked=false;
 		}
 
+
+		// var templateTmpList=this.state.searchTemplateValueList;
+		// for(var i=0;i<templateTmpList.length;i++){
+		// 	templateTmpList[i].checked=false;
+		// }
+		//
+		// var tagTmpList=this.state.tagList;
+		//
+		// for(var i=0;i<tagTmpList.length;i++){
+		// 	tagTmpList[i].checked=false;
+		// }
+
+
 		this.setState({
 			modeItemList:modeTmpList,
 			ratingItemList:ratingTmpList,
 			idVerificationList:idTmpList,
+			searchTemplateValueList:[],
+			tagList:[],
 		});
 
 	}
