@@ -3,6 +3,7 @@ import { graphql } from 'react-apollo'
 import {
   CREATE_CHAT
 } from '../../graphql/Mutations'
+import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 
 export default CreateChat = graphql(CREATE_CHAT) (
   class extends Component {
@@ -11,7 +12,14 @@ export default CreateChat = graphql(CREATE_CHAT) (
     }
 
     render() {
-      return this.props.children( this.props.mutate )
+      let {item, currentUser } = this.props
+      let optimisticResponse = optimisticCreateChat( item, currentUser )
+
+      return this.props.children( () => this.props.mutate({
+          variables: { listingId: item.id }
+        , optimisticResponse: optimisticResponse
+        })
+      )
     }
   }
 )

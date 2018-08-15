@@ -12,17 +12,18 @@ import {
 } from 'native-base';
 import { withNavigation } from 'react-navigation'
 import styles from './styles';
-import { Layout, Colors } from '../../constants/';
-import Baby from '../Baby';
-import IdentityVerification from '../IdentityVerification';
-import BBBIcon from '../BBBIcon';
-import Stars from '../Stars';
+import { Layout, Colors } from '../../../constants/';
+import Baby from '../../Baby';
+import IdentityVerification from '../../IdentityVerification';
+import BBBIcon from '../../BBBIcon';
+import Stars from '../../Stars';
 
-import LikeButton from '../../screens/HomeScreen/LikeButton'
-import CreateChat from '../../graphql/mutations/CreateChat'
-import LastMessageIds from '../../screens/ChatListScreen/LastMessageIds'
-import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
-import GetProfile from '../../graphql/queries/GetProfile'
+import LikeButton from '../../../screens/HomeScreen/LikeButton'
+import CreateChat from '../../../graphql/mutations/CreateChat'
+import ChatButton from '../../buttons/ChatButton'
+import LastMessageIds from '../../../screens/ChatListScreen/LastMessageIds'
+import { optimisticCreateChat } from '../../../graphql/mutations/Optimistic.js'
+import GetProfile from '../../../graphql/queries/GetProfile'
 
 class Listing extends Component {
 
@@ -71,7 +72,7 @@ console.log("sec only")
   }
 
   render() {
-    let {item, loginStatus} = this.props.navigation.state.params
+    let {item, loginStatus, chatIndexes, currentUser} = this.props.navigation.state.params
 
     return (
       <View>
@@ -98,46 +99,7 @@ console.log("sec only")
           }}
         >
           <LikeButton item={item} loginStatus={loginStatus} />
-          { loginStatus.loginStatus &&
-            <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
-              <CreateChat>{ mutateCreateChat  => (
-                <GetProfile>{ currentUser => (
-                  <TouchableOpacity
-                    style={styles.chatIconSec}
-                    onPress={() => {
-                      if ( item.chatId ) {
-                        this.props.navigation.navigate('chatDetailScreen', {
-                          chatId: item.chatId
-                        , chatIndexes: chatIndexes
-                        })
-                      } else {
-                        let optimisticResponse = optimisticCreateChat(item, currentUser )
-                        mutateCreateChat({
-                          variables: { listingId: item.id }
-                        , optimisticResponse: optimisticResponse
-                        })
-                        .then( ({ data: { createChat }}) => {
-                          this.props.navigation.navigate('chatDetailScreen', {
-                            chatId: createChat.id
-                          , chatIndexes: chatIndexes
-                          })
-                        })
-                      }
-                    }}
-                  >
-                    <View >
-                      <BBBIcon
-                        name="Chat"
-                        size={Layout.moderateScale(18)}
-                        color={item.chatId!==null ? Colors.tintColor : Colors.white}
-                        style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                )}</GetProfile>
-              )}</CreateChat>
-            )}</LastMessageIds>
-          }
+          <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
         </View>
         <Item style={styles.userItemDetailsSec}>
           <View style={styles.userProfileSec}>

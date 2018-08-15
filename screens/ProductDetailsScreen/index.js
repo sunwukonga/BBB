@@ -34,6 +34,8 @@ import likeProductApi from './LikeProductApi';
 
 import LoginStatus from '../HomeScreen/LoginStatus'
 import LikeButton from '../HomeScreen/LikeButton'
+import LastMessageIds from '../ChatListScreen/LastMessageIds'
+import GetProfile from '../../graphql/queries/GetProfile'
 import Listing from '../../components/display/Listing'
 
 
@@ -65,15 +67,19 @@ class ProductDetailsScreen extends React.Component {
 
     return (
       <LoginStatus>{ loginStatus => (
-        <Container style={styles.container}>
-          <BBBHeader
-            title={item.title}
-            leftComponent={leftComponent}
-          />
-          <Content style={styles.contentStyle}>
-            <Listing item={item} loginStatus={loginStatus} />
-          </Content>
-        </Container>
+        <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
+            <GetProfile loginStatus={loginStatus}>{ currentUser => (
+              <Container style={styles.container}>
+                <BBBHeader
+                  title={item.title}
+                  leftComponent={leftComponent}
+                />
+                <Content style={styles.contentStyle}>
+                  <Listing item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+                </Content>
+              </Container>
+            )}</GetProfile>
+        )}</LastMessageIds>
       )}</LoginStatus>
     )
   }

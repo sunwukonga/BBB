@@ -50,17 +50,18 @@ export default FacebookOauth = graphql(SET_AUTH_STATUS)(
 
     onBBToken = ( {user, token} ) => {
       if (user.profileImage.imageKey) {
-        this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
+        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
       } else if (user.profileImage.imageURL) {
-        this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
+        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
       } else {
-        this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: null}});
+        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: null}});
       }
     };
 
     render() {
+      let { chatId, listingId, mutateCreateChat, dest } = this.props.navigation.state.params
       return (
-        <View {...this.props}>
+        <View>
         <Mutation
           mutation={FACEBOOK_LOGIN}
           fetchOptions = 'no-cache'
@@ -82,30 +83,59 @@ export default FacebookOauth = graphql(SET_AUTH_STATUS)(
               if (type === 'success') {
 
                 startTime = new Date()
-                const data = await loginFacebook({
+                const { data } = await loginFacebook({
                   variables: { token: token },
                 });
                 console.log("Time (ms) to get BBToken: ", new Date() - startTime)
 
-                console.log('data.data.loginFacebook '+JSON.stringify(data.data.loginFacebook));
+                console.log('data.loginFacebook '+JSON.stringify(data.loginFacebook));
                 startTime = new Date()
-                await this.onBBToken(data.data.loginFacebook)
-                console.log("Time (ms) to store token and profile: ", new Date() - startTime)
-
-                if ( this.props.navigation.state && this.props.navigation.state.params ) {
-                  // Arriving from Home -> drawerOpen
-                  if ( this.props.navigation.state.params.dest == 'openDrawer' ) {
-                    this.props.navigation.dispatch(NA_LoginToHome)
+                this.onBBToken(data.loginFacebook)
+                .then( ({ userId }) => {
+                  if ( this.props.navigation.state && this.props.navigation.state.params ) {
+                    // Arriving from Home -> drawerOpen
+                    if ( dest == 'openDrawer' ) {
+                      this.props.navigation.dispatch(NA_LoginToHome)
+                    }
+                    // Arriving from Home -> CreateNewItemScreen
+                    if ( dest == 'createNewItemScreen' ) {
+                      this.props.navigation.dispatch(NA_LoginToCreate)
+                    }
+                    // Arriving from Home -> chatDetail
+                    // Arriving from productDetail -> chatDetail
+                    if ( dest == 'chatDetailsScreen' ) {
+                      // Logged in. Can we find if listing is a part of 
+                      if ( userId == listingId ) {
+                        Alert.alert(
+                          'This is your listing!',
+                          'You cannot chat with yourself.',
+                          [
+                            {text: 'OK', onPress: () => {
+                              this.props.navigation.goBack()
+                            }},
+                          ],
+                          { cancelable: false }
+                        )
+                      } else {
+                      // No way to know if chat has been created before or not... try and react
+                        mutateCreateChat()
+                        .then( ({ data: { createChat }, error }) => {
+                          let _chatId = createChat.id
+                          console.log("After create chat promise")
+                          if (error) {
+                            console.log("Have ERROR")
+                            _chatId = chatId
+                          }
+                          this.props.navigation.navigate('chatDetailScreen', {
+                            chatId: _chatId
+                          , chatIndexes: []
+                          })
+                        })
+                      }
+                    }
                   }
-                  // Arriving from Home -> CreateNewItemScreen
-                  if ( this.props.navigation.state.params.dest == 'createNewItemScreen' ) {
-                    this.props.navigation.dispatch(NA_LoginToCreate)
-                  }
-                }
-                // Arriving from Home(drawerOpen) -> chatList
-                // Arriving from Home -> chatDetail
-                // Arriving from productDetail -> chatDetail
-                // Arriving from 
+                  console.log("Time (ms) to store token and profile: ", new Date() - startTime)
+                })
               } else {
                 console.log("login failed")
               }

@@ -17,6 +17,7 @@ import BBBIcon from '../../components/BBBIcon';
 import Stars from '../../components/Stars';
 
 import LikeButton from './LikeButton'
+import ChatButton from '../../components/buttons/ChatButton'
 import CreateChat from '../../graphql/mutations/CreateChat'
 import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 import GetProfile from '../../graphql/queries/GetProfile'
@@ -56,44 +57,7 @@ class PureListItem extends Component {
               : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey}} style={styles.rowImage} />
             }
             <LikeButton item={item} loginStatus={loginStatus} />
-
-            { loginStatus.loginStatus &&
-              <CreateChat>{ mutateCreateChat  => (
-                <TouchableOpacity
-                  style={styles.chatIconSec}
-                  onPress={() => {
-                    if ( item.chatId ) {
-                      this.props.navigation.navigate('chatDetailScreen', {
-                        chatId: item.chatId
-                      , chatIndexes: chatIndexes
-                      })
-                    } else {
-                      let optimisticResponse = optimisticCreateChat(item, currentUser )
-                      mutateCreateChat({
-                        variables: { listingId: item.id }
-                      , optimisticResponse: optimisticResponse
-                      })
-                      .then( ({ data: { createChat }}) => {
-                        this.props.navigation.navigate('chatDetailScreen', {
-                          chatId: createChat.id
-                        , chatIndexes: chatIndexes
-                        })
-                      })
-                    }
-                  }}
-                >
-                  <View >
-                    <BBBIcon
-                      name="Chat"
-                      size={Layout.moderateScale(18)}
-                      color={item.chatId!==null ? Colors.tintColor : Colors.white}
-                      style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-                    />
-                  </View>
-                </TouchableOpacity>
-              )}</CreateChat>
-            }
-
+            <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
           </View>
 
           <Item style={styles.userItemDetailsSec}>

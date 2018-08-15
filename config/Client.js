@@ -83,7 +83,7 @@ const stateLink = withClientState({
         console.log('setAuthStatus client-side mutation fired');
         token = args.token
         cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'MyProfile', id: args.id, profileName: args.profileName, profileImageURL: args.profileImageURL }}});
-        return null;
+        return { userId: args.id }
       },
       unsetAuthStatus: (_, args, { cache }) => {
         console.log('unsetAuthStatus client-side mutation fired');

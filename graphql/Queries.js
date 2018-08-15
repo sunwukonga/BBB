@@ -19,17 +19,33 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
       imageKey
     }
     saleMode {
+      id
       price
       counterOffer
       currency {
-        symbolPrepend
-        disabled
+        iso4217
         currencyName
         currencySymbol
       }
       mode
       exchangeModes {
+        id
+        mode
         price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
       }
     }
     template {
@@ -38,15 +54,19 @@ query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
       description
       primaryImage {
         id
+        imageKey
       }
       secondaryImages {
         id
+        imageKey
       }
       tags{
+        id
         name
       }
     }
     tags{
+      id
       name
     }
     viewers
@@ -92,17 +112,33 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
       imageKey
     }
     saleMode {
+      id
       price
       counterOffer
       currency {
-        symbolPrepend
-        disabled
+        iso4217
         currencyName
         currencySymbol
       }
       mode
       exchangeModes {
+        id
+        mode
         price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
       }
     }
     template {
@@ -111,15 +147,19 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
       description
       primaryImage {
         id
+        imageKey
       }
       secondaryImages {
         id
+        imageKey
       }
       tags{
+        id
         name
       }
     }
     tags{
+      id
       name
     }
     viewers
@@ -156,26 +196,40 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
     }
     primaryImage {
       id
-      imageURL
       imageKey
     }
     secondaryImages {
       id
-      imageURL
       imageKey
     }
     saleMode {
+      id
       price
       counterOffer
       currency {
-        symbolPrepend
-        disabled
+        iso4217
         currencyName
         currencySymbol
       }
       mode
       exchangeModes {
+        id
+        mode
         price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
       }
     }
     template {
@@ -184,18 +238,18 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
       description
       primaryImage {
         id
-        imageURL
         imageKey
       }
       secondaryImages {
-        imageURL
         imageKey
       }
       tags{
+        id
         name
       }
     }
     tags{
+      id
       name
     }
     viewers
@@ -223,7 +277,6 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
 const GET_USER_VISITED_LIST = gql`
 query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
   getUserVisitedListings(countryCode:$countryCode,limit:$limit,page:$page){
-
     id
     title
     description
@@ -233,26 +286,40 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
     }
     primaryImage {
       id
-      imageURL
       imageKey
     }
     secondaryImages {
       id
-      imageURL
       imageKey
     }
     saleMode {
+      id
       price
       counterOffer
       currency {
-        symbolPrepend
-        disabled
+        iso4217
         currencyName
         currencySymbol
       }
       mode
       exchangeModes {
+        id
+        mode
         price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
       }
     }
     template {
@@ -261,19 +328,19 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
       description
       primaryImage {
         id
-        imageURL
         imageKey
       }
       secondaryImages {
         id
-        imageURL
         imageKey
       }
       tags{
+        id
         name
       }
     }
     tags{
+      id
       name
     }
     viewers
@@ -310,26 +377,40 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
     }
     primaryImage {
       id
-      imageURL
       imageKey
     }
     secondaryImages {
       id
-      imageURL
       imageKey
     }
     saleMode {
+      id
       price
       counterOffer
       currency {
-        symbolPrepend
-        disabled
+        iso4217
         currencyName
         currencySymbol
       }
       mode
       exchangeModes {
+        id
+        mode
         price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
       }
     }
     template {
@@ -338,19 +419,19 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
       description
       primaryImage {
         id
-        imageURL
         imageKey
       }
       secondaryImages {
         id
-        imageURL
         imageKey
       }
       tags{
+        id
         name
       }
     }
     tags{
+      id
       name
     }
     viewers
@@ -387,12 +468,10 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
     }
     primaryImage {
       id
-      imageURL
       imageKey
     }
     secondaryImages {
       id
-      imageURL
       imageKey
     }
     saleMode {
@@ -401,8 +480,6 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
       counterOffer
       currency {
         iso4217
-        symbolPrepend
-        disabled
         currencyName
         currencySymbol
       }
@@ -433,19 +510,19 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
       description
       primaryImage {
         id
-        imageURL
         imageKey
       }
       secondaryImages {
         id
-        imageURL
         imageKey
       }
       tags{
+        id
         name
       }
     }
     tags{
+      id
       name
     }
     viewers
@@ -514,13 +591,20 @@ query getChatMessages($chatIndexes:[ChatIndex]) {
       }
       user {
         id
+        firstName
+        lastName
         profileName
         profileImage {
           id
+          imageURL
           imageKey
         }
       }
       primaryImage {
+        id
+        imageKey
+      }
+      secondaryImages {
         id
         imageKey
       }
@@ -532,13 +616,24 @@ query getChatMessages($chatIndexes:[ChatIndex]) {
           id
           imageKey
         }
+        tags{
+          id
+          name
+        }
+      }
+      tags{
+        id
+        name
       }
     }
     initUser {
       id
+      firstName
+      lastName
       profileName
       profileImage {
         id
+        imageURL
         imageKey
       }
     }
