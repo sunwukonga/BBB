@@ -7,11 +7,13 @@ import styles from './styles';
 import { Layout, Colors } from '../../../constants/';
 import BBBIcon from '../../BBBIcon';
 import { withNavigation, NavigationActions } from 'react-navigation'
+import { w } from '../../../utils/helpers.js'
 
 const NA_HomeToLoginToChat = ( item, mutateCreateChat ) => NavigationActions.navigate({
   routeName: 'loginScreen'
 , params: { dest: 'chatDetailsScreen'
-          , item: item
+          , listingId: item.id
+          , ownerId: w(item, ['user', 'id'])
           , mutateCreateChat: mutateCreateChat
           }
 })
@@ -21,9 +23,16 @@ class ChatButton extends Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
+      return true
+    }
+    return false;
+  }
+
   navOrCreate( mutateCreateChat, item, loginStatus, chatIndexes ) {
     if ( loginStatus.loginStatus ) {
-      if ( item.chatId ) {
+      if ( item.chatId != -1 ) {
         // chat already exists
         this.props.navigation.navigate('chatDetailScreen', {
           chatId: item.chatId
@@ -47,8 +56,7 @@ class ChatButton extends Component {
   render() {
     const {item, loginStatus, chatIndexes, currentUser} = this.props
 
-
-    if (loginStatus.userId == item.user.id) {
+    if (loginStatus.myProfile.id == item.user.id) {
       // Cannot chat with yourself. Button should not exist.
       return null
     } else {
@@ -62,7 +70,7 @@ class ChatButton extends Component {
               <BBBIcon
                 name="Chat"
                 size={Layout.moderateScale(18)}
-                color={item.chatId!==null ? Colors.tintColor : Colors.white}
+                color={item.chatId != -1 ? Colors.tintColor : Colors.white}
                 style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
               />
             </View>

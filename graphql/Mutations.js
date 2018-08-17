@@ -11,6 +11,11 @@ mutation setAuthStatus( $token: String!, $id: Int!, $profileName: String!, $prof
   setAuthStatus( token: $token, id: $id, profileName: $profileName, profileImageURL: $profileImageURL ) @client
 }`
 
+const UNSET_AUTH_STATUS = gql`
+mutation unsetAuthStatus( $id: Int! ) {
+  unsetAuthStatus( id: $id ) @client
+}`
+
 const SET_COUNTRY = gql`
 mutation setCountry ( $countryCode: String! ) {
   setCountry( countryCode: $countryCode) @client
@@ -297,6 +302,7 @@ export {
   LIKE_LISTING
 , CREATE_CHAT
 , SET_AUTH_STATUS
+, UNSET_AUTH_STATUS
 , SET_COUNTRY
 , FACEBOOK_LOGIN
 , SEND_MESSAGE

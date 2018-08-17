@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Button, Platform, StyleSheet, Text, View } from "react-native";
-import { graphql,Mutation } from "react-apollo";
+import { graphql, Mutation, withApollo } from "react-apollo";
 import gql from "graphql-tag";
 
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -13,6 +13,10 @@ import {
   FACEBOOK_LOGIN
 , SET_AUTH_STATUS
 } from '../../graphql/Mutations'
+import {
+  GET_LISTING
+} from '../../graphql/Queries'
+import { w } from '../../utils/helpers.js'
 
 
 // NA -> navigation Action
@@ -45,7 +49,7 @@ const SA_LoginToCreate = StackActions.reset({
 })
 */
 
-export default FacebookOauth = graphql(SET_AUTH_STATUS)(
+const FacebookOauth = graphql(SET_AUTH_STATUS)(
   class extends Component {
 
     onBBToken = ( {user, token} ) => {
@@ -59,7 +63,7 @@ export default FacebookOauth = graphql(SET_AUTH_STATUS)(
     };
 
     render() {
-      let { chatId, listingId, mutateCreateChat, dest } = this.props.navigation.state.params
+      let { listingId, ownerId, mutateCreateChat, dest } = this.props.navigation.state.params
       return (
         <View>
         <Mutation
@@ -91,7 +95,7 @@ export default FacebookOauth = graphql(SET_AUTH_STATUS)(
                 console.log('data.loginFacebook '+JSON.stringify(data.loginFacebook));
                 startTime = new Date()
                 this.onBBToken(data.loginFacebook)
-                .then( ({ userId }) => {
+                .then( ({ data: {setAuthStatus: {userId}}}) => {
                   if ( this.props.navigation.state && this.props.navigation.state.params ) {
                     // Arriving from Home -> drawerOpen
                     if ( dest == 'openDrawer' ) {
@@ -105,7 +109,7 @@ export default FacebookOauth = graphql(SET_AUTH_STATUS)(
                     // Arriving from productDetail -> chatDetail
                     if ( dest == 'chatDetailsScreen' ) {
                       // Logged in. Can we find if listing is a part of 
-                      if ( userId == listingId ) {
+                      if ( userId == ownerId ) {
                         Alert.alert(
                           'This is your listing!',
                           'You cannot chat with yourself.',
@@ -117,19 +121,32 @@ export default FacebookOauth = graphql(SET_AUTH_STATUS)(
                           { cancelable: false }
                         )
                       } else {
-                      // No way to know if chat has been created before or not... try and react
-                        mutateCreateChat()
-                        .then( ({ data: { createChat }, error }) => {
-                          let _chatId = createChat.id
-                          console.log("After create chat promise")
-                          if (error) {
-                            console.log("Have ERROR")
-                            _chatId = chatId
+                        this.props.client.query({
+                          query: GET_LISTING,
+                          variables: { id: listingId },
+                          fetchOptions: 'network-only'
+                        })
+                        .then( ({data: {getListing}}) => {
+                          console.log("CHECK updated: ", getListing.chatId)
+                          if ( (_chatId = getListing.chatId) != -1 ) {
+                            this.props.navigation.navigate('chatDetailScreen', {
+                              chatId: _chatId
+                            , chatIndexes: []
+                            })
+                          } else {
+                            mutateCreateChat()
+                            .then( ({ data: { createChat }, error }) => {
+                              console.log("After create chat promise")
+                              if (error) {
+                                console.log("Have ERROR", error)
+                              }
+                              //console.log("NAV: ", w(this, ['props', 'navigation']))
+                              this.props.navigation.navigate('chatDetailScreen', {
+                                chatId: createChat.id
+                              , chatIndexes: []
+                              })
+                            })
                           }
-                          this.props.navigation.navigate('chatDetailScreen', {
-                            chatId: _chatId
-                          , chatIndexes: []
-                          })
                         })
                       }
                     }
@@ -148,3 +165,5 @@ export default FacebookOauth = graphql(SET_AUTH_STATUS)(
     }
   }
 );
+
+export default withApollo( FacebookOauth )

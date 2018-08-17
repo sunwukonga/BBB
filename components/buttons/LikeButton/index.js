@@ -14,11 +14,19 @@ import {
 import {
   GET_USER_LIKED_LIST
 } from '../../../graphql/Queries'
+import { w } from '../../../utils/helpers.js'
 
 
 class LikeButton extends Component {
   constructor(props) {
     super(props);
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if ( w(this.props, ['item', 'liked']) !== w(nextProps, ['item', 'liked']) ) {
+      return true
+    }
+    return false;
   }
 
   updateUserLikedListings = (prevArray, newItem) => {
@@ -37,7 +45,7 @@ class LikeButton extends Component {
   render() {
     const {item, loginStatus} = this.props
 
-    if ( loginStatus.loginStatus && (loginStatus.userId != item.user.id) ) {
+    if ( loginStatus.loginStatus && (loginStatus.myProfile.id != item.user.id) ) {
       return (
         <Mutation
           mutation={LIKE_LISTING}

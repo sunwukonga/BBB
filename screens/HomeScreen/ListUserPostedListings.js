@@ -13,6 +13,7 @@ import {
   GET_USER_POSTED_LIST
 } from '../../graphql/Queries'
 import PureListItem from './PureListItem'
+import { w } from '../../utils/helpers.js'
 
 
 class ListUserPostedListings extends Component {
@@ -20,6 +21,12 @@ class ListUserPostedListings extends Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
+      return true
+    }
+    return false;
+  }
 
   render() {
     let { variables, loginStatus, chatIndexes, currentUser } = this.props
@@ -30,7 +37,7 @@ class ListUserPostedListings extends Component {
       <Query
         query = {GET_USER_POSTED_LIST}
         variables = {Object.assign(variables, { countryCode: loginStatus.countryCode })}
-        fetchPolicy="cache-and-network"
+        fetchPolicy="network-only"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
           if (networkStatus === 1) {

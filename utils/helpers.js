@@ -13,6 +13,16 @@ function updateChatMessages(oldChatList, newChatList) {
                 })
 }
 
+function  w( root, nested ) {
+  if (!root) return null
+  return nested.reduce( (acc, cur) => {
+    if (!acc) return null
+    if (acc[cur]) return acc[cur]
+    else return null
+  }, root)
+}
+
 export {
   updateChatMessages
+, w
 }

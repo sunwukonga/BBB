@@ -11,123 +11,24 @@ import styles from './styles';
 import { Layout, Images, Colors, Urls } from '../../constants/';
 
 //apollo client
-import { Query, graphql } from "react-apollo";
-import gql from "graphql-tag";
+import { graphql } from "react-apollo";
+import {
+  UNSET_AUTH_STATUS
+} from '../../graphql/Mutations'
 import GetCachedProfile from '../../graphql/queries/GetCachedProfile'
 import LoginStatus from '../HomeScreen/LoginStatus'
 //import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 //reset the appolo cache
-export default LoggedinState = graphql(gql`
-  mutation unsetAuthStatus {
-    unsetAuthStatus @client
-  }
-`)(
+export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
   class extends Component {
     constructor(props) {
       super(props)
     }
 
-      /*
-      if (state) {
-        console.log("DrawerState: ", state)
-      }
-      if (this.state) {
-        console.log("thisDrawerState: ", this.state)
-      }
-      */
-      /*
-      this.props.navigation.addListener(
-        'willFocus',
-        payload => {
-          console.log("BBBBBBBBBBBBBBBBBBBBBBBB")
-          getProfile()
-          .then( res => {
-            console.log("AAAAAAAAAAAAA: ", res)
-              if (res.data.getProfile.profileName == 0) {
-                this.setState({
-                  profileName: res.data.getProfile.profileName,
-                })
-              }
-              if (res.data.getProfile.profileImage) {
-                this.setState({
-                  profileImageURL:  Urls.s3ImagesUrl + res.data.getProfile.profileImage.imageKey,
-                })
-              }
-          })
-        }
-      )
-*/
-      /*
-      this.state({
-        profileName: ""
-      , profileImage: null
-      })
-      */
-/*
-      const defaultGetStateForAction = MainDrawer.router.getStateForAction;
-      MainDrawer.router.getStateForAction = (action, state) => {
-        console.log('getStateForAction called');
-        if (state && action.type === 'Navigation/OPEN_DRAWER') {
-            console.log('<===============>DrawerOpen');
-          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
-            console.log('Listener ADDED');
-        }
-        if (state && action.type === 'Navigation/DRAWER_CLOSED') {
-            console.log('<|||||||||||||||>DrawerClose');
-          this.drawerBackHandler.remove()
-            console.log('Listener REMOVED');
-        }
-        return defaultGetStateForAction(action, state);
-      };
-*/
-      /*
-      this.props.navigation.addListener(
-        'willFocus',
-        payload => {
-          BackHandler.addEventListener("hardwareBackPress", this.onBackPress);
-        }
-      )
-      this.props.navigation.addListener(
-        'willBlur',
-        payload => {
-      console.log("Drawer BackHandler removed")
-          BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
-        }
-      )
-      */
-    /*
-    componentDidMount() {
-      console.log("BBBBBBBBBBBBBBBBBBBBBBBB")
-      getProfile()
-      .then( res => {
-        console.log("AAAAAAAAAAAAA: ", res)
-          if (res.data.getProfile.profileName == 0) {
-            this.setState({
-              profileName: res.data.getProfile.profileName,
-            })
-          }
-          if (res.data.getProfile.profileImage) {
-            this.setState({
-              profileImageURL:  Urls.s3ImagesUrl + res.data.getProfile.profileImage.imageKey,
-            })
-          }
-      })
+    shouldComponentUpdate(nextProps, nextState) {
+      return false
     }
-*/
-    /*
-    componentWillUnmount() {
-      console.log("Drawer BackHandler removed")
-      BackHandler.removeEventListener("hardwareBackPress", this.onBackPress);
-    }
-    */
-    /*
-    onBackPress = () => {
-      console.log("onBackPress called to close drawer")
-      this.props.navigation.closeDrawer()
-      return true
-    }
-    */
 
     w = ( root, nested ) => {
       if (!root) return null
@@ -138,140 +39,135 @@ export default LoggedinState = graphql(gql`
       }, root)
     }
 
-        //<Container style={styles.container} {...this.props}>
     render() {
       const { navigation } = this.props;
+      console.log("Render DRAWER")
       return (
-        <Container style={styles.container} >
-          <LoginStatus>{ loginStatus => {
-            if (loginStatus.loginStatus) {
-              return (
-                <GetCachedProfile>{ myProfile => {
-                  console.log("GetCachedProfile")
-                  return (
-                  <View style={styles.usersDetailsSec}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.props.navigation.navigate('profileScreen')
-                    }}>
-                  {(this.w(myProfile, ['profileImageURL']))
-                  ? <Image style={styles.userImage} source={{uri: myProfile.profileImageURL}} />
-                  : <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-                  }
-                  </TouchableOpacity>
-                  <View style={styles.usersDetails}>
-                    <Text style={styles.userName}>{(this.w(myProfile, ['profileName'])) ? myProfile.profileName : ""}</Text>
-                    {/*
-                    <Text style={styles.tokenText}>
-                      BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>
-                    </Text>
-                    */}
-                    </View>
-                  </View>
-                  )
-                }}</GetCachedProfile>
-              )
-            } else return null
-          }}</LoginStatus>
-          <Content style={styles.content}>
-            <Item
-              style={styles.borderView}
-              onPress={() =>  navigation.closeDrawer()}>
-              <BBBIcon
-                name="Home"
-                size={Layout.moderateScale(20)}
-                color={Colors.secondaryColor}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.uglyDrawerItem}>Home</Text>
-            </Item>
-            <Item
-              style={styles.borderView}
-              onPress={() => {
-                this.props.navigation.navigate('chatListScreen')
-              }}>
-              <BBBIcon
-                name="Chat"
-                size={Layout.moderateScale(20)}
-                color={Colors.secondaryColor}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.uglyDrawerItem}>Chat</Text>
-            </Item>
-            <Item
-              style={styles.borderView}
-              onPress={() => {
-                navigation.navigate('notificationScreen')
-              }}>
-              <BBBIcon
-                name="Notification"
-                size={Layout.moderateScale(20)}
-                color={Colors.secondaryColor}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.uglyDrawerItem}>Notifications</Text>
-            </Item>
-            <Item
-              style={styles.borderView}
-              onPress={() => {
-                navigation.navigate('favoriteScreen')
-              }}>
-              <BBBIcon
-                name="Favorite"
-                size={Layout.moderateScale(20)}
-                color={Colors.secondaryColor}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.uglyDrawerItem}>Favorites</Text>
-            </Item>
-            <Item
-              style={styles.borderView}
-              onPress={() => {
-                navigation.navigate('settingScreen')
-              }}>
-              <BBBIcon
-                name="Settings"
-                size={Layout.moderateScale(20)}
-                color={Colors.secondaryColor}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.uglyDrawerItem}>Settings</Text>
-            </Item>
-            <Item
-              style={styles.borderView}
-              onPress={() => {
-                navigation.navigate('supportScreen')
-              }}>
-              <BBBIcon
-                name="Support"
-                size={Layout.moderateScale(20)}
-                color={Colors.secondaryColor}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.uglyDrawerItem}>Support</Text>
-            </Item>
-            <Item
-              style={[
-                styles.borderView,
-                {
-                  borderBottomWidth: 0,
-                  borderBottomColor: Colors.menuitemborder,
-                },
-              ]}
-              onPress={() => {
-                this.props.navigation.closeDrawer()
-                this.props.mutate({});
-              }}>
-              <BBBIcon
-                name="Logout"
-                size={Layout.moderateScale(20)}
-                color={Colors.secondaryColor}
-                style={styles.menuIcon}
-              />
-              <Text style={styles.uglyDrawerItem}>Log Out</Text>
-            </Item>
-          </Content>
-        </Container>
+        <LoginStatus>{ loginStatus => (
+          <Container style={styles.container} >
+            {loginStatus.loginStatus ?
+              <View style={styles.usersDetailsSec}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('profileScreen')
+                }}>
+              {(this.w(loginStatus, ['myProfile', 'profileImageURL']))
+              ? <Image style={styles.userImage} source={{uri: loginStatus.myProfile.profileImageURL}} />
+              : <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+              }
+              </TouchableOpacity>
+              <View style={styles.usersDetails}>
+                <Text style={styles.userName}>{(this.w(loginStatus, ['myProfile', 'profileName'])) ? loginStatus.myProfile.profileName : ""}</Text>
+                {/*
+                <Text style={styles.tokenText}>
+                  BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>
+                </Text>
+                */}
+                </View>
+              </View>
+            : null }
+            <Content style={styles.content}>
+              <Item
+                style={styles.borderView}
+                onPress={() =>  navigation.closeDrawer()}>
+                <BBBIcon
+                  name="Home"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Home</Text>
+              </Item>
+              <Item
+                style={styles.borderView}
+                onPress={() => {
+                  this.props.navigation.navigate('chatListScreen')
+                }}>
+                <BBBIcon
+                  name="Chat"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Chat</Text>
+              </Item>
+              <Item
+                style={styles.borderView}
+                onPress={() => {
+                  navigation.navigate('notificationScreen')
+                }}>
+                <BBBIcon
+                  name="Notification"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Notifications</Text>
+              </Item>
+              <Item
+                style={styles.borderView}
+                onPress={() => {
+                  navigation.navigate('favoriteScreen')
+                }}>
+                <BBBIcon
+                  name="Favorite"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Favorites</Text>
+              </Item>
+              <Item
+                style={styles.borderView}
+                onPress={() => {
+                  navigation.navigate('settingScreen')
+                }}>
+                <BBBIcon
+                  name="Settings"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Settings</Text>
+              </Item>
+              <Item
+                style={styles.borderView}
+                onPress={() => {
+                  navigation.navigate('supportScreen')
+                }}>
+                <BBBIcon
+                  name="Support"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Support</Text>
+              </Item>
+              <Item
+                style={[
+                  styles.borderView,
+                  {
+                    borderBottomWidth: 0,
+                    borderBottomColor: Colors.menuitemborder,
+                  },
+                ]}
+                onPress={() => {
+                  this.props.mutate({ variables: { id: loginStatus.myProfile.id }})
+                  .then( () => {
+                    this.props.navigation.closeDrawer()
+                  })
+                }}>
+                <BBBIcon
+                  name="Logout"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Log Out</Text>
+              </Item>
+            </Content>
+          </Container>
+        )}</LoginStatus>
       );
     }
   }

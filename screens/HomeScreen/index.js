@@ -70,7 +70,7 @@ export default class HomeScreen extends React.Component {
   }
 
   openDrawerAndSetState = () => {
-    this.setState({ drawerOpen: true })
+    this.drawerOpen = true
     this.props.navigation.openDrawer()
   }
 
@@ -81,20 +81,21 @@ export default class HomeScreen extends React.Component {
       limit:10,
       page:1,
       searchTerms:'',
-      drawerOpen: false,
     }
+
+    this.drawerOpen = false
 
     this.drawerBackHandler = null
     const defaultGetStateForAction = MainDrawer.router.getStateForAction;
     MainDrawer.router.getStateForAction = (action, state) => {
       if (state && action.type === 'Navigation/OPEN_DRAWER') {
-        this.setState({ drawerOpen: true })
+        this.drawerOpen = true
           console.log('<===============>DrawerOpen');
         this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
           console.log('Listener ADDED');
       }
       if (state && action.type === 'Navigation/DRAWER_CLOSED') {
-        this.setState({ drawerOpen: false })
+        this.drawerOpen = false
           console.log('<|||||||||||||||>DrawerClose');
         this.drawerBackHandler.remove()
         this.drawerBackHandler = null
@@ -188,7 +189,7 @@ export default class HomeScreen extends React.Component {
       'didFocus',
       payload => {
         console.log('didFocus')
-        if ( this.state.drawerOpen ) {
+        if ( this.drawerOpen ) {
           // reattach the listener as we never closed the drawer
           this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
         }
@@ -313,6 +314,7 @@ export default class HomeScreen extends React.Component {
           rightComponent={rightComponent}
         />
         */
+    console.log("HOMESCREEN Render.")
     return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (

@@ -21,6 +21,7 @@ import ChatButton from '../../components/buttons/ChatButton'
 import CreateChat from '../../graphql/mutations/CreateChat'
 import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 import GetProfile from '../../graphql/queries/GetProfile'
+import { w } from '../../utils/helpers.js'
 
 class PureListItem extends Component {
 
@@ -30,8 +31,14 @@ class PureListItem extends Component {
 
   // comparisons of important changes here
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.item.liked !== nextProps.liked) {
-      return true;
+    if ( w(this.props, ['item', 'liked']) !== w(nextProps, ['item', 'liked']) ) {
+      return true
+    }
+    if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
+      return true
+    }
+    if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
+      return true
     }
     return false;
   }

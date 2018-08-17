@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 const GET_MOST_RECENT_LIST = gql`
-query getMostRecentLists($countryCode:String!,$limit:Int,$page:Int){
-  getMostRecentListings(countryCode:$countryCode,limit:$limit,page:$page){
+query getMostRecentListings($countryCode:String!,$limit:Int,$page:Int){
+  getMostRecentListings(countryCode:$countryCode,limit:$limit,page:$page) @connection(key: "getMostRecentListings", filter: ["countryCode"]) {
     id
     title
     description
@@ -663,6 +663,96 @@ query {
   }
 }`
 
+const GET_LISTING = gql`
+query getListing($id:Int){
+  getListing(id:$id) {
+    id
+    title
+    description
+    category {
+      id
+      name
+    }
+    primaryImage {
+      id
+      imageKey
+    }
+    secondaryImages {
+      id
+      imageKey
+    }
+    saleMode {
+      id
+      price
+      counterOffer
+      currency {
+        iso4217
+        currencyName
+        currencySymbol
+      }
+      mode
+      exchangeModes {
+        id
+        mode
+        price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
+      }
+    }
+    template {
+      id
+      title
+      description
+      primaryImage {
+        id
+        imageKey
+      }
+      secondaryImages {
+        id
+        imageKey
+      }
+      tags{
+        id
+        name
+      }
+    }
+    tags{
+      id
+      name
+    }
+    viewers
+    likes
+    liked
+    chatId
+    user {
+      id
+      firstName
+      lastName
+      profileName
+      profileImage {
+        id
+        imageURL
+        imageKey
+      }
+      sellerRating
+      sellerRatingCount
+      online
+      idVerification
+    }
+  }
+}`
 
 export {
   GET_MOST_RECENT_LIST
@@ -675,4 +765,5 @@ export {
 , GET_COUNTRY_LIST
 , GET_CHAT_MESSAGES
 , GET_PROFILE
+, GET_LISTING
 }

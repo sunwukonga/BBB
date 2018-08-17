@@ -20,13 +20,13 @@ const cache = new InMemoryCache({
       case 'Language': return object.iso639_2
       default: return object.id || object._id // fall back to `id` and `_id` for all other types
     }
-  }
-  //cacheRedirects: {
-    //Query: {
-      //movie: (_, { id }, { getCacheKey }) =>
-        //getCacheKey({ __typename: 'Movie', id });
-    //}
-  //}
+  },
+  cacheRedirects: {
+    Query: {
+      getListing: (_, { id }, { getCacheKey }) =>
+        getCacheKey({ __typename: 'Listing', id })
+    }
+  },
 });
 const httpLink = new HttpLink({
   uri: BBB_BASE_URL,
@@ -72,7 +72,7 @@ const stateLink = withClientState({
   , countryCode: 'SG'
   , myProfile: {
       __typename: 'MyProfile'
-    , id: null
+    , id: -1
     , profileName: ""
     , profileImageURL: ""
     }
@@ -87,7 +87,7 @@ const stateLink = withClientState({
       },
       unsetAuthStatus: (_, args, { cache }) => {
         console.log('unsetAuthStatus client-side mutation fired');
-        cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: null, profileName: "", profileImageURL: "" }}});
+        cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: -1, profileName: "", profileImageURL: "" }}});
         return null;
       },
       setCountry: (_, args, { cache }) => {
@@ -100,7 +100,11 @@ const stateLink = withClientState({
 });
 const link = ApolloLink.from([errorLink, stateLink, middlewareLink, httpLink]);
 
-export default client = new ApolloClient({
+const client = new ApolloClient({
   link
 , cache
 });
+
+client.onResetStore(stateLink.writeDefaults);
+
+export default client

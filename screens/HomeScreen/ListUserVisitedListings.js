@@ -13,6 +13,7 @@ import {
   GET_USER_VISITED_LIST
 } from '../../graphql/Queries'
 import PureListItem from './PureListItem'
+import { w } from '../../utils/helpers.js'
 
 
 class ListUserVisitedListings extends Component {
@@ -20,6 +21,18 @@ class ListUserVisitedListings extends Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if ( w(this.props, ['item', 'liked']) !== w(nextProps, ['item', 'liked']) ) {
+      return true
+    }
+    if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
+      return true
+    }
+    if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
+      return true
+    }
+    return false;
+  }
 
   render() {
     let { variables, loginStatus, chatIndexes, currentUser } = this.props
@@ -30,7 +43,7 @@ class ListUserVisitedListings extends Component {
       <Query
         query = {GET_USER_VISITED_LIST}
         variables = {Object.assign(variables, { countryCode: loginStatus.countryCode })}
-        fetchPolicy="cache-and-network"
+        fetchPolicy="network-only"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables }) => {
           if (networkStatus === 1) {

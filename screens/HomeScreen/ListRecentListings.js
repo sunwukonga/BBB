@@ -13,6 +13,7 @@ import {
   GET_MOST_RECENT_LIST
 } from '../../graphql/Queries'
 import PureListItem from './PureListItem'
+import { w } from '../../utils/helpers.js'
 
 
 class ListRecentListings extends Component {
@@ -20,9 +21,16 @@ class ListRecentListings extends Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
+      return true
+    }
+    return false;
+  }
 
   render() {
     let { variables, loginStatus, chatIndexes, currentUser } = this.props
+    console.log("LISTRECENT Render")
     return (
       <Query
         query = {GET_MOST_RECENT_LIST}
@@ -30,12 +38,16 @@ class ListRecentListings extends Component {
         fetchPolicy="cache-and-network"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
+          // https://github.com/apollographql/apollo-client/blob/master/packages/apollo-client/src/core/networkStatus.ts
+          // https://github.com/apollographql/apollo-client/issues/3660
+          // https://github.com/apollographql/react-apollo/issues/1217
           if (networkStatus === 1) {
             return <ActivityIndicator size="large" />;
           }
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
+          console.log(',')
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
