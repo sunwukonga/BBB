@@ -48,17 +48,17 @@ export default ToggleLike = graphql(
     }
 
     adjustListing = (listing, item) => {
-        if (listing.id == item.id) {
-          if (listing.liked) {
-            listing.likes = listing.likes - 1
-            listing.liked = false
-          } else {
-            listing.likes = listing.likes + 1
-            listing.liked = true
-          }
+      if (listing.id == item.id) {
+        if (listing.liked) {
+          listing.likes = listing.likes - 1
+          listing.liked = false
+        } else {
+          listing.likes = listing.likes + 1
+          listing.liked = true
         }
-        return listing
       }
+      return listing
+    }
 
     render() {
       let {item, loginStatus} = this.props

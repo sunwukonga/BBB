@@ -25,7 +25,6 @@ class ChatButton extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    console.log("SCU.ChatButton")
     console.log("NextProps: ", w(nextProps, ['item', 'chatId']) )
     if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
       return true
@@ -64,7 +63,7 @@ class ChatButton extends Component {
       return null
     } else {
       return (
-        <CreateChat item={item} currentUser={currentUser}>{ mutateCreateChat  => (
+        <CreateChat item={item} loginStatus={loginStatus} currentUser={currentUser}>{ mutateCreateChat  => (
           <TouchableOpacity
             style={styles.chatIconSec}
             onPress={ () => this.navOrCreate( mutateCreateChat, item, loginStatus, chatIndexes ) }
