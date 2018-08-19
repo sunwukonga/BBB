@@ -165,7 +165,7 @@ class ListChats extends Component {
           )*/
           return (
                 <FlatList
-                  horizontal = {true}
+                  horizontal = {false}
                   contentContainerStyle={styles.listContent}
                   keyExtractor={(item, index) => index.toString()}
                   data = {data.getChatMessages || []}
