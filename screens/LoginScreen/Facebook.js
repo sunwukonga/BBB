@@ -63,7 +63,7 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
     };
 
     render() {
-      let { listingId, ownerId, mutateCreateChat, dest } = this.props.navigation.state.params
+      let { listingId, ownerId, mutateCreateChat, mutateToggleLike, dest } = this.props.navigation.state.params
       return (
         <View>
         <Mutation
@@ -96,59 +96,91 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
                 startTime = new Date()
                 this.onBBToken(data.loginFacebook)
                 .then( ({ data: {setAuthStatus: {userId}}}) => {
-                  if ( this.props.navigation.state && this.props.navigation.state.params ) {
-                    // Arriving from Home -> drawerOpen
-                    if ( dest == 'openDrawer' ) {
-                      this.props.navigation.dispatch(NA_LoginToHome)
-                    }
-                    // Arriving from Home -> CreateNewItemScreen
-                    if ( dest == 'createNewItemScreen' ) {
-                      this.props.navigation.dispatch(NA_LoginToCreate)
-                    }
-                    // Arriving from Home -> chatDetail
-                    // Arriving from productDetail -> chatDetail
-                    if ( dest == 'chatDetailsScreen' ) {
-                      // Logged in. Can we find if listing is a part of 
-                      if ( userId == ownerId ) {
-                        Alert.alert(
-                          'This is your listing!',
-                          'You cannot chat with yourself.',
-                          [
-                            {text: 'OK', onPress: () => {
-                              this.props.navigation.goBack()
-                            }},
-                          ],
-                          { cancelable: false }
-                        )
-                      } else {
-                        this.props.client.query({
-                          query: GET_LISTING,
-                          variables: { id: listingId },
-                          fetchOptions: 'network-only'
-                        })
-                        .then( ({data: {getListing}}) => {
-                          console.log("CHECK updated: ", getListing.chatId)
-                          if ( (_chatId = getListing.chatId) != -1 ) {
+                  // Arriving from Home -> drawerOpen
+                  if ( dest == 'openDrawer' ) {
+                    this.props.navigation.dispatch(NA_LoginToHome)
+                  }
+                  // Arriving from Home -> CreateNewItemScreen
+                  if ( dest == 'createNewItemScreen' ) {
+                    this.props.navigation.dispatch(NA_LoginToCreate)
+                  }
+                  // Arriving from Home -> chatDetail
+                  // Arriving from productDetail -> chatDetail
+                  if ( dest == 'chatDetailsScreen' ) {
+                    if ( userId == ownerId ) {
+                      Alert.alert(
+                        'This is your listing!',
+                        'You cannot chat with yourself.',
+                        [
+                          {text: 'OK', onPress: () => {
+                            this.props.navigation.goBack()
+                          }},
+                        ],
+                        { cancelable: false }
+                      )
+                    } else {
+                      this.props.client.query({
+                        query: GET_LISTING,
+                        variables: { id: listingId },
+                        fetchOptions: 'network-only'
+                      })
+                      .then( ({data: {getListing}}) => {
+                        console.log("CHECK updated: ", getListing.chatId)
+                        if ( (_chatId = getListing.chatId) != -1 ) {
+                          this.props.navigation.navigate('chatDetailScreen', {
+                            chatId: _chatId
+                          , chatIndexes: []
+                          })
+                        } else {
+                          mutateCreateChat()
+                          .then( ({ data: { createChat }, error }) => {
+                            console.log("After create chat promise")
+                            if (error) {
+                              console.log("Have ERROR", error)
+                            }
+                            //console.log("NAV: ", w(this, ['props', 'navigation']))
                             this.props.navigation.navigate('chatDetailScreen', {
-                              chatId: _chatId
+                              chatId: createChat.id
                             , chatIndexes: []
                             })
-                          } else {
-                            mutateCreateChat()
-                            .then( ({ data: { createChat }, error }) => {
-                              console.log("After create chat promise")
-                              if (error) {
-                                console.log("Have ERROR", error)
-                              }
-                              //console.log("NAV: ", w(this, ['props', 'navigation']))
-                              this.props.navigation.navigate('chatDetailScreen', {
-                                chatId: createChat.id
-                              , chatIndexes: []
-                              })
+                          })
+                        }
+                      })
+                    }
+                  }
+                  // Arriving from Home -> (Like) Home
+                  // Arriving from productDetail -> (Like) Home
+                  if ( dest == 'homeScreen' ) {
+                    // Handle like
+                    if ( userId == ownerId ) {
+                      Alert.alert(
+                        'This is your listing!',
+                        'You cannot like your own listing.',
+                        [
+                          {text: 'OK', onPress: () => {
+                            this.props.navigation.goBack()
+                          }},
+                        ],
+                        { cancelable: false }
+                      )
+                    } else {
+                      this.props.client.query({
+                        query: GET_LISTING,
+                        variables: { id: listingId },
+                        fetchOptions: 'network-only'
+                      })
+                      .then( ({data: {getListing}}) => {
+                        console.log("CHECK updated: ", getListing.liked)
+                          if (!getListing.liked) {
+                            mutateToggleLike({listingId: listingId, like: true })
+                            .then( ({ data: { likeListing }, error }) => {
+                              console.log("After toggle like promise")
+                              this.props.navigation.goBack()
                             })
+                          } else {
+                            this.props.navigation.goBack()
                           }
-                        })
-                      }
+                      })
                     }
                   }
                   console.log("Time (ms) to store token and profile: ", new Date() - startTime)

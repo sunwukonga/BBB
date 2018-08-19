@@ -3,10 +3,10 @@ import {
   Image
 , TouchableOpacity
 , View
+, Text
 } from 'react-native';
 import {
-  Text
-, Item
+  Item
 } from 'native-base';
 import { withNavigation } from 'react-navigation'
 import styles from './styles';
@@ -37,16 +37,12 @@ class PureListItem extends Component {
     if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
       return true
     }
-    if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
-      return true
-    }
     return false;
   }
 
   render() {
     let {item, loginStatus, chatIndexes, currentUser } = this.props
     return (
-
         <TouchableOpacity
           onPress={ () => this.props.navigation.navigate({
             routeName: 'productDetailsScreen'
@@ -63,6 +59,7 @@ class PureListItem extends Component {
               ? <Baby style={styles.rowImage} />
               : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey}} style={styles.rowImage} />
             }
+            <Text>{ console.log("Pure: ", item.id, ", ", item.chatId) }</Text>
             <LikeButton item={item} loginStatus={loginStatus} />
             <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
           </View>

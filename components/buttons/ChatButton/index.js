@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   View
 , TouchableOpacity
+, Text
 } from 'react-native';
 import styles from './styles';
 import { Layout, Colors } from '../../../constants/';
@@ -24,6 +25,8 @@ class ChatButton extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    console.log("SCU.ChatButton")
+    console.log("NextProps: ", w(nextProps, ['item', 'chatId']) )
     if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
       return true
     }
@@ -67,6 +70,7 @@ class ChatButton extends Component {
             onPress={ () => this.navOrCreate( mutateCreateChat, item, loginStatus, chatIndexes ) }
           >
             <View >
+              <Text>{ console.log("Chat: ", item.id, ", ", item.chatId) }</Text>
               <BBBIcon
                 name="Chat"
                 size={Layout.moderateScale(18)}

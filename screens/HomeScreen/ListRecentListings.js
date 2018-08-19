@@ -19,6 +19,8 @@ import { w } from '../../utils/helpers.js'
 class ListRecentListings extends Component {
   constructor(props) {
     super(props);
+
+    this.lastFetchedPage = 1
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -35,7 +37,7 @@ class ListRecentListings extends Component {
       <Query
         query = {GET_MOST_RECENT_LIST}
         variables = {Object.assign(variables, { countryCode: loginStatus.countryCode })}
-        fetchPolicy="cache-and-network"
+        fetchPolicy="network-only"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
           // https://github.com/apollographql/apollo-client/blob/master/packages/apollo-client/src/core/networkStatus.ts
@@ -47,7 +49,6 @@ class ListRecentListings extends Component {
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
-          console.log(',')
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
@@ -58,37 +59,49 @@ class ListRecentListings extends Component {
                 contentContainerStyle={styles.listContent}
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getMostRecentListings || []}
-                renderItem={({ item }) =>
-                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
-                }
+                renderItem={({ item }) => {
+                  console.log('LRL: ', item.id)
+                  return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+                }}
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
                 onRefresh={() => refetch()}
-                onEndReached={() =>
-                  fetchMore({
-                    variables: {
-                      page: (data.getMostRecentListings.length / variables.limit >> 0) + 1
-                    },
-                    updateQuery: (prev, { fetchMoreResult }) => {
-                      console.log("*****************************updateQuery called")
-                      if (!fetchMoreResult) return prev
-                      if (!prev) {
-                        prev = {}
-                      }
-                      if (!prev.getMostRecentListings) {
-                        prev.getMostRecentListings = []
-                      }
-                      return { 
-                        getMostRecentListings:
-                          prev.getMostRecentListings
-                          .concat(fetchMoreResult.getMostRecentListings)
-                          .filter( (item, index, items) => {
-                            return !index || item.id != items[index - 1].id
-                          })
-                      }
+                onEndReached={() => {
+                  if ( data.getMostRecentListings.length % variables.limit == 0 ) {
+                    let nextPage = (data.getMostRecentListings.length / variables.limit >> 0) + 1
+                    if ( this.lastFetchedPage < nextPage ) {
+                      return fetchMore({
+                        variables: Object.assign({}, variables, { page: nextPage }),
+                        updateQuery: (prev, { fetchMoreResult }) => {
+                          this.lastFetchedPage++
+                          if (!fetchMoreResult) return prev
+                          if (!prev) {
+                            prev = {}
+                          }
+                          if (!prev.getMostRecentListings) {
+                            prev.getMostRecentListings = []
+                          }
+                          return {
+                            getMostRecentListings:
+                              fetchMoreResult.getMostRecentListings.reduce( (acc, cur) => {
+                                if ( listing = acc.find( listing => cur.id == listing.id ) ) {
+                                  // Because `listing` is an object, it is passed by reference.
+                                  // Changing it below, changes the original.
+                                  listing.chatId = cur.chatId
+                                  listing.likes = cur.likes
+                                  listing.liked = cur.liked
+                                  return acc
+                                } else {
+                                  acc.push(cur)
+                                  return acc
+                                }
+                              }, JSON.parse(JSON.stringify(prev.getMostRecentListings)))
+                          }
+                        }
+                      })
                     }
-                  })
-                }
+                  }
+                }}
               />
             </View>
           )

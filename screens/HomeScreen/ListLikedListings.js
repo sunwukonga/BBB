@@ -19,6 +19,8 @@ import { w } from '../../utils/helpers.js'
 class ListLikedListings extends Component {
   constructor(props) {
     super(props);
+
+    this.lastFetchedPage = 1
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -63,7 +65,7 @@ class ListLikedListings extends Component {
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => item.id.toString()}
                 data = {data.getMostLikedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
@@ -71,30 +73,42 @@ class ListLikedListings extends Component {
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
                 onRefresh={() => refetch()}
-                onEndReached={() =>
-                  fetchMore({
-                    variables: {
-                      page: (data.getMostLikedListings.length / variables.limit >> 0) + 1
-                    },
-                    updateQuery: (prev, { fetchMoreResult }) => {
-                      if (!fetchMoreResult) return prev
-                      if (!prev) {
-                        prev = {}
-                      }
-                      if (!prev.getMostLikedListings ) {
-                        prev.getMostLikedListings = []
-                      }
-                      return {
-                        getMostLikedListings:
-                          prev.getMostLikedListings
-                          .concat(fetchMoreResult.getMostLikedListings)
-                          .filter( (item, index, items) => {
-                            return !index || item.id != items[index - 1].id
-                          })
-                      }
+                onEndReached={() => {
+                  if ( data.getMostLikedListings.length % variables.limit == 0 ) {
+                    let nextPage = (data.getMostLikedListings.length / variables.limit >> 0) + 1
+                    if ( this.lastFetchedPage < nextPage ) {
+                      return fetchMore({
+                        variables: Object.assign({}, variables, { page: nextPage }),
+                        updateQuery: (prev, { fetchMoreResult }) => {
+                          this.lastFetchedPage++
+                          if (!fetchMoreResult) return prev
+                          if (!prev) {
+                            console.log("ListLikedListings:Fetchmore:prev was undefined")
+                            prev = {}
+                          }
+                          if (!prev.getMostLikedListings) {
+                            console.log("ListLikedListings:Fetchmore:prev.getMostLikedListings was undefined")
+                            prev.getMostLikedListings = []
+                          }
+                          return {
+                            getMostLikedListings:
+                              fetchMoreResult.getMostLikedListings.reduce( (acc, cur) => {
+                                if ( listing = acc.find( listing => cur.id == listing.id ) ) {
+                                  listing.chatId = cur.chatId
+                                  listing.likes = cur.likes
+                                  listing.liked = cur.liked
+                                  return acc
+                                } else {
+                                  acc.push(cur)
+                                  return acc
+                                }
+                              }, JSON.parse(JSON.stringify(prev.getMostLikedListings)))
+                          }
+                        }
+                      })
                     }
-                  })
-                }
+                  }
+                }}
               />
             </View>
           )

@@ -7,6 +7,7 @@ import {
 import styles from './styles';
 import { Layout, Colors } from '../../../constants/';
 import BBBIcon from '../../BBBIcon';
+import { withNavigation, NavigationActions } from 'react-navigation'
 
 import {
   LIKE_LISTING
@@ -15,11 +16,24 @@ import {
   GET_USER_LIKED_LIST
 } from '../../../graphql/Queries'
 import { w } from '../../../utils/helpers.js'
+import ToggleLike from '../../../graphql/mutations/ToggleLike'
 
+const NA_LikeToLoginToHome = ( item, mutateToggleLike ) => NavigationActions.navigate({
+  routeName: 'loginScreen'
+, params: { dest: 'homeScreen'
+          , listingId: item.id
+          , ownerId: w(item, ['user', 'id'])
+          , mutateToggleLike: mutateToggleLike
+          }
+})
 
 class LikeButton extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      toggle: true
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -29,56 +43,48 @@ class LikeButton extends Component {
     return false;
   }
 
-  updateUserLikedListings = (prevArray, newItem) => {
-    if (newItem.liked) {
-      return prevArray.filter( item => item.id != newItem.id )
+
+  navOrToggle( mutateToggleLike, item, loginStatus ) {
+    console.log("navOrToggle called")
+    if ( loginStatus.loginStatus ) {
+      // Toggle the like
+      console.log("LikeButton Pressed.")
+      mutateToggleLike({ listingId: item.id, like: !item.liked })
+      .then( ({ data: { likeListing }}) => {
+        // Signal that like has changed...
+        /*item.liked = true
+        this.setState({
+          toggle: !this.state.toggle
+        }) */
+      })
     } else {
-      let item = Object.assign({}, newItem)
-      item.liked = true
-      item.likes = item.likes + 1
-      console.log("NEW_ITEM: ", item)
-      console.log("1ST_OF_ARRAY: ", prevArray[0])
-      return prevArray.filter( item => item.id != newItem.id ).unshift( item )
+      this.props.navigation.dispatch(NA_LikeToLoginToHome( item, mutateToggleLike ))
     }
   }
 
   render() {
     const {item, loginStatus} = this.props
 
-    if ( loginStatus.loginStatus && (loginStatus.myProfile.id != item.user.id) ) {
-      return (
-        <Mutation
-          mutation={LIKE_LISTING}
-          update={(cache, { data: { likeListing } }) => {
-            const { getUserLikedListings } = cache.readQuery({
-              query: GET_USER_LIKED_LIST
-            , variables: {"countryCode":'SG',"limit":10,"page":1}
-            })
-            const newUserLikedListings = this.updateUserLikedListings( getUserLikedListings, item )
-            cache.writeQuery({
-              query: GET_USER_LIKED_LIST,
-              data: { getUserLikedListings : newUserLikedListings }
-            })
-          }}
-        >
-          {(likeListing, { data }) => (
-            <TouchableOpacity style={styles.favoriteIconSec} onPress={() => likeListing({ variables: { listingId: item.id, like: !item.liked } }) }>
-              <View >
-                <BBBIcon
-                  name="Favorite"
-                  size={Layout.moderateScale(18)}
-                  color={item.liked ? Colors.tintColor : Colors.white}
-                  style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
-                />
-              </View>
-            </TouchableOpacity>
-          )}
-        </Mutation>
-      )
-    } else {
+    if (loginStatus.myProfile.id == item.user.id) {
+      // Cannot like your own listing. Button should not exist.
       return null
+    } else {
+      return (
+        <ToggleLike item={item} loginStatus={loginStatus}>{ mutateToggleLike  => (
+          <TouchableOpacity style={styles.favoriteIconSec} onPress={() => this.navOrToggle( mutateToggleLike, item, loginStatus ) }>
+            <View >
+              <BBBIcon
+                name="Favorite"
+                size={Layout.moderateScale(18)}
+                color={item.liked ? Colors.tintColor : Colors.white}
+                style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
+              />
+            </View>
+          </TouchableOpacity>
+        )}</ToggleLike>
+      )
     }
   }
 }
 
-export default LikeButton
+export default withNavigation(LikeButton)

@@ -95,7 +95,7 @@ query getMostRecentListings($countryCode:String!,$limit:Int,$page:Int){
 
 const GET_MOST_VISITED_LIST = gql`
 query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
-  getMostVisitedListings(countryCode:$countryCode,limit:$limit,page:$page) {
+  getMostVisitedListings(countryCode:$countryCode,limit:$limit,page:$page) @connection(key: "getMostVisitedListings", filter: ["countryCode"]) {
     id
     title
     description
@@ -186,7 +186,7 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
 
 const GET_MOST_LIKED_LIST = gql`
 query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
-  getMostLikedListings(countryCode:$countryCode,limit:$limit,page:$page) {
+  getMostLikedListings(countryCode:$countryCode,limit:$limit,page:$page) @connection(key: "getMostLikedListings", filter: ["countryCode"]) {
     id
     title
     description
@@ -276,7 +276,7 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
 
 const GET_USER_VISITED_LIST = gql`
 query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
-  getUserVisitedListings(countryCode:$countryCode,limit:$limit,page:$page){
+  getUserVisitedListings(countryCode:$countryCode,limit:$limit,page:$page) @connection(key: "getUserVisitedListings", filter: ["countryCode"]) {
     id
     title
     description
@@ -367,7 +367,7 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
 
 const GET_USER_POSTED_LIST = gql`
 query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
-  getUserPostedListings(countryCode:$countryCode,limit:$limit,page:$page) {
+  getUserPostedListings(countryCode:$countryCode,limit:$limit,page:$page) @connection(key: "getUserPostedListings", filter: ["countryCode"]) {
     id
     title
     description
@@ -458,7 +458,7 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
 
 const GET_USER_LIKED_LIST = gql`
 query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
-  getUserLikedListings(countryCode:$countryCode,limit:$limit,page:$page) {
+  getUserLikedListings(countryCode:$countryCode,limit:$limit,page:$page) @connection(key: "getUserLikedListings", filter: ["countryCode"]) {
     id
     title
     description
@@ -664,7 +664,7 @@ query {
 }`
 
 const GET_LISTING = gql`
-query getListing($id:Int){
+query getListing($id:Int!){
   getListing(id:$id) {
     id
     title

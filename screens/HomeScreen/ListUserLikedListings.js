@@ -19,6 +19,8 @@ import { w } from '../../utils/helpers.js'
 class ListUserLikedListings extends Component {
   constructor(props) {
     super(props);
+
+    this.lastFetchedPage = 1
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -74,32 +76,42 @@ class ListUserLikedListings extends Component {
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
                 onRefresh={() => refetch()}
-                onEndReached={() =>
-                  fetchMore({
-                    variables: {
-                      page: (data.getUserLikedListings.length / variables.limit >> 0) + 1
-                    },
-                    updateQuery: (prev, { fetchMoreResult }) => {
-                      console.log("PREV: ", prev)
-                      if (!fetchMoreResult) return prev
-                      if (!prev.getUserLikedListings) {
-                        return {
-                          getUserLikedListings: fetchMoreResult.getUserLikedListings
+                onEndReached={() => {
+                  if ( data.getUserLikedListings.length % variables.limit == 0 ) {
+                    let nextPage = (data.getUserLikedListings.length / variables.limit >> 0) + 1
+                    if ( this.lastFetchedPage < nextPage ) {
+                      return fetchMore({
+                        variables: Object.assign({}, variables, { page: nextPage }),
+                        updateQuery: (prev, { fetchMoreResult }) => {
+                          this.lastFetchedPage++
+                          if (!fetchMoreResult) return prev
+                          if (!prev) {
+                            prev = {}
+                          }
+                          if (!prev.getUserLikedListings) {
+                            return {
+                              getUserLikedListings: fetchMoreResult.getUserLikedListings
+                            }
+                          }
+                          return {
+                            getMostUserLikedings:
+                              fetchMoreResult.getUserLikedListings.reduce( (acc, cur) => {
+                                if ( listing = acc.find( listing => cur.id == listing.id ) ) {
+                                  listing.chatId = cur.chatId
+                                  listing.likes = cur.likes
+                                  listing.liked = cur.liked
+                                  return acc
+                                } else {
+                                  acc.push(cur)
+                                  return acc
+                                }
+                              }, JSON.parse(JSON.stringify(prev.getUserLikedListings)))
+                          }
                         }
-                      }
-           //           console.log("*****************PREV: ", prev.getUserLikedListings)
-            //          console.log("*****************POST: ", fetchMoreResult.getUserLikedListings)
-                      return {
-                        getUserLikedListings:
-                          prev.getUserLikedListings
-                          .concat(fetchMoreResult.getUserLikedListings)
-                          .filter( (item, index, items) => {
-                            return !index || item.id != items[index - 1].id
-                          })
-                      }
+                      })
                     }
-                  })
-                }
+                  }
+                }}
               />
             </View>
           )
