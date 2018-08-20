@@ -5,7 +5,9 @@ import {
 , Image
 , View
 , Text
+, Alert
 , ActivityIndicator
+, TouchableOpacity
 } from 'react-native';
 import {
   Button
@@ -29,6 +31,7 @@ import {
 } from '../../graphql/Queries'
 import { updateChatMessages } from '../../utils/helpers.js'
 import LastMessageIds from './LastMessageIds'
+import DeleteChat from '../../graphql/mutations/DeleteChat'
 
 
 class ListChats extends Component {
@@ -68,48 +71,60 @@ class ListChats extends Component {
     }
   }
 
+  deleteChat( chatId, mutateDeleteChat ) {
+    Alert.alert(
+      'Delete',
+      'Are you sure you want to delete this chat?',
+      [
+        {text: 'DELETE', onPress: () => mutateDeleteChat()},
+      ],
+      { cancelable: true }
+    )
+  }
+
       //<LastMessageIds>{ chatIndexes  => (
 // TODO: Change target to chatScreen
 //  renderChat = ( { item }) => {
-  renderChat = ( chats, chatIndexes ) => {
-    let { item } = chats
+  renderChat = ( item, chatIndexes, loginStatus ) => {
+    let { item: chat } = item
     return (
-        <List
+      <DeleteChat chat={chat} loginStatus={loginStatus}>{ mutateDeleteChat => (
+        <ListItem
+          avatar
           style={styles.mainlist}
-          key={item.id}
+          key={item.index}
+          onLongPress={()=> this.deleteChat( chat.id, mutateDeleteChat )}
+          onPress={() => {
+            this.props.navigation.navigate('chatDetailScreen', {
+              chatId: chat.id
+            , chatIndexes: chatIndexes
+            })
+          }}
         >
-          <ListItem
-            avatar
-            onPress={() => {
-              this.props.navigation.navigate('chatDetailScreen', {
-                chatId: item.id
-              , chatIndexes: chatIndexes
-              })
-            }}>
-            <Left style={styles.left}>
-              <View style={styles.bebyview}>
-                { this.otherImage( item ) }
-              </View>
-            </Left>
-            <Body style={styles.bodys}>
-              <View style={styles.titleview}>
-              { item.listing.primaryImage===null ||  item.listing.primaryImage.imageKey===null
-                ? <Baby style={styles.rowImage} />
-                : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.listing.primaryImage.imageKey}} style={styles.rowImage} />
-              }
-                <Text style={styles.title}>{item.listing.title}</Text>
-              </View>
-              <View style={styles.bottomline} />
-              <View>{ this.otherProfileName( item ) }</View>
-              <View style={styles.namecount}>
-                  { item.newMessageCount && item.newMessageCount > 0
-                  ? <Text style={styles.count}>{item.newMessageCount}</Text>
-                  : null
-                  }
-              </View>
-            </Body>
-          </ListItem>
-        </List>
+          <Left style={styles.left}>
+            <View style={styles.bebyview}>
+              { this.otherImage( chat ) }
+            </View>
+          </Left>
+          <Body style={styles.bodys}>
+            <View style={styles.titleview}>
+            { chat.listing.primaryImage===null ||  chat.listing.primaryImage.imageKey===null
+              ? <Baby style={styles.rowImage} />
+              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+chat.listing.primaryImage.imageKey}} style={styles.rowImage} />
+            }
+              <Text style={styles.title}>{chat.listing.title}</Text>
+            </View>
+            <View style={styles.bottomline} />
+            <View>{ this.otherProfileName( chat ) }</View>
+            <View style={styles.namecount}>
+                { chat.newMessageCount && chat.newMessageCount > 0
+                ? <Text style={styles.count}>{chat.newMessageCount}</Text>
+                : null
+                }
+            </View>
+          </Body>
+        </ListItem>
+      )}</DeleteChat>
     )
   }
 
@@ -120,12 +135,12 @@ class ListChats extends Component {
   // then give the option in the ChatScreen to fetch more from the cache as neede.
   // I.e. the user scrolls up.
   render() {
-    let { chatIndexes } = this.props
+    let { chatIndexes, loginStatus } = this.props
     return (
       <Query
         query = {GET_CHAT_MESSAGES}
         variables = {{chatIndexes: chatIndexes}}
-        fetchPolicy = "cache-and-network"
+        fetchPolicy = "network-only"
         update={(cache, { data: { getChatMessages } }) => {
           const data = cache.readQuery({
             query: GET_CHAT_MESSAGES
@@ -169,7 +184,7 @@ class ListChats extends Component {
                   contentContainerStyle={styles.listContent}
                   keyExtractor={(item, index) => index.toString()}
                   data = {data.getChatMessages || []}
-                  renderItem={(item) => this.renderChat(item, chatIndexes)}
+                  renderItem={ (item) => this.renderChat(item, chatIndexes, loginStatus)}
                   refreshing={networkStatus === 4 || networkStatus === 3}
                   onRefresh={() => refetch()}
                 />

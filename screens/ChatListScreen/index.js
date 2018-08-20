@@ -9,6 +9,7 @@ import {
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 import ListChats from './ListChats'
+import LoginStatus from '../HomeScreen/LoginStatus'
 import LastMessageIds from './LastMessageIds'
 
 //style
@@ -38,9 +39,11 @@ class ChatListScreen extends Component {
       <Container style={styles.container}>
         <BBBHeader title="Chats" leftComponent={leftComponent} />
         <Content>
-          <LastMessageIds loginStatus={{loginStatus: true}}>{ chatIndexes  => (
-            <ListChats chatIndexes={chatIndexes} />
-          )}</LastMessageIds>
+          <LoginStatus>{ loginStatus => (
+            <LastMessageIds loginStatus={loginStatus}>{ chatIndexes  => (
+              <ListChats chatIndexes={chatIndexes} loginStatus={loginStatus} />
+            )}</LastMessageIds>
+          )}</LoginStatus>
         </Content>
       </Container>
     );

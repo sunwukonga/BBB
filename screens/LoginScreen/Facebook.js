@@ -134,7 +134,7 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
                         } else {
                           mutateCreateChat()
                           .then( ({ data: { createChat }, error }) => {
-                            console.log("After create chat promise")
+                            console.log("After create chat promise, ChatId: ", createChat.id)
                             if (error) {
                               console.log("Have ERROR", error)
                             }

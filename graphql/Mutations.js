@@ -163,8 +163,13 @@ mutation createChat($listingId: Int!) {
   }
 }`
 
-const SEND_MESSAGE = gql`mutation
-sendChatMessage($chatId: Int!, $message: String,$image:UploadedImage,$lastMessageId:Int) {
+const DELETE_CHAT = gql`
+mutation deleteChat($chatId: Int!) {
+  deleteChat(chatId: $chatId)
+}`
+
+const SEND_MESSAGE = gql`
+mutation sendChatMessage($chatId: Int!, $message: String,$image:UploadedImage,$lastMessageId:Int) {
   sendChatMessage(chatId: $chatId, message: $message,image:$image,lastMessageId:$lastMessageId) {
     id
     message
@@ -307,4 +312,5 @@ export {
 , FACEBOOK_LOGIN
 , SEND_MESSAGE
 , CREATE_LISTING
+, DELETE_CHAT
 }
