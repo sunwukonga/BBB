@@ -24,6 +24,7 @@ import CreateChat from '../../../graphql/mutations/CreateChat'
 import LastMessageIds from '../../../screens/ChatListScreen/LastMessageIds'
 import { optimisticCreateChat } from '../../../graphql/mutations/Optimistic.js'
 import GetProfile from '../../../graphql/queries/GetProfile'
+import { w } from '../../../utils/helpers.js'
 
 class Listing extends Component {
 
@@ -56,17 +57,28 @@ class Listing extends Component {
   }
 
   collateImages( item ) {
-    if (item.secondaryImages.length > 0) {
-      if (item.primaryImage) {
-console.log("sec + pri")
-        return item.secondaryImages.slice().unshift( item.primaryImage )
+    if ( w(item, ['primaryImage', 'imageKey'] ) ) {
+      // primary image exists
+      if (w(item, ['secondaryImages', 'length'] > 0 ) ) {
+        // secondary images may exist
+        let secImages = item.secondaryImages.filter( image => image.imageKey )
+        if ( secImages.length > 0 ) {
+          console.log("sec + pri")
+          return item.secondaryImages.slice().unshift( item.primaryImage )
+        } else {
+          console.log("pri only")
+          return [item.primaryImage]
+        }
       } else {
-console.log("sec only")
-        return item.secondaryImages
+        console.log("pri only")
+        return [item.primaryImage]
       }
     } else {
-      if (item.primaryImage) {
-        return [item.primaryImage]
+      // primary image does not exist
+      let secImages = item.secondaryImages.filter( image => image.imageKey )
+      if ( secImages.length > 0 ) {
+        console.log("sec only")
+        return item.secondaryImages
       } else return [{dummy: true}]
     }
   }
@@ -79,7 +91,7 @@ console.log("sec only")
         <FlatList
           horizontal = {true}
           contentContainerStyle={styles.contentSwiper}
-          keyExtractor={(item, id) => id.toString()}
+          keyExtractor={(item, index) => index.toString()}
           data = { this.collateImages(item) }
           renderItem={({ item }) => this.renderItem( item ) }
         />
@@ -102,15 +114,17 @@ console.log("sec only")
           <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
         </View>
         <Item style={styles.userItemDetailsSec}>
-          <View style={styles.userProfileSec}>
-            {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
-                <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
-            }
-            <View style={item.user.online ? styles.userOnline : styles.userOffline} />
-          </View>
-          <View style={styles.userNameSec}>
-            <Text style={styles.userName}>{item.user.profileName}</Text>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={styles.userProfileSec}>
+              {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
+                  <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+                : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+              }
+              <View style={item.user.online ? styles.userOnline : styles.userOffline} />
+            </View>
+            <View style={styles.userNameSec}>
+              <Text style={styles.userName}>{item.user.profileName}</Text>
+            </View>
           </View>
           <View style={styles.activeuserSec}>
             <IdentityVerification
@@ -120,6 +134,9 @@ console.log("sec only")
             />
           </View>
         </Item>
+        <View>
+          <Text style={styles.postTitle} numberOfLines={3}>{item.title}</Text>
+        </View>
         <View>
           <Text style={styles.postDesc} numberOfLines={3}>{item.description}</Text>
         </View>
@@ -139,8 +156,10 @@ console.log("sec only")
           </View>
         </View>
 
-        <View style={[styles.alignmentButton, {backgroundColor: Colors.offerButton}]}>
-          <Text style={styles.regularSmall}>{item.saleMode.mode.toUpperCase()}</Text>
+        <View style={styles.alignmentButton}>
+          <View style={styles.offerButton}>
+            <Text style={styles.regularSmall}>{item.saleMode.mode.toUpperCase()}</Text>
+          </View>
         </View>
         <View>
           <Text style={styles.regularLarge}>Category</Text>

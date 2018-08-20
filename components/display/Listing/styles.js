@@ -232,6 +232,7 @@ export default StyleSheet.create({
 	},
 	userItemDetailsSec: {
 		flexDirection: 'row',
+    justifyContent: 'space-between',
 		paddingHorizontal: Layout.moderateScale(8),
 		paddingBottom: Layout.moderateScale(8),
 	},
@@ -253,7 +254,7 @@ export default StyleSheet.create({
 		left: Layout.moderateScale(20),
 	},
 	userNameSec: {
-		width: Layout.WIDTH * 0.27,
+		width: Layout.WIDTH * 0.4,
 	},
 	userName: {
 		color: Colors.menuuserNameandTokenColor,
@@ -278,8 +279,16 @@ export default StyleSheet.create({
 		color: Colors.menuuserNameandTokenColor,
 		fontFamily: 'roboto-reguler',
 	},
+	postTitle: {
+		marginLeft: Layout.moderateScale(10),
+		marginRight: Layout.moderateScale(10),
+		fontSize: Layout.moderateScale(14),
+		color: Colors.menuuserNameandTokenColor,
+		fontFamily: 'roboto-bold',
+	},
 	productreviewSec: {
 		flexDirection: 'row',
+    justifyContent: 'space-between',
 		marginTop: Layout.moderateScale(5),
 		marginBottom: Layout.moderateScale(5),
 		paddingHorizontal: Layout.moderateScale(8),
