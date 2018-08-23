@@ -20,7 +20,7 @@ import {
 , Body
 } from 'native-base';
 import styles from './styles';
-import { Layout, Colors } from '../../constants/';
+import { Layout, Colors, Urls } from '../../constants/';
 import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
@@ -43,13 +43,13 @@ class ListChats extends Component {
     if ( chat.listing && chat.listing.user && chat.listing.user.id != chat.userId ) {
       return (
        ( chat.listing.user.profileImage && chat.listing.user.profileImage.imageKey )
-       ? <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+       ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
        : <Baby style={styles.rowImage} />
       )
     } else if ( chat && chat.initUser ) {
       return (
        ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey )
-       ? <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
+       ? <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
        : <Baby style={styles.rowImage} />
       )
     }
@@ -110,7 +110,7 @@ class ListChats extends Component {
             <View style={styles.titleview}>
             { chat.listing.primaryImage===null ||  chat.listing.primaryImage.imageKey===null
               ? <Baby style={styles.rowImage} />
-              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+chat.listing.primaryImage.imageKey}} style={styles.rowImage} />
+              : <Image source={{ uri: Urls.s3ImagesURL + chat.listing.primaryImage.imageKey }} style={styles.rowImage} />
             }
               <Text style={styles.title}>{chat.listing.title}</Text>
             </View>

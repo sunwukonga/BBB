@@ -9,7 +9,6 @@ import {
 , ListView
 , FlatList
 , TextInput
-, AsyncStorage
 } from 'react-native';
 import {
   ActionSheet,
@@ -391,24 +390,6 @@ export default class CreateNewItemScreen extends React.Component {
       </View>
     );
   }
-
-  // REDUNDANT: DO NOT USE
-  _retrieveCountry = async () => {
-      try {
-          const value = await AsyncStorage.getItem('countryCode');
-          if (value !== null) {
-            // We have data!!
-            console.log(value);
-            this.setState({
-              countryCode: value
-            });
-          }
-       } catch (error) {
-         // Error retrieving data
-         console.log(error);
-       }
-    }
-
 
   _pickImage = async () => {
     // At some point I'd like to Hash an image before sending a request for a signed url to upload it.

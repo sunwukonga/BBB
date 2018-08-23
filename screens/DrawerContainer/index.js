@@ -15,7 +15,6 @@ import { graphql } from "react-apollo";
 import {
   UNSET_AUTH_STATUS
 } from '../../graphql/Mutations'
-import GetCachedProfile from '../../graphql/queries/GetCachedProfile'
 import LoginStatus from '../HomeScreen/LoginStatus'
 //import MainDrawer from '../../navigation/MainDrawerNavigator'
 

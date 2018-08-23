@@ -156,7 +156,7 @@ export default class ChatScreen extends Component {
 
     if ( chat && chat.listing && chat.listing.user && chat.listing.user.id != chat.userId ) {
       if ( chat.listing.user.profileImage && chat.listing.user.profileImage.imageKey ) {
-        profileImage = <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+        profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
       } else {
         profileImage = <Baby style={styles.profileImage} />
       }
@@ -167,7 +167,7 @@ export default class ChatScreen extends Component {
       }
     } else if ( chat.initUser.id != chat.userId ) {
       if ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey ) {
-        profileImage = <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.initUser.primaryImage.imageKey }} style={styles.profileImage} />
+        profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.primaryImage.imageKey }} style={styles.profileImage} />
       } else {
         profileImage = <Baby style={styles.profileImage} />
       }
@@ -305,7 +305,7 @@ export default class ChatScreen extends Component {
                 />
                 <View style={styles.notifyContainer}>
                   { (chat && chat.listing && chat.listing.primaryImage && chat.listing.primaryImage.imageKey)
-                  ? <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.listing.primaryImage.imageKey}} style={styles.notifyImage} />
+                  ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.primaryImage.imageKey }} style={styles.notifyImage} />
                   : <Baby style={styles.profileImage} />
                   }
                   <Text style={styles.regularSmall}>

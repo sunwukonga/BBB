@@ -10,7 +10,7 @@ import {
 } from 'native-base';
 import { withNavigation } from 'react-navigation'
 import styles from './styles';
-import { Layout, Colors } from '../../constants/';
+import { Layout, Colors, Urls } from '../../constants/';
 import Baby from '../../components/Baby';
 import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
@@ -57,7 +57,7 @@ class PureListItem extends Component {
           <View>
             { item.primaryImage===null || item.primaryImage.imageKey===null
               ? <Baby style={styles.rowImage} />
-              : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey}} style={styles.rowImage} />
+              : <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
             }
             <Text>{ console.log("Pure: ", item.id, ", ", item.chatId) }</Text>
             <LikeButton item={item} loginStatus={loginStatus} />
@@ -70,7 +70,7 @@ class PureListItem extends Component {
 
               {item.user.profileImage===null || item.user.profileImage.imageKey===null
                 ? <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-                : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+                : <Image source={{ uri: Urls.s3ImagesURL + item.user.profileImage.imageKey }} style={styles.userProfile} />
               }
 
               <View style={item.user.online ? styles.userOnline : styles.userOffline} />

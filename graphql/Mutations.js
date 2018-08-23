@@ -7,8 +7,14 @@ mutation likeListing($listingId:Int!,$like:Boolean){
 }`
 
 const SET_AUTH_STATUS = gql`
-mutation setAuthStatus( $token: String!, $id: Int!, $profileName: String!, $profileImageURL: String ) {
-  setAuthStatus( token: $token, id: $id, profileName: $profileName, profileImageURL: $profileImageURL ) @client
+mutation setAuthStatus( $token: String!, $id: Int!, $profileName: String!, $nameChangeCount: Int, $profileImageURL: String ) {
+  setAuthStatus( token: $token, id: $id, profileName: $profileName, nameChangeCount: $nameChangeCount, profileImageURL: $profileImageURL ) @client
+}`
+
+// Decided not to use this after all. Easier with a cache query read and write
+const UPDATE_AUTH_STATUS = gql`
+mutation updateAuthStatus( $id: Int!, $profileName: String!, $nameChangeCount: Int, $profileImageURL: String ) {
+  updateAuthStatus( id: $id, profileName: $profileName, nameChangeCount: $nameChangeCount, profileImageURL: $profileImageURL ) @client
 }`
 
 const UNSET_AUTH_STATUS = gql`
@@ -30,6 +36,7 @@ mutation loginFacebook($token: String!) {
       firstName
       lastName
       profileName
+      nameChangeCount
       profileImage {
         id
         imageURL
@@ -301,16 +308,54 @@ mutation createListing(
   }
 }`
 
+const SET_PROFILE_IMAGE = gql`
+mutation setProfileImage ( $image: UploadedImage! ) {
+  setProfileImage(image: $image) {
+    id
+    imageKey
+  }
+}`
 
+const SET_PROFILE_NAME = gql`
+mutation setProfileName ( $profileName: String! ) {
+  setProfileName(profileName: $profileName)
+}`
+
+const DELETE_PROFILE_IMAGE = gql`
+mutation deleteProfileImage {
+  deleteProfileImage {
+    imageURL
+  }
+}`
+
+const GET_S3_SIGNED_URL = gql`
+  mutation getSignedUrl($imageType: String!) {
+    getSignedUrl(imageType: $imageType) {
+      id,
+      key,
+      bucket,
+      X_Amz_Date,
+      X_Amz_Algorithm,
+      X_Amz_Signature,
+      X_Amz_Credential,
+      policy
+    }
+  }
+`;
 
 export {
   LIKE_LISTING
 , CREATE_CHAT
 , SET_AUTH_STATUS
 , UNSET_AUTH_STATUS
+, UPDATE_AUTH_STATUS
 , SET_COUNTRY
 , FACEBOOK_LOGIN
 , SEND_MESSAGE
 , CREATE_LISTING
 , DELETE_CHAT
+, SET_PROFILE_IMAGE
+, SET_PROFILE_NAME
+, DELETE_PROFILE_IMAGE
+, GET_S3_SIGNED_URL
 }

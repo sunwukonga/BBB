@@ -74,6 +74,7 @@ const stateLink = withClientState({
       __typename: 'MyProfile'
     , id: -1
     , profileName: ""
+    , nameChangeCount: 0
     , profileImageURL: ""
     }
   },
@@ -82,14 +83,46 @@ const stateLink = withClientState({
       setAuthStatus: (_, args, { cache }) => {
         console.log('setAuthStatus client-side mutation fired');
         token = args.token
-        cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'MyProfile', id: args.id, profileName: args.profileName, profileImageURL: args.profileImageURL }}});
+        cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'MyProfile', id: args.id, profileName: args.profileName, nameChangeCount: args.nameChangeCount, profileImageURL: args.profileImageURL }}});
         return { userId: args.id }
       },
       unsetAuthStatus: (_, args, { cache }) => {
         console.log('unsetAuthStatus client-side mutation fired');
         token = default_token
-        cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: -1, profileName: "", profileImageURL: "" }}});
+        cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: -1, profileName: "", nameChangeCount: 0, profileImageURL: "" }}});
         return null;
+      },
+      updateAuthStatus: (_, args, { cache }) => {
+        console.log('updateAuthStatus client-side mutation fired');
+          let change = false
+          let newMyProfile = {
+            __typename: 'MyProfile'
+          , id: args.id
+          }
+          if (args.profileName) {
+            if (args.nameChangeCount) {
+              newMyProfile.profileName = args.profileName
+              newMyProfile.nameChangeCount = args.nameChangeCount
+              change = true
+            } else {
+              console.log("udateAuthStatus: profileName AND nameChangeCount must be set together")
+            }
+          }
+          if (args.profileImageURL) {
+            newMyProfile.profileImageURL = args.profileImageURL
+            change = true
+          }
+          let writeObject = {
+            data: {
+              myProfile: newMyProfile
+            }
+          }
+          if (change) {
+            cache.writeData( writeObject )
+          } else {
+            console.log("udateAuthStatus: no valid data supplied to be updated")
+          }
+        return null
       },
       setCountry: (_, args, { cache }) => {
         console.log('setCountry client-side mutation fired');

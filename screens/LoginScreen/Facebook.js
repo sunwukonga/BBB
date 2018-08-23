@@ -54,11 +54,11 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
 
     onBBToken = ( {user, token} ) => {
       if (user.profileImage.imageKey) {
-        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: Urls.s3ImagesUrl +  user.profileImage.imageURL}});
+        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, nameChangeCount: user.nameChangeCount, profileImageURL: Urls.s3ImagesURL +  user.profileImage.imageKey}});
       } else if (user.profileImage.imageURL) {
-        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: user.profileImage.imageURL}});
+        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, nameChangeCount: user.nameChangeCount, profileImageURL: user.profileImage.imageURL}});
       } else {
-        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, profileImageURL: null}});
+        return this.props.mutate({ variables: {token: token, id: user.id, profileName: user.profileName, nameChangeCount: user.nameChangeCount, profileImageURL: null}});
       }
     };
 

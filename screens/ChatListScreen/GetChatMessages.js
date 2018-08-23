@@ -15,6 +15,7 @@ import {
 import styles from './styles';
 import Baby from '../../components/Baby';
 import { withNavigation } from 'react-navigation'
+import { Urls } from '../../../constants/';
 
 import {
   GET_CHAT_MESSAGES
@@ -29,13 +30,13 @@ class ListChatMessages extends Component {
     if ( chat.listing && chat.listing.user && chat.listing.user.id != chat.userId ) {
       return (
        ( chat.listing.user.profileImage && chat.listing.user.profileImage.imageKey )
-       ? <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+       ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
        : <Baby style={styles.rowImage} />
       )
     } else if ( chat && chat.initUser ) {
       return (
        ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey )
-       ? <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/" + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
+       ? <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
        : <Baby style={styles.rowImage} />
       )
     }
@@ -76,7 +77,7 @@ class ListChatMessages extends Component {
           <View style={styles.titleview}>
           { item.listing.primaryImage===null ||  item.listing.primaryImage.imageKey===null
             ? <Baby style={styles.rowImage} />
-            : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.listing.primaryImage.imageKey}} style={styles.rowImage} />
+            : <Image source={{ uri: Urls.s3ImagesURL + item.listing.primaryImage.imageKey }} style={styles.rowImage} />
           }
             <Text style={styles.title}>{item.listing.title}</Text>
           </View>

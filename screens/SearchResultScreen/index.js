@@ -33,7 +33,7 @@ import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader';
 import styles from './styles';
 import BBBIcon from '../../components/BBBIcon';
-import { Layout, Colors, Images } from '../../constants/';
+import { Layout, Colors, Images, Urls } from '../../constants/';
 import IdentityVerification from '../../components/IdentityVerification';
 import Stars from '../../components/Stars';
 import getSearchProductList from './SearchListing';
@@ -194,7 +194,7 @@ export default class SearchResultScreen extends React.Component {
       <View>
       { item.primaryImage===null || item.primaryImage.imageKey===null
         ? <Image  source={Images.trollie} style={styles.rowImage} />
-        : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.primaryImage.imageKey+""}} style={styles.rowImage} />
+        : <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
       }
       <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
         <View >
@@ -222,7 +222,7 @@ export default class SearchResultScreen extends React.Component {
         <View style={styles.userProfileSec}>
 
           {item.user.profileImage===null || item.user.profileImage.imageKey===null ?   <Image  source={Images.tempUser} style={styles.userProfile} /> :
-              <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+              <Image source={{ uri: Urls.s3ImagesURL + item.user.primaryImage.imageKey }} style={styles.userProfile} />
           }
 
             <View style={item.user.online ? styles.userOnline : styles.userOffline} />

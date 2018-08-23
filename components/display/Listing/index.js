@@ -12,7 +12,7 @@ import {
 } from 'native-base';
 import { withNavigation } from 'react-navigation'
 import styles from './styles';
-import { Layout, Colors } from '../../../constants/';
+import { Layout, Colors, Urls } from '../../../constants/';
 import Baby from '../../Baby';
 import IdentityVerification from '../../IdentityVerification';
 import BBBIcon from '../../BBBIcon';
@@ -50,7 +50,7 @@ class Listing extends Component {
     } else {
       return (
         <View key={item.id} style={styles.swiperSec}>
-          <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.imageKey}} style={styles.rowImage} />
+          <Image source={{ uri: Urls.s3ImagesURL + item.imageKey }} style={styles.rowImage} />
         </View>
       )
     }
@@ -59,7 +59,7 @@ class Listing extends Component {
   collateImages( item ) {
     if ( w(item, ['primaryImage', 'imageKey'] ) ) {
       // primary image exists
-      if (w(item, ['secondaryImages', 'length'] > 0 ) ) {
+      if (w(item, ['secondaryImages', 'length'] ) > 0 ) {
         // secondary images may exist
         let secImages = item.secondaryImages.filter( image => image.imageKey )
         if ( secImages.length > 0 ) {
@@ -118,7 +118,7 @@ class Listing extends Component {
             <View style={styles.userProfileSec}>
               {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
                   <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-                : <Image source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/bbb-app-images/"+item.user.primaryImage.imageKey+""}} style={styles.userProfile} />
+                : <Image source={{ uri: Urls.s3ImagesURL + item.user.profileImage.imageKey }} style={styles.userProfile} />
               }
               <View style={item.user.online ? styles.userOnline : styles.userOffline} />
             </View>

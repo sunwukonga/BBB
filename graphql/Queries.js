@@ -555,6 +555,7 @@ query getLoginStatus @client {
   myProfile {
     id
     profileName
+    nameChangeCount
     profileImageURL
   }
 }`
@@ -753,6 +754,7 @@ query getListing($id:Int!){
     }
   }
 }`
+
 
 export {
   GET_MOST_RECENT_LIST

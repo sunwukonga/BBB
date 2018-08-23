@@ -11,5 +11,10 @@
 
 */
 
-export const GUEST = "guest";
-export const USER = "user";
+const GUEST = "guest";
+const USER = "user";
+
+export default {
+  GUEST
+, USER
+}
