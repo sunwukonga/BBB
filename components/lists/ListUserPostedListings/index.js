@@ -10,13 +10,13 @@ import styles from './styles';
 import { withNavigation } from 'react-navigation'
 
 import {
-  GET_USER_LIKED_LIST
-} from '../../graphql/Queries'
-import PureListItem from './PureListItem'
-import { w } from '../../utils/helpers.js'
+  GET_USER_POSTED_LIST
+} from '../../../graphql/Queries'
+import PureListItem from '../../../screens/HomeScreen/PureListItem'
+import { w } from '../../../utils/helpers.js'
 
 
-class ListUserLikedListings extends Component {
+class ListUserPostedListings extends Component {
   constructor(props) {
     super(props);
 
@@ -24,12 +24,6 @@ class ListUserLikedListings extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if ( w(this.props, ['item', 'liked']) !== w(nextProps, ['item', 'liked']) ) {
-      return true
-    }
-    if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
-      return true
-    }
     if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
       return true
     }
@@ -43,7 +37,7 @@ class ListUserLikedListings extends Component {
     }
     return (
       <Query
-        query = {GET_USER_LIKED_LIST}
+        query = {GET_USER_POSTED_LIST}
         variables = {Object.assign(variables, { countryCode: loginStatus.countryCode })}
         fetchPolicy="network-only"
       >
@@ -54,22 +48,21 @@ class ListUserLikedListings extends Component {
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
-          if (!data.getUserLikedListings || data.getUserLikedListings.length == 0) {
+          if (!data.getUserPostedListings || data.getUserPostedListings.length == 0) {
             return null
           }
-
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
                 <Text style={styles.populerText}>
-                  Your Liked Listings
+                  Your Listed Items
                 </Text>
               </View>
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
                 keyExtractor={(item, index) => index.toString()}
-                data = {data.getUserLikedListings || []}
+                data = {data.getUserPostedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
                 }
@@ -77,8 +70,8 @@ class ListUserLikedListings extends Component {
                 refreshing={networkStatus === 4 || networkStatus === 3}
                 onRefresh={() => refetch()}
                 onEndReached={() => {
-                  if ( data.getUserLikedListings.length % variables.limit == 0 ) {
-                    let nextPage = (data.getUserLikedListings.length / variables.limit >> 0) + 1
+                  if ( data.getUserPostedListings.length % variables.limit == 0 ) {
+                    let nextPage = (data.getUserPostedListings.length / variables.limit >> 0) + 1
                     if ( this.lastFetchedPage < nextPage ) {
                       return fetchMore({
                         variables: Object.assign({}, variables, { page: nextPage }),
@@ -88,14 +81,12 @@ class ListUserLikedListings extends Component {
                           if (!prev) {
                             prev = {}
                           }
-                          if (!prev.getUserLikedListings) {
-                            return {
-                              getUserLikedListings: fetchMoreResult.getUserLikedListings
-                            }
+                          if (!prev.getUserPostedListings) {
+                            prev.getUserPostedListings = []
                           }
                           return {
-                            getMostUserLikedings:
-                              fetchMoreResult.getUserLikedListings.reduce( (acc, cur) => {
+                            getUserPostedListings:
+                              fetchMoreResult.getUserPostedListings.reduce( (acc, cur) => {
                                 if ( listing = acc.find( listing => cur.id == listing.id ) ) {
                                   listing.chatId = cur.chatId
                                   listing.likes = cur.likes
@@ -105,7 +96,7 @@ class ListUserLikedListings extends Component {
                                   acc.push(cur)
                                   return acc
                                 }
-                              }, JSON.parse(JSON.stringify(prev.getUserLikedListings)))
+                              }, JSON.parse(JSON.stringify(prev.getUserPostedListings)))
                           }
                         }
                       })
@@ -121,4 +112,4 @@ class ListUserLikedListings extends Component {
   }
 }
 
-export default withNavigation(ListUserLikedListings)
+export default withNavigation(ListUserPostedListings)

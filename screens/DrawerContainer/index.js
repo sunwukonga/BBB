@@ -5,6 +5,7 @@ import { Container, Content, Text, Item } from 'native-base';
 
 // custom components
 import BBBIcon from '../../components/BBBIcon';
+import { Ionicons } from '@expo/vector-icons';
 
 // screen style
 import styles from './styles';
@@ -93,15 +94,15 @@ export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
               <Item
                 style={styles.borderView}
                 onPress={() => {
-                  navigation.navigate('notificationScreen')
+                  navigation.navigate('ownListingsScreen')
                 }}>
-                <BBBIcon
-                  name="Notification"
+                <Ionicons
+                  name="ios-images-outline"
                   size={Layout.moderateScale(20)}
                   color={Colors.secondaryColor}
                   style={styles.menuIcon}
                 />
-                <Text style={styles.uglyDrawerItem}>Notifications</Text>
+                <Text style={styles.uglyDrawerItem}>Your Listings</Text>
               </Item>
               <Item
                 style={styles.borderView}
@@ -171,3 +172,18 @@ export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
     }
   }
 );
+/*
+              <Item
+                style={styles.borderView}
+                onPress={() => {
+                  navigation.navigate('notificationScreen')
+                }}>
+                <BBBIcon
+                  name="Notification"
+                  size={Layout.moderateScale(20)}
+                  color={Colors.secondaryColor}
+                  style={styles.menuIcon}
+                />
+                <Text style={styles.uglyDrawerItem}>Notifications</Text>
+              </Item>
+*/

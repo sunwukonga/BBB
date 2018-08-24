@@ -7,6 +7,7 @@ import { Colors, Layout } from '../constants/';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import FavoriteScreen from '../screens/FavoriteScreen';
+import OwnListingsScreen from '../screens/OwnListingsScreen';
 import NotificationScreen from '../screens/NotificationScreen';
 import SettingScreen from '../screens/SettingScreen';
 import SupportScreen from '../screens/SupportScreen';
@@ -41,6 +42,7 @@ export default createStackNavigator(
   {
     homeDrawer: { screen: DrawerNavigator },
     favoriteScreen: { screen: FavoriteScreen },
+    ownListingsScreen: { screen: OwnListingsScreen },
     notificationScreen: { screen: NotificationScreen },
     settingScreen: { screen: SettingScreen },
     supportScreen: { screen: SupportScreen },

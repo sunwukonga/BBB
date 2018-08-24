@@ -5,6 +5,8 @@ import {
 , TouchableOpacity
 , AsyncStorage
 , BackHandler
+, FlatList
+, Alert
 } from 'react-native';
 // For creating Actions. Will move out to external file later
 import { NavigationActions } from 'react-navigation';
@@ -25,18 +27,17 @@ import {
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
+import { Ionicons } from '@expo/vector-icons';
 // style
 import styles from './styles';
 import headerStyles from '../../components/BBBHeader/styles';
-import { Layout, Colors, Images } from '../../constants/';
+import { Layout, Colors, Images, IconNames } from '../../constants/';
 
 // FlatLists with embedded Queries
 import ListRecentListings from './ListRecentListings'
 import ListVisitedListings from './ListVisitedListings'
 import ListLikedListings from './ListLikedListings'
 import ListUserVisitedListings from './ListUserVisitedListings'
-import ListUserLikedListings from './ListUserLikedListings'
-import ListUserPostedListings from './ListUserPostedListings'
 
 import likeProductApi from './LikeProductApi';
 import LoginStatus from './LoginStatus'
@@ -347,6 +348,26 @@ export default class HomeScreen extends React.Component {
                     </Item>
                   </View>
 
+              <FlatList
+                horizontal = {true}
+                contentContainerStyle={styles.listContent}
+                keyExtractor={(item, index) => index.toString()}
+                data = { IconNames || ["md-create"]}
+                renderItem={({ item }) => {
+                  return (
+                    <TouchableOpacity onPress={() => Alert.alert("IconName: " + item)}>
+                      <Ionicons
+                        name={item}
+                        size={Layout.moderateScale(24)}
+                        color={Colors.primaryColor}
+                        style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}
+                      />
+                    </TouchableOpacity>
+                  )
+                }}
+              />
+
+
                   <ListRecentListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
                   <View style={styles.adSec}>
                     <Text style={styles.mainadText}>
@@ -361,8 +382,6 @@ export default class HomeScreen extends React.Component {
                     <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
                     <View style={styles.hr} />
                     <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
-                    <ListUserLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
-                    <ListUserPostedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
                   </View>
                 </View>
               </Content>

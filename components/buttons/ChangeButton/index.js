@@ -23,7 +23,6 @@ class ChangeButton extends Component {
       <SelectAndUploadImage>{ selectAndUploadImage => (
         <SetProfileImage>{ mutateProfileImage => (
           <TouchableOpacity style={styles.favoriteIconSec} onPress={() => {
-            console.log("THIS IS WHERE I PRESS")
             selectAndUploadImage()
             .then( uploadedImage => mutateProfileImage( uploadedImage ) )
           }}>

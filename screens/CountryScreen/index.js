@@ -24,6 +24,12 @@ import Flag from 'react-native-round-flags';
 
 import {
   GET_COUNTRY_LIST
+, GET_MOST_RECENT_LIST
+, GET_MOST_VISITED_LIST
+, GET_MOST_LIKED_LIST
+, GET_USER_VISITED_LIST
+, GET_USER_LIKED_LIST
+, GET_USER_POSTED_LIST
 } from '../../graphql/Queries'
 import {
   SET_COUNTRY
@@ -48,7 +54,41 @@ export default class CountryScreen extends React.Component {
 
   renderItem = ({ item }) => {
     return (
-      <Mutation mutation={SET_COUNTRY}>
+      <Mutation
+        mutation = { SET_COUNTRY }
+        update = {(cache, { data: { setCountry } }) => {
+          cache.writeQuery({
+            query: GET_USER_LIKED_LIST
+          , variables: {"countryCode": item.isoCode}
+          , data: { getUserLikedListings: [] }
+          })
+          cache.writeQuery({
+            query: GET_USER_VISITED_LIST
+          , variables: {"countryCode": item.isoCode}
+          , data: { getUserVisitedListings: [] }
+          })
+          cache.writeQuery({
+            query: GET_USER_POSTED_LIST
+          , variables: {"countryCode": item.isoCode}
+          , data: { getUserPostedListings: [] }
+          })
+          cache.writeQuery({
+            query: GET_MOST_RECENT_LIST
+          , variables: {"countryCode": item.isoCode}
+          , data: { getMostRecentListings: [] }
+          })
+          cache.writeQuery({
+            query: GET_MOST_VISITED_LIST
+          , variables: {"countryCode": item.isoCode}
+          , data: { getMostVisitedListings: [] }
+          })
+          cache.writeQuery({
+            query: GET_MOST_LIKED_LIST
+          , variables: {"countryCode": item.isoCode}
+          , data: { getMostLikedListings: [] }
+          })
+        }}
+      >
         {(setCountry, { data }) => (
           <ListItem
             onPress={() => {

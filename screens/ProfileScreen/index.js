@@ -65,9 +65,7 @@ render() {
         <Container style={styles.container}>
           <BBBHeader title="Profile" leftComponent={ leftComponent } />
           <Content>
-
             <View>
-              <Text>{console.log("Info: ", loginStatus.myProfile)}</Text>
               <DisplayProfileImage imageURL={loginStatus.myProfile.profileImageURL} />
               <View style={{
                 borderWidth:1,
@@ -88,7 +86,7 @@ render() {
 
             </View>
             <View style={styles.getStartedContainer}>
-              <Text style={styles.getStartedText}>ProfileScreen</Text>
+              <View style={styles.hr} />
             </View>
 
           </Content>

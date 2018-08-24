@@ -49,22 +49,4 @@ export default StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'roboto-reguler',
   },
-	swiperSec: {
-		height: Layout.HEIGHT * 0.4,
-	},
-	rowImage: {
-		height: Layout.HEIGHT * 0.4,
-		width: Layout.WIDTH * 0.92,
-		borderWidth: Layout.moderateScale(1),
-		borderRadius: Layout.moderateScale(8),
-		borderColor: Colors.postmain,
-		resizeMode: 'cover',
-		alignSelf: 'center',
-  },
-  hr: {
-    borderWidth: 0.5,
-    borderColor: 'black',
-    width: '80%',
-    margin: '10%',
-  },
 })
