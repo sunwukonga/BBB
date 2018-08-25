@@ -33,7 +33,7 @@ export default class OwnListingsScreen extends React.Component {
 				transparent
 				onPress={() => this.props.navigation.goBack()}>
 				<BBBIcon
-					name="Menu"
+					name="BackArrow"
 					size={Layout.moderateScale(18)}
 					color={Colors.white}
 				/>

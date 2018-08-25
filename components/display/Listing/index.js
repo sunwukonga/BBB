@@ -116,21 +116,21 @@ class Listing extends Component {
         <Item style={styles.userItemDetailsSec}>
           <View style={{ flexDirection: 'row' }}>
             <View style={styles.userProfileSec}>
-              {item.user.profileImage===null || item.user.profileImage.imageKey===null ?
-                  <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+              { w(item, ['user', 'profileImage', 'imageKey']) === null
+                ? <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
                 : <Image source={{ uri: Urls.s3ImagesURL + item.user.profileImage.imageKey }} style={styles.userProfile} />
               }
-              <View style={item.user.online ? styles.userOnline : styles.userOffline} />
+              <View style={w(item, ['user', 'online']) ? styles.userOnline : styles.userOffline} />
             </View>
             <View style={styles.userNameSec}>
-              <Text style={styles.userName}>{item.user.profileName}</Text>
+              <Text style={styles.userName}>{w(item, ['user', 'profileName'])}</Text>
             </View>
           </View>
           <View style={styles.activeuserSec}>
             <IdentityVerification
               width={Layout.moderateScale(30)}
               height={Layout.moderateScale(30)}
-              level={item.user.idVerification}
+              level={w(item, ['user', 'idVerification'])}
             />
           </View>
         </Item>
@@ -147,9 +147,9 @@ class Listing extends Component {
               size={Layout.moderateScale(14)}
               styleOn={{ color: Colors.starcolor, marginTop: Layout.moderateScale(2) }}
               styleOff={{ color: Colors.lightGray, marginTop: Layout.moderateScale(2) }}
-              repeats={item.user.sellerRating}
+              repeats={w(item, ['user', 'sellerRating'])}
             />
-            <Text style={styles.ratingmsgct}> ({item.user.sellerRatingCount}) </Text>
+            <Text style={styles.ratingmsgct}> ({w(item, ['user', 'sellerRatingCount'])}) </Text>
           </View>
           <View style={styles.priceSec}>
             <Text style={styles.pricetext}>{item.saleMode.currency!==null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
@@ -164,7 +164,7 @@ class Listing extends Component {
         <View>
           <Text style={styles.regularLarge}>Category</Text>
           <Text style={[styles.regularSmall, styles.tagContainer]}>
-            {item.category.name}
+            {w(item, ['category', 'name'])}
           </Text>
         </View>
       </View>

@@ -388,6 +388,7 @@ export default class Dropdown extends PureComponent {
 			<TextField
 				{...props}
 				value={title}
+        label={"Label_" + title}
 				editable={false}
 				onChangeText={undefined}
 				renderAccessory={renderAccessory}

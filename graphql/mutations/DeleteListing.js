@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { graphql } from 'react-apollo'
 import {
-  LIKE_LISTING
-} from '../Mutations'
+  DELETE_LISTING
+} from '../../graphql/Mutations'
 import {
   GET_MOST_RECENT_LIST
 , GET_MOST_VISITED_LIST
@@ -13,64 +13,22 @@ import {
 } from '../Queries'
 //import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 
-export default ToggleLike = graphql(
-  LIKE_LISTING
-/*, {
-    options: (props) => ({
-      variables: {
-        width: props.size,
-        height: props.size,
-      },
-    })
-  } */
-) (
+export default DeleteListing = graphql(DELETE_LISTING) (
   class extends Component {
     constructor(props) {
       super(props)
     }
 
-   /*     data.updateQuery((previousResult) => ({
-            ...previousResult,
-            count: previousResult.count + 1,
-          })); */
-
-    updateUserLikedListings = (prevArray, newItem) => {
-      if (newItem.liked) {
-        return prevArray.filter( item => item.id != newItem.id )
-      } else {
-        let copiedItem = JSON.parse(JSON.stringify(newItem))
-        copiedItem.liked = true
-        copiedItem.likes = copiedItem.likes + 1
-        let nextArray = prevArray.filter( item => item.id != newItem.id )
-        nextArray.unshift( copiedItem )
-        return nextArray
-      }
-    }
-
-    adjustListing = (oldListing, item) => {
-      let listing = JSON.parse(JSON.stringify(oldListing))
-      if (listing.id == item.id) {
-        if (listing.liked) {
-          listing.likes = listing.likes - 1
-          listing.liked = false
-        } else {
-          listing.likes = listing.likes + 1
-          listing.liked = true
-        }
-      }
-      return listing
-    }
-
     render() {
-      let {item, loginStatus} = this.props
+      let { listingId, loginStatus } = this.props
 
 //      let optimisticResponse = optimisticCreateChat( item, currentUser )
 // , optimisticResponse: optimisticResponse
-  // TODO: variables below should be filled with the real country
-  // No need for limit or page
-      return this.props.children( (inputVariables) => this.props.mutate({
-          variables: inputVariables,
-          update: (cache, { data: { likeListing } }) => {
+      return this.props.children( () => this.props.mutate({
+        variables: { listingId: listingId },
+        update: (cache, { data: { deleteListing } }) => {
+          console.log("deleteListing: ", deleteListing)
+          if ( deleteListing ) {
             // ------------------- READING -------------------
             const { getUserLikedListings } = cache.readQuery({
               query: GET_USER_LIKED_LIST
@@ -97,40 +55,39 @@ export default ToggleLike = graphql(
             , variables: {"countryCode": loginStatus.countryCode}
             })
             // ------------------- WRITING -------------------
-            const newUserLikedListings = this.updateUserLikedListings( getUserLikedListings, item )
             cache.writeQuery({
               query: GET_USER_LIKED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getUserLikedListings : newUserLikedListings }
+            , data: { getUserLikedListings: getUserLikedListings.filter( listing => listing.id != listingId) }
             })
             cache.writeQuery({
               query: GET_USER_VISITED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getUserVisitedListings: getUserVisitedListings.map( listing => this.adjustListing(listing, item) )}
+            , data: { getUserVisitedListings: getUserVisitedListings.filter( listing => listing.id != listingId) }
             })
             cache.writeQuery({
               query: GET_USER_POSTED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getUserPostedListings: getUserPostedListings.map( listing => this.adjustListing(listing, item) )}
+            , data: { getUserPostedListings: getUserPostedListings.filter( listing => listing.id != listingId) }
             })
             cache.writeQuery({
               query: GET_MOST_RECENT_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getMostRecentListings: getMostRecentListings.map( listing => this.adjustListing(listing, item) )}
+            , data: { getMostRecentListings: getMostRecentListings.filter( listing => listing.id != listingId) }
             })
             cache.writeQuery({
               query: GET_MOST_VISITED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getMostVisitedListings: getMostVisitedListings.map( listing => this.adjustListing(listing, item) )}
+            , data: { getMostVisitedListings: getMostVisitedListings.filter( listing => listing.id != listingId) }
             })
             cache.writeQuery({
               query: GET_MOST_LIKED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getMostLikedListings: getMostLikedListings.map( listing => this.adjustListing(listing, item) )}
+            , data: { getMostLikedListings: getMostLikedListings.filter( listing => listing.id != listingId) }
             })
-          }
-        })
-      )
+          } // END if
+        }
+      }))
     }
   }
 )

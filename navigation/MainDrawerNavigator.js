@@ -21,6 +21,7 @@ import StrollersScreen from '../screens/StrollersScreen';
 import ChatListScreen from '../screens/ChatListScreen';
 import CreateNewItemScreen from '../screens/CreateNewItemScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import AboutUsScreen from '../screens/AboutUsScreen';
 
 
 import DrawerContainer from '../screens/DrawerContainer/';
@@ -55,6 +56,7 @@ export default createStackNavigator(
     chatListScreen: { screen: ChatListScreen },
     createNewItemScreen: { screen: CreateNewItemScreen },
     profileScreen: { screen: ProfileScreen },
+    aboutUsScreen: { screen: AboutUsScreen },
   },
   {
     headerMode: 'none',

@@ -44,6 +44,7 @@ import getCategoryList from './AllCategoryApi';
 import getTemplateList from './SearchTemplateApi';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
 import LoginStatus from '../HomeScreen/LoginStatus'
+import { w } from '../../utils/helpers.js'
 
 import CreateListing from '../../graphql/mutations/CreateListing'
 
@@ -867,409 +868,329 @@ export default class CreateNewItemScreen extends React.Component {
       <LoginStatus>{ loginStatus => (
         <CreateListing>{ mutateCreateListing => (
           <View>
-          <Button transparent onPress={() => {
-            mutateCreateListing( this.collateVariables( loginStatus.countryCode ))
-            .then(({ data }) => {
-              console.log("Listing Created: ", data.createListing)
-              this.props.navigation.navigate({
-                routeName: 'productDetailsScreen'
-              , params: {
-                  item: data.createListing
-                , loginStatus: loginStatus
-                }
+            <Button transparent onPress={() => {
+              mutateCreateListing( this.collateVariables( loginStatus.countryCode ))
+              .then(({ data }) => {
+                console.log("Listing Created: ", data.createListing)
+                this.props.navigation.navigate({
+                  routeName: 'productDetailsScreen'
+                , params: {
+                    item: data.createListing
+                  , loginStatus: loginStatus
+                  }
+                })
               })
-            })
-          }}>
-          <Ionicons
-          name="md-checkmark"
-          size={Layout.moderateScale(25)}
-          style={{ color: '#ffffff' }}
-          />
-          </Button>
+            }}>
+              <Ionicons
+              name="md-checkmark"
+              size={Layout.moderateScale(25)}
+              style={{ color: '#ffffff' }}
+              />
+            </Button>
           </View>
         )}</CreateListing>
       )}</LoginStatus>
     );
     var _this = this;
+
     return (
-
       <View style={styles.container}>
-      <BBBHeader
-      title="Create A New Item"
-      leftComponent={leftComponent}
-      rightComponent={rightComponent}
-      />
+        <BBBHeader
+        title="Create A New Item"
+        leftComponent={leftComponent}
+        rightComponent={rightComponent}
+        />
 
-      <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}>
-      <View style={styles.imagesMainView}>
-              <FlatList
-                horizontal={true}
-                data={this.state.images}
-                extraData={this.state}
-                keyExtractor={(item, index) => item.id }
-                renderItem={this._renderRow.bind(this)}
-                contentContainerStyle={styles.listContents}
-              />
-      </View>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+        >
+          <View style={styles.imagesMainView}>
+            <FlatList
+              horizontal={true}
+              data={this.state.images}
+              extraData={this.state}
+              keyExtractor={(item, index) => item.id }
+              renderItem={this._renderRow.bind(this)}
+              contentContainerStyle={styles.listContents}
+            />
+          </View>
+          <View style={styles.Descrip}>
+            <Text style={styles.txtTitle}>Title</Text>
+            <Item style={styles.txtInput} regular>
+              <Input  onChangeText={(text) => {
+                console.log("Title",text);
+                this.setState({ title:text});
+              }} />
+            </Item>
+          </View>
 
-      <View style={styles.Descrip}>
-      <Text style={styles.txtTitle}>Title</Text>
-      <Item style={styles.txtInput} regular>
-      <Input  onChangeText={(text) => {
-          console.log("Title",text);
-          this.setState({ title:text});
-      }} />
-      </Item>
-      </View>
-
-            <View style={styles.Descrip}>
-
+          <View style={styles.Descrip}>
             <Text style={styles.txtTitle}>Description</Text>
             <Item style={styles.txtInput} regular>
-            <Input
-            multiline={true}
-            style={{
-              height: Layout.HEIGHT * 0.1,
-                marginBottom: Layout.HEIGHT * 0.015,
-            }}
-            onChangeText={text => { this.setState({ longDesc:text }); }}
-             maxLength={1024}
-            />
-            <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
+              <Input
+                multiline={true}
+                style={{
+                  height: Layout.HEIGHT * 0.1,
+                  marginBottom: Layout.HEIGHT * 0.015,
+                }}
+                onChangeText={text => { this.setState({ longDesc:text }); }}
+                maxLength={1024}
+              />
+              <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
             </Item>
-            </View>
-
-
+          </View>
 
             <View style={styles.dataFacetoFace}>
-            <Text style={styles.txtTitle}>Category</Text>
-            <View>
-            <View style={styles.categoryTxtView}>
-
-            <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
-            {this.state.selectedCateName === null ?
-
-               <Text regular>Select Category</Text>
-
-                : (
-
-              <Text regular>{this.state.selectedCateName}</Text>
-            )}
-              </TouchableOpacity>
-              </View>
-            <ModalFilterPicker
-                key={1}
-                visible={this.state.visible}
-                onSelect={this.onSelect}
-                onCancel={this.onCancel}
-                selectedOption={this.state.selectedCateId}
-                options={this.state.allCategoryValueList}
-
-              />
-            </View>
-  </View>
-
-      <View style={styles.exchangeMode}>
-      <Text style={styles.txtExch}>Exchange Mode</Text>
-      <View style={styles.saleview}>
-      <TouchableOpacity onPress={this.onPressHeadSale}>
-      <View style={styles.saleHeader}>
-      {this.state.isCollapsedSale ? (
-        <Feather
-          name="circle"
-          style={{
-            width: Layout.moderateScale(30),
-            height: Layout.moderateScale(30),
-            fontSize: Layout.moderateScale(30),
-            color: '#c8c8c8',
-          }}
-        />
-      ) : (
-        <RedioSelected
-        width={Layout.moderateScale(30)}
-        height={Layout.moderateScale(30)}
-        />
-      )}
-      <Text style={styles.txtfacetoFace}>Sale</Text>
-      </View>
-      </TouchableOpacity>
-      {this.state.isCollapsedSale ? null : (
-        <View style={styles.bottomline} />
-      )}
-      <Collapsible collapsed={this.state.isCollapsedSale}>
-      <View style={styles.saleChild}>
-      <View style={styles.subFacetoFace}>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Currency</Text>
-      <Dropdown
-        data={dataCurrency}
-        labelHeight={0}
-        dropdownPosition={0}
-        baseColor="rgba(0, 0, 0, .00)"
-        containerStyle={styles.dateDropDown}
-        onChangeText={(value, index, data) => this.handleCurreny(value)}
-
-      />
-      </View>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Additional Cost</Text>
-      <Item style={styles.txtInput} regular>
-      <Input keyboardType="numeric"  onChangeText={(text) => this.setState({cost: text})} />
-      </Item>
-      </View>
-      </View>
-      <CheckBox
-      style={styles.chboxRemember}
-      onClick={() => _this.onClick(temp)}
-      onValueChange={() => this.setState({ counterOffer: !this.state.counterOffer })}
-      isChecked={this.state.counterOffer}
-      checkBoxColor={'#fff'}
-      rightText={'Allow counter offer'}
-      rightTextStyle={{
-        color: 'black',
-          fontSize: 20,
-          marginLeft: 20,
-          fontFamily: 'roboto-reguler',
-      }}
-      unCheckedImage={
-        <Ionicons
-        name="ios-square-outline"
-        size={Layout.moderateScale(20)}
-        color="black"
-        style={styles.cancle}
-        />
-      }
-      checkedImage={
-        <Ionicons
-        name="ios-checkbox-outline"
-        size={Layout.moderateScale(20)}
-        color="black"
-        style={styles.cancle}
-        />
-      }
-      />
-      </View>
-      </Collapsible>
-      </View>
-
-
-      <View style={styles.saleview}>
-      <TouchableOpacity onPress={this.onPressHeadDonate}>
-      <View style={styles.saleHeader}>
-      {this.state.isCollapsedDonate ? (
-        <Feather
-        name="circle"
-        style={{
-          width: Layout.moderateScale(30),
-            height: Layout.moderateScale(30),
-            fontSize: Layout.moderateScale(30),
-            color: '#c8c8c8',
-        }}
-        />
-      ) : (
-        <RedioSelected
-        width={Layout.moderateScale(30)}
-        height={Layout.moderateScale(30)}
-        />
-      )}
-      <Text style={styles.txtfacetoFace}>Donate</Text>
-      </View>
-      </TouchableOpacity>
-      {this.state.isCollapsedDonate ? null : (
-        <View style={styles.bottomline} />
-      )}
-      <Collapsible collapsed={this.state.isCollapsedDonate}>
-      <View style={styles.saleChild}>
-      <View style={styles.subFacetoFace}>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>
-      Address
-      </Text>
-      <Item style={styles.txtInput} regular>
-      <Input />
-      </Item>
-      </View>
-      </View>
-      </View>
-      </Collapsible>
-      </View>
-
-
-
-      </View>
-
-      <View style={styles.deliveryOption}>
-      <Text style={styles.txtDelOpt}>Delivery Options</Text>
-      <View style={styles.faceToFace}>
-      <Text style={styles.txtfacetoFace}>Face to Face</Text>
-      <View style={styles.bottomline} />
-      <View style={styles.subFacetoFace}>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Line 1</Text>
-      <Item style={styles.txtInput} regular>
-      <Input  onChangeText={(text) => {
-        this.setState({ address: { ...this.state.address, lineOne: text} });
-      }}   />
-      </Item>
-      <Text style={styles.txtTitle}>Line 2</Text>
-      <Item style={styles.txtInput} regular>
-      <Input onChangeText={(text) => {
-              this.setState({ address: { ...this.state.address, lineTwo: text} });
-      }} />
-      </Item>
-      <Text style={styles.txtTitle}>Postcode</Text>
-      <Item style={styles.txtInput} regular>
-      <Input onChangeText={(text) => {
-        this.setState({ address: { ...this.state.address, postcode: text} });
-      }} />
-      </Item>
-      </View>
-      <View style={styles.mapFacetoFace}>
-      <MapView
-      style={{ flex: 1 }}
-      initialRegion={{
-        latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-      }}
-      />
-      </View>
-      </View>
-      </View>
-
-      <View style={styles.regPost}>
-      <Text style={styles.txtfacetoFace}>Registered Post</Text>
-      <View style={styles.bottomline} />
-      <View style={styles.subFacetoFace}>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Currency</Text>
-      <Dropdown
-      data={dataCurrency}
-      labelHeight={0}
-      dropdownPosition={0}
-      baseColor="rgba(0, 0, 0, .00)"
-      containerStyle={styles.dateDropDown}
-        onChangeText={(value, index, data) =>{ this.setState({postCurrency:value}) } }
-      />
-      </View>
-      <View style={styles.dataFacetoFace}>
-      <Text style={styles.txtTitle}>Additional Cost</Text>
-      <Item style={styles.txtInput} regular>
-      <Input keyboardType="numeric" onChangeText={(text) =>{ this.setState({postCost:text}) } }/>
-      </Item>
-      </View>
-      </View>
-      </View>
-      </View>
-
-
-
-      <View style={styles.categoty}>
-
-      <View style={styles.dataFacetoFace}>
-
-
-      <Text style={styles.txtTitles}>Templates</Text>
-      <View>
-      <View style={styles.categoryTxtView}>
-
-      <TouchableOpacity  onPress={this.onShowTemplate}   style={styles.selectionInput}>
-      {this.state.selectedTemplateName === null ?   <Text regular>Select Template</Text> : (
-        <Text regular>{this.state.selectedTemplateName}</Text>
-      )}
-
-        </TouchableOpacity>
-        </View>
-
-        {this.state.searchTemplateValueList.length === 0 ? null : (
-      <ModalFilterPicker
-          key={2}
-          visible={this.state.templateVisible}
-          onSelect={this.onSelectTemplate}
-          onCancel={this.onCancel}
-            selectedOption={this.state.selectedTemplateName}
-          options={this.state.searchTemplateValueList}
-        />
-      )}
-        </View>
-
-      <View>
-      </View>
-
-      <Text style={styles.txtTitles}>Tags</Text>
-
-
-      <View style={styles.categoryTxtView}>
-
-      <TouchableOpacity  onPress={this.onShowTags}  style={styles.selectionInput}>
-      <Text regular>Select Tag</Text>
-        </TouchableOpacity>
-        </View>
-
-        {this.state.allTagList.length === 0 ? null : (
-      <ModalFilterPicker
-          key={3}
-          visible={this.state.tagVisible}
-          onSelect={this.onSelectTag}
-          onCancel={this.onCancel}
-          options={this.state.allTagList}
-        />
-      )}
+              <Text style={styles.txtTitle}>Category</Text>
               <View>
-                <ListView
-                  horizontal={true}
-                  contentContainerStyle={styles.listContent}
-                  dataSource={this.state.dataSourceTags}
-                  renderRow={this._renderRowTags.bind(this)}
-                  enableEmptySections
-                  pageSize={parseInt(this.state.pageSize)}
+                <View style={styles.categoryTxtView}>
+                  <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
+                  {this.state.selectedCateName === null
+                  ? <Text regular>Select Category</Text>
+                  : (
+                    <Text regular>{this.state.selectedCateName}</Text>
+                  )}
+                  </TouchableOpacity>
+                </View>
+                <ModalFilterPicker
+                  key={1}
+                  visible={this.state.visible}
+                  onSelect={this.onSelect}
+                  onCancel={this.onCancel}
+                  selectedOption={w(this, ['state', 'selectedCateId']) ? this.state.selectedCateId.toString() : ''}
+                  options={this.state.allCategoryValueList}
                 />
               </View>
             </View>
-          </View>
+
+              <View style={styles.exchangeMode}>
+                <Text style={styles.txtExch}>Exchange Mode</Text>
+                <View style={styles.saleview}>
+                  <TouchableOpacity onPress={this.onPressHeadSale}>
+                    <View style={styles.saleHeader}>
+                      {this.state.isCollapsedSale
+                      ? (
+                      <Feather
+                        name="circle"
+                        style={{
+                          width: Layout.moderateScale(30),
+                          height: Layout.moderateScale(30),
+                          fontSize: Layout.moderateScale(30),
+                          color: '#c8c8c8',
+                        }}
+                      />
+                      ) : (
+                      <RedioSelected width={Layout.moderateScale(30)} height={Layout.moderateScale(30)} />
+                      )}
+                      <Text style={styles.txtfacetoFace}>Sale</Text>
+                    </View>
+                  </TouchableOpacity>
+                  {this.state.isCollapsedSale ? null : (
+                  <View style={styles.bottomline} />
+                  )}
+                  <Collapsible collapsed={this.state.isCollapsedSale}>
+                    <View style={styles.saleChild}>
+                      <View style={styles.subFacetoFace}>
+                        <View style={styles.dataFacetoFace}>
+                          <Text style={styles.txtTitle}>Currency</Text>
+                          <Dropdown
+                            data={dataCurrency}
+                            labelHeight={0}
+                            dropdownPosition={0}
+                            baseColor="rgba(0, 0, 0, .00)"
+                            containerStyle={styles.dateDropDown}
+                            onChangeText={(value, index, data) => this.handleCurreny(value)}
+                          />
+                        </View>
+                        <View style={styles.dataFacetoFace}>
+                          <Text style={styles.txtTitle}>Price</Text>
+                          <Item style={styles.txtInput} regular>
+                            <Input keyboardType="numeric"  onChangeText={(text) => this.setState({cost: text})} />
+                          </Item>
+                        </View>
+                      </View>
+                      <CheckBox
+                        style={styles.chboxRemember}
+                        onClick={() => _this.onClick(temp)}
+                        onValueChange={() => this.setState({ counterOffer: !this.state.counterOffer })}
+                        isChecked={this.state.counterOffer}
+                        checkBoxColor={'#fff'}
+                        rightText={'Allow counter offer'}
+                        rightTextStyle={{
+                          color: 'black',
+                            fontSize: 20,
+                            marginLeft: 20,
+                            fontFamily: 'roboto-reguler',
+                        }}
+                        unCheckedImage={
+                          <Ionicons
+                          name="ios-square-outline"
+                          size={Layout.moderateScale(20)}
+                          color="black"
+                          style={styles.cancle}
+                          />
+                        }
+                        checkedImage={
+                          <Ionicons
+                          name="ios-checkbox-outline"
+                          size={Layout.moderateScale(20)}
+                          color="black"
+                          style={styles.cancle}
+                          />
+                        }
+                      />
+                    </View>
+                  </Collapsible>
+                </View>
+
+                <View style={styles.saleview}>
+                  <TouchableOpacity onPress={this.onPressHeadDonate}>
+                    <View style={styles.saleHeader}>
+                      {this.state.isCollapsedDonate ? (
+                        <Feather
+                        name="circle"
+                        style={{
+                          width: Layout.moderateScale(30),
+                            height: Layout.moderateScale(30),
+                            fontSize: Layout.moderateScale(30),
+                            color: '#c8c8c8',
+                        }}
+                        />
+                      ) : (
+                        <RedioSelected
+                        width={Layout.moderateScale(30)}
+                        height={Layout.moderateScale(30)}
+                        />
+                      )}
+                      <Text style={styles.txtfacetoFace}>Donate</Text>
+                    </View>
+                  </TouchableOpacity>
+                  {this.state.isCollapsedDonate ? null : (
+                  <View style={styles.bottomline} />
+                  )}
+                  <Collapsible collapsed={this.state.isCollapsedDonate}>
+                    <View style={styles.saleChild}>
+                      <View style={styles.subFacetoFace}>
+                        <View style={styles.dataFacetoFace}>
+                          <Text style={styles.txtTitle}>Address</Text>
+                          <Item style={styles.txtInput} regular>
+                            <Input />
+                          </Item>
+                        </View>
+                      </View>
+                    </View>
+                  </Collapsible>
+                </View>
+              </View>
+
+              <View style={styles.deliveryOption}>
+                <Text style={styles.txtDelOpt}>Delivery Options</Text>
+                <View style={styles.faceToFace}>
+                  <Text style={styles.txtfacetoFace}>Face to Face</Text>
+                  <View style={styles.bottomline} />
+                  <View style={styles.subFacetoFace}>
+                    <View style={styles.dataFacetoFace}>
+                      <Text style={styles.txtTitle}>Line 1</Text>
+                      <Item style={styles.txtInput} regular>
+                      <Input  onChangeText={(text) => {
+                        this.setState({ address: { ...this.state.address, lineOne: text} });
+                      }}   />
+                      </Item>
+                      <Text style={styles.txtTitle}>Line 2</Text>
+                      <Item style={styles.txtInput} regular>
+                        <Input onChangeText={(text) => {
+                          this.setState({ address: { ...this.state.address, lineTwo: text} });
+                        }} />
+                      </Item>
+                      <Text style={styles.txtTitle}>Postcode</Text>
+                      <Item style={styles.txtInput} regular>
+                        <Input onChangeText={(text) => {
+                          this.setState({ address: { ...this.state.address, postcode: text} });
+                        }} />
+                      </Item>
+                    </View>
+                    <View style={styles.mapFacetoFace}>
+                      <MapView
+                      style={{ flex: 1 }}
+                      initialRegion={{
+                        latitude: 37.78825,
+                          longitude: -122.4324,
+                          latitudeDelta: 0.0922,
+                          longitudeDelta: 0.0421,
+                      }}
+                      />
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.regPost}>
+                  <Text style={styles.txtfacetoFace}>Registered Post</Text>
+                  <View style={styles.bottomline} />
+                  <View style={styles.subFacetoFace}>
+                    <View style={styles.dataFacetoFace}>
+                    <Text style={styles.txtTitle}>Currency</Text>
+                    <Dropdown
+                    data={dataCurrency}
+                    labelHeight={0}
+                    dropdownPosition={0}
+                    baseColor="rgba(0, 0, 0, .00)"
+                    containerStyle={styles.dateDropDown}
+                      onChangeText={(value, index, data) =>{ this.setState({postCurrency:value}) } }
+                    />
+                    </View>
+                    <View style={styles.dataFacetoFace}>
+                      <Text style={styles.txtTitle}>Postal Cost</Text>
+                      <Item style={styles.txtInput} regular>
+                        <Input keyboardType="numeric" onChangeText={(text) =>{ this.setState({postCost:text}) } }/>
+                      </Item>
+                    </View>
+                  </View>
+                </View>
+              </View>
+
+              <View style={{ padding: Layout.HEIGHT * 0.1}} />
         </ScrollView>
 
         <ProgressDialog
           visible={this.state.progressVisible}
           message={this.state.progressMsg}
-          activityIndicatorSize="large"
-          activityIndicatorColor="blue"
+          activityIndicatorColor='blue'
         />
 
        <Dialog
-           visible={this.state.showDialog}
-           title={this.state.dialogTitle}
-           onTouchOutside={() => this.setState({showDialog:false})}
-           contentStyle={{ justifyContent: 'center', alignItems: 'center' }}
-           animationType="fade">
-           <Text style={{ marginBottom: 10,	color: 'black' }}>{this.state.errorMsg}</Text>
-           <TouchableOpacity
-                style={{
-                      marginRight:40,
-                      marginLeft:40,
-                      marginTop:10,
-                      paddingTop:10,
-                      paddingBottom:10,
-                      backgroundColor:'#00A6A4',
-                      borderRadius:10,
-                      borderWidth: 1,
-                      borderColor: '#fff'
-                    }}
-                     onPress={() => this.setState({showDialog:false})}
-                     underlayColor='#fff'>
-                     <Text style={{
-                          color:'#fff',
-                          textAlign:'center',
-                          paddingLeft : 10,
-                          paddingRight : 10
-                        }}>Ok</Text>
-            </TouchableOpacity>
+         visible={this.state.showDialog}
+         title={this.state.dialogTitle}
+         onTouchOutside={() => this.setState({showDialog:false})}
+         contentStyle={{ justifyContent: 'center', alignItems: 'center' }}
+         animationType="fade"
+       >
+         <Text style={{ marginBottom: 10,	color: 'black' }}>{this.state.errorMsg}</Text>
+         <TouchableOpacity
+           style={{
+             marginRight:40,
+             marginLeft:40,
+             marginTop:10,
+             paddingTop:10,
+             paddingBottom:10,
+             backgroundColor:'#00A6A4',
+             borderRadius:10,
+             borderWidth: 1,
+             borderColor: '#fff'
+           }}
+           onPress={() => this.setState({showDialog:false})}
+           underlayColor='#fff'
+         >
+           <Text style={{
+             color:'#fff',
+             textAlign:'center',
+             paddingLeft : 10,
+             paddingRight : 10
+           }}>Ok</Text>
+         </TouchableOpacity>
        </Dialog>
       </View>
-    );
+    )
   }
   onShow = () => {
     this.setState({ visible: true });
@@ -1359,3 +1280,59 @@ export default class CreateNewItemScreen extends React.Component {
     });
   }
 }
+
+/*
+              <View style={styles.categoty}>
+                <View style={styles.dataFacetoFace}>
+                  <Text style={styles.txtTitles}>Templates</Text>
+                  <View>
+                    <View style={styles.categoryTxtView}>
+                      <TouchableOpacity  onPress={this.onShowTemplate}   style={styles.selectionInput}>
+                      {this.state.selectedTemplateName === null ?   <Text regular>Select Template</Text> : (
+                        <Text regular>{this.state.selectedTemplateName}</Text>
+                      )}
+                      </TouchableOpacity>
+                    </View>
+                    {this.state.searchTemplateValueList.length === 0 ? null : (
+                    <ModalFilterPicker
+                      key={2}
+                      visible={this.state.templateVisible}
+                      onSelect={this.onSelectTemplate}
+                      onCancel={this.onCancel}
+                      selectedOption={this.state.selectedTemplateName}
+                      options={this.state.searchTemplateValueList}
+                    />
+                    )}
+                  </View>
+                <View>
+              </View>
+
+              <Text style={styles.txtTitles}>Tags</Text>
+              <View style={styles.categoryTxtView}>
+                <TouchableOpacity  onPress={this.onShowTags}  style={styles.selectionInput}>
+                  <Text regular>Select Tag</Text>
+                </TouchableOpacity>
+              </View>
+
+              {this.state.allTagList.length === 0 ? null : (
+              <ModalFilterPicker
+                key={3}
+                visible={this.state.tagVisible}
+                onSelect={this.onSelectTag}
+                onCancel={this.onCancel}
+                options={this.state.allTagList}
+              />
+              )}
+              <View>
+                <ListView
+                  horizontal={true}
+                  contentContainerStyle={styles.listContent}
+                  dataSource={this.state.dataSourceTags}
+                  renderRow={this._renderRowTags.bind(this)}
+                  enableEmptySections
+                  pageSize={parseInt(this.state.pageSize)}
+                />
+              </View>
+            </View>
+          </View>
+*/

@@ -175,6 +175,11 @@ mutation deleteChat($chatId: Int!) {
   deleteChat(chatId: $chatId)
 }`
 
+const DELETE_LISTING = gql`
+mutation deleteListing($listingId: Int!) {
+  deleteListing(listingId: $listingId)
+}`
+
 const SEND_MESSAGE = gql`
 mutation sendChatMessage($chatId: Int!, $message: String,$image:UploadedImage,$lastMessageId:Int) {
   sendChatMessage(chatId: $chatId, message: $message,image:$image,lastMessageId:$lastMessageId) {
@@ -354,6 +359,7 @@ export {
 , SEND_MESSAGE
 , CREATE_LISTING
 , DELETE_CHAT
+, DELETE_LISTING
 , SET_PROFILE_IMAGE
 , SET_PROFILE_NAME
 , DELETE_PROFILE_IMAGE

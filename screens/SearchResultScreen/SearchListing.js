@@ -9,32 +9,47 @@ query searchListing($terms:[String],$limit:Int,$page:Int,$filter:Filters!){
     id
     title
     description
-    secondaryImages {
+    category {
       id
-      imageKey
+      name
     }
     primaryImage {
       id
       imageKey
     }
+    secondaryImages {
+      id
+      imageKey
+    }
     saleMode {
+      id
       price
       counterOffer
       currency {
-        symbolPrepend
-        disabled
-        currencySymbol
+        iso4217
         currencyName
+        currencySymbol
       }
       mode
-     exchangeModes {
-       price
-       currency {
-         symbolPrepend
-         disabled
-       }
-       mode
-     }
+      exchangeModes {
+        id
+        mode
+        price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
+      }
     }
     template {
       id
@@ -48,17 +63,18 @@ query searchListing($terms:[String],$limit:Int,$page:Int,$filter:Filters!){
         id
         imageKey
       }
-      tags {
+      tags{
         id
         name
       }
     }
-    categoryId
-    tags {
+    tags{
       id
+      name
     }
-    liked
+    viewers
     likes
+    liked
     chatId
     user {
       id
@@ -67,21 +83,14 @@ query searchListing($terms:[String],$limit:Int,$page:Int,$filter:Filters!){
       profileName
       profileImage {
         id
+        imageURL
         imageKey
       }
-      sellerRatingCount
       sellerRating
-      idVerification
+      sellerRatingCount
       online
-      country {
-        isoCode
-        name
-        tld
-      }
-
+      idVerification
     }
-    viewers
-
   }
 }`;
 

@@ -71,6 +71,7 @@ export default class HomeScreen extends React.Component {
   }
 
   openDrawerAndSetState = () => {
+    console.log("openDrawerAndSetState")
     this.drawerOpen = true
     this.props.navigation.openDrawer()
   }
@@ -93,14 +94,14 @@ export default class HomeScreen extends React.Component {
         this.drawerOpen = true
           console.log('<===============>DrawerOpen');
         this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
-          console.log('Listener ADDED');
+          console.log('Listener ADDED && drawerOpen:true');
       }
       if (state && action.type === 'Navigation/DRAWER_CLOSED') {
         this.drawerOpen = false
           console.log('<|||||||||||||||>DrawerClose');
         this.drawerBackHandler.remove()
         this.drawerBackHandler = null
-          console.log('Listener REMOVED');
+          console.log('Listener REMOVED && drawerOpen:false');
       }
       return defaultGetStateForAction(action, state);
     };
@@ -196,6 +197,7 @@ export default class HomeScreen extends React.Component {
         }
         if ( this.props.navigation.state && this.props.navigation.state.params ) {
           if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
+            this.props.navigation.state.params.doAction = ''
             this.openDrawerAndSetState()
           }
         }
@@ -340,11 +342,15 @@ export default class HomeScreen extends React.Component {
                         onChangeText={(text) => {
                             this.setState({ searchTerms:text});
                         }}
-                        onSubmitEditing={(content) =>
+                        onSubmitEditing={ () =>
                           this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})
                         }
                       />
-                      <BBBIcon name="Search" style={styles.searchicon} />
+                      <TouchableOpacity onPress={() =>
+                        this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})
+                      }>
+                        <BBBIcon name="Search" style={styles.searchicon} />
+                      </TouchableOpacity>
                     </Item>
                   </View>
 

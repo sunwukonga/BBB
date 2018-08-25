@@ -292,7 +292,7 @@ export default class ChatScreen extends Component {
             if (!data.getChatMessages || data.getChatMessages.length == 0) {
               return (
                 <View style={styles.left}>
-                  <Text style={[styles.title, styles.clearMarginTop]}>No love? Maybe you need more listings ;)</Text>
+                  <Text style={[styles.title, styles.clearMarginTop]}>Apparently there's no chat by that ID</Text>
                 </View>
               )
             }

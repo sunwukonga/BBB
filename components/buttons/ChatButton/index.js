@@ -9,6 +9,7 @@ import { Layout, Colors } from '../../../constants/';
 import BBBIcon from '../../BBBIcon';
 import { withNavigation, NavigationActions } from 'react-navigation'
 import { w } from '../../../utils/helpers.js'
+import CreateChat from '../../../graphql/mutations/CreateChat'
 
 const NA_HomeToLoginToChat = ( item, mutateCreateChat ) => NavigationActions.navigate({
   routeName: 'loginScreen'
@@ -58,7 +59,7 @@ class ChatButton extends Component {
   render() {
     const {item, loginStatus, chatIndexes, currentUser} = this.props
 
-    if (loginStatus.myProfile.id == item.user.id) {
+    if (loginStatus.myProfile.id == w(item, ['user', 'id'])) {
       // Cannot chat with yourself. Button should not exist.
       return null
     } else {

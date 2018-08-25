@@ -30,10 +30,6 @@ const NA_LikeToLoginToHome = ( item, mutateToggleLike ) => NavigationActions.nav
 class LikeButton extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      toggle: true
-    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -65,7 +61,7 @@ class LikeButton extends Component {
   render() {
     const {item, loginStatus} = this.props
 
-    if (loginStatus.myProfile.id == item.user.id) {
+    if (loginStatus.myProfile.id == w(item, ['user', 'id'])) {
       // Cannot like your own listing. Button should not exist.
       return null
     } else {

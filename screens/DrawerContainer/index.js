@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { View, Image, TouchableOpacity} from 'react-native';
+import { Alert, View, Image, TouchableOpacity} from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Container, Content, Text, Item } from 'native-base';
 
@@ -120,20 +120,29 @@ export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
               <Item
                 style={styles.borderView}
                 onPress={() => {
-                  navigation.navigate('settingScreen')
+                  navigation.navigate('aboutUsScreen')
                 }}>
-                <BBBIcon
-                  name="Settings"
+                <Ionicons
+                  name="ios-link-outline"
                   size={Layout.moderateScale(20)}
                   color={Colors.secondaryColor}
                   style={styles.menuIcon}
                 />
-                <Text style={styles.uglyDrawerItem}>Settings</Text>
+                <Text style={styles.uglyDrawerItem}>About Us</Text>
               </Item>
               <Item
                 style={styles.borderView}
                 onPress={() => {
-                  navigation.navigate('supportScreen')
+                  Alert.alert(
+                    'Work In Progress',
+                    'This feature is currently in development',
+                    [
+                      {text: 'OK', onPress: () => {
+                      }},
+                    ],
+                    { cancelable: true }
+                  )
+                    //navigation.navigate('supportScreen')
                 }}>
                 <BBBIcon
                   name="Support"

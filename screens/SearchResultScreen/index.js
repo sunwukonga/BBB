@@ -36,6 +36,7 @@ import BBBIcon from '../../components/BBBIcon';
 import { Layout, Colors, Images, Urls } from '../../constants/';
 import IdentityVerification from '../../components/IdentityVerification';
 import Stars from '../../components/Stars';
+import LoginStatus from '../HomeScreen/LoginStatus'
 import getSearchProductList from './SearchListing';
 
 var mode="SALE",searchTerms="",rating=null,verification=null,priceMax=null,priceMin=null,categories=[],templates=[],tags=[],counterOffer=null,distance=null;
@@ -90,7 +91,7 @@ export default class SearchResultScreen extends React.Component {
 		counterOffer=nextProps.navigation.state.params.counterOffer;
 		priceMax=nextProps.navigation.state.params.maxPrice;
 		priceMin=nextProps.navigation.state.params.minPrice;
-		var category=nextProps.navigation.state.params.categoryId;
+		var category=nextProps.navigation.state.params.category.id;
 		var templateId=nextProps.navigation.state.params.templateId;
 		var tagId=nextProps.navigation.state.params.tagId;
 		if(templateId!=null){
@@ -184,38 +185,22 @@ export default class SearchResultScreen extends React.Component {
   }
 
 
-  _renderItem = ({ item }) => (
+  _renderItem = ({ item }, loginStatus) => (
     <TouchableOpacity
       style={styles.imagesSubView}
       onPress={() =>   this.props.navigation.navigate({
 		        routeName: 'productDetailsScreen',
-		        params: { previous_screen: 'searchResultScreen',item:item}
+		        params: {
+              previous_screen: 'searchResultScreen'
+            , item: item
+            , loginStatus: loginStatus
+            }
 		    })}>
       <View>
       { item.primaryImage===null || item.primaryImage.imageKey===null
         ? <Image  source={Images.trollie} style={styles.rowImage} />
         : <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
       }
-      <TouchableOpacity style={styles.favoriteIconSec} onPress={() => alert('Favorite Clicked')}>
-        <View >
-          <BBBIcon
-            name="Favorite"
-            size={Layout.moderateScale(13)}
-            color={item.liked ? Colors.tintColor : Colors.white}
-            style={styles.icons}
-          />
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.chatIconSec} onPress={() => this.goChat(item)}>
-        <View >
-          <BBBIcon
-            name="Chat"
-            size={Layout.moderateScale(13)}
-            color={item.chatId!==null ? Colors.tintColor : Colors.white}
-            style={styles.icons}
-          />
-        </View>
-      </TouchableOpacity>
     </View>
     <View style={styles.userdetailSec}>
       <Item style={styles.userItemDetailsSec}>
@@ -326,6 +311,7 @@ export default class SearchResultScreen extends React.Component {
 				);
 			}
   		return (
+        <LoginStatus>{ loginStatus => (
   			<Container style={styles.container}>
   				<BBBHeader
   					title="Search Result"
@@ -341,7 +327,7 @@ export default class SearchResultScreen extends React.Component {
             <FlatList
     							data={this.state.searchList}
     							keyExtractor={listItemData => ''+listItemData.id}
-    							renderItem={this._renderItem}
+    							renderItem={(item) => this._renderItem(item, loginStatus)}
 									contentContainerStyle={styles.listContent}
 	                onEndReached={this.onEndReached.bind(this)}
 	                onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
@@ -356,6 +342,7 @@ export default class SearchResultScreen extends React.Component {
               activityIndicatorSize="large"
                          />
   			</Container>
+        )}</LoginStatus>
   		);
   	}
 
