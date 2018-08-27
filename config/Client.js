@@ -25,6 +25,8 @@ const cache = new InMemoryCache({
     Query: {
       getListing: (_, { id }, { getCacheKey }) =>
         getCacheKey({ __typename: 'Listing', id })
+    , getCachedCountry: (_, { isoCode }, { getCacheKey }) =>
+        getCacheKey({ __typename: 'Country', isoCode })
     }
   },
 });

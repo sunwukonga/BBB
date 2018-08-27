@@ -58,6 +58,7 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
           , dest: 'createNewItemScreen'}
 })
 
+const showIcons = false
 
 export default class HomeScreen extends React.Component {
 
@@ -353,7 +354,7 @@ export default class HomeScreen extends React.Component {
                       </TouchableOpacity>
                     </Item>
                   </View>
-
+              { showIcons ?
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
@@ -372,7 +373,7 @@ export default class HomeScreen extends React.Component {
                   )
                 }}
               />
-
+              : null }
 
                   <ListRecentListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
                   <View style={styles.adSec}>

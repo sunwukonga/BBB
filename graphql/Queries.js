@@ -577,6 +577,23 @@ query {
   }
 }`
 
+const GET_CACHED_COUNTRY = gql`
+query getCachedCountry($isoCode: Int!) {
+  getCachedCountry(isoCode: $isoCode) @client {
+    isoCode
+    name
+    currencies {
+      iso4217
+      currencyName
+      currencySymbol
+    }
+    languages {
+      iso639_2
+      name
+    }
+  }
+}`
+
 const GET_CHAT_MESSAGES = gql`
 query getChatMessages($chatIndexes:[ChatIndex]) {
   getChatMessages(chatIndexes:$chatIndexes) {
@@ -755,6 +772,17 @@ query getListing($id:Int!){
   }
 }`
 
+const GET_NESTED_CATEGORY_LIST = gql`
+query {
+  allCategoriesNested {
+    id
+    name
+    children {
+      id
+      name
+    }
+  }
+}`;
 
 export {
   GET_MOST_RECENT_LIST
@@ -765,7 +793,9 @@ export {
 , GET_USER_POSTED_LIST
 , GET_LOGIN_STATUS
 , GET_COUNTRY_LIST
+, GET_CACHED_COUNTRY
 , GET_CHAT_MESSAGES
 , GET_PROFILE
 , GET_LISTING
+, GET_NESTED_CATEGORY_LIST
 }

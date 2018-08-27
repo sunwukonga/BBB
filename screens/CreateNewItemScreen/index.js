@@ -9,6 +9,7 @@ import {
 , ListView
 , FlatList
 , TextInput
+, Picker
 } from 'react-native';
 import {
   ActionSheet,
@@ -47,6 +48,7 @@ import LoginStatus from '../HomeScreen/LoginStatus'
 import { w } from '../../utils/helpers.js'
 
 import CreateListing from '../../graphql/mutations/CreateListing'
+import GetCachedCountry from '../../graphql/queries/GetCachedCountry'
 
 import Collapsible from 'react-native-collapsible';
 const dataObjectsCates = [];
@@ -59,6 +61,8 @@ Catgeory List Details
 */
 var allCategoryList = [];
 var allCategoryValueList = [];
+var currency = ''
+var postcurrency = ''
 export default class CreateNewItemScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -124,7 +128,6 @@ export default class CreateNewItemScreen extends React.Component {
       mode: SALE,
 
       images: imageList,
-      currency: '',
       cost: 0.0,
       counterOffer: false,
       template: null,
@@ -137,7 +140,6 @@ export default class CreateNewItemScreen extends React.Component {
                , directions: ''
       },
       postCost: 0.0,
-      postCurrency: "",
       shortDesc: null,
       longDesc: '',
       category: '',
@@ -175,22 +177,23 @@ export default class CreateNewItemScreen extends React.Component {
         return false;
     }
     if(this.state.address.lineOne.length>=1 || this.state.address.lineTwo.length>=1 || this.state.address.postcode.length>=1){
-          if(this.state.address.lineOne.length===0){
-            Toast.show("Please Enter Address Line 1",Toast.SHORT)
-            return false;
-          }
-          if(this.state.address.lineTwo.length===0){
-             Toast.show("Please Enter Address Line 2",Toast.SHORT)
-              return false;
-          }
-          if(this.state.address.postcode.length===0){
-              Toast.show("Please Enter Postcode",Toast.SHORT)
-              return false;
-          }
-        }
+      if(this.state.address.lineOne.length===0){
+        Toast.show("Please Enter Address Line 1",Toast.SHORT)
+        return false;
+      }
+      if(this.state.address.lineTwo.length===0){
+         Toast.show("Please Enter Address Line 2",Toast.SHORT)
+          return false;
+      }
+      if(this.state.address.postcode.length===0){
+          Toast.show("Please Enter Postcode",Toast.SHORT)
+          return false;
+      }
+    }
 
-    if(this.state.postCurrency.length>=1 || (this.state.postCost.length>=1 && this.state.postCost != 0.0)){
-      if(this.state.postCurrency.length===0){
+
+    if(postCurrency.length == 0 || (this.state.postCost && this.state.postCost == 0.0)){
+      if (postCurrency.length===0){
           Toast.show("Please Select Post Currency",Toast.SHORT)
           return false;
       }
@@ -198,9 +201,8 @@ export default class CreateNewItemScreen extends React.Component {
           Toast.show("Please Enter Post Cost",Toast.SHORT)
           return false;
       }
-
     }
-    return true;
+    return true
   }
 
 
@@ -257,8 +259,8 @@ export default class CreateNewItemScreen extends React.Component {
     var post_=null;
     var addr_=null;
 
-    if(this.state.postCurrency.length!=0){
-      post_={"postCurrency":this.state.postCurrency,"postCost":this.state.postCost};
+    if(postCurrency.length!=0){
+      post_={"postCurrency":postCurrency,"postCost":this.state.postCost};
     }
     if(this.state.address.lineOne.length!=0){
       addr_=this.state.address;
@@ -267,7 +269,7 @@ export default class CreateNewItemScreen extends React.Component {
     variables = { variables: {
       "mode":this.state.mode,
       "images":imageUploadList,
-      "currency":this.state.currency,
+      "currency": currency,
       "cost":this.state.cost,
       "counterOffer":this.state.counterOffer,
     /*  "barterTemplates":this.state.barterTemplates,*/
@@ -806,8 +808,7 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   handleCurreny(value){
-    this.setState({currency:value})
-
+    postCurrency = value
   }
 
 
@@ -863,333 +864,342 @@ export default class CreateNewItemScreen extends React.Component {
       />
       </Button>
     );
-    var rightComponent = (
-
-      <LoginStatus>{ loginStatus => (
-        <CreateListing>{ mutateCreateListing => (
-          <View>
-            <Button transparent onPress={() => {
-              mutateCreateListing( this.collateVariables( loginStatus.countryCode ))
-              .then(({ data }) => {
-                console.log("Listing Created: ", data.createListing)
-                this.props.navigation.navigate({
-                  routeName: 'productDetailsScreen'
-                , params: {
-                    item: data.createListing
-                  , loginStatus: loginStatus
-                  }
-                })
+    var rightComponent = (loginStatus) => (
+      <CreateListing>{ mutateCreateListing => (
+        <View>
+          <Button transparent onPress={() => {
+            mutateCreateListing( this.collateVariables( loginStatus.countryCode ))
+            .then(({ data }) => {
+              console.log("Listing Created: ", data.createListing)
+              this.props.navigation.navigate({
+                routeName: 'productDetailsScreen'
+              , params: {
+                  item: data.createListing
+                , loginStatus: loginStatus
+                }
               })
-            }}>
-              <Ionicons
-              name="md-checkmark"
-              size={Layout.moderateScale(25)}
-              style={{ color: '#ffffff' }}
-              />
-            </Button>
-          </View>
-        )}</CreateListing>
-      )}</LoginStatus>
-    );
+            })
+          }}>
+            <Ionicons
+            name="md-checkmark"
+            size={Layout.moderateScale(25)}
+            style={{ color: '#ffffff' }}
+            />
+          </Button>
+        </View>
+      )}</CreateListing>
+    )
     var _this = this;
 
     return (
-      <View style={styles.container}>
-        <BBBHeader
-        title="Create A New Item"
-        leftComponent={leftComponent}
-        rightComponent={rightComponent}
-        />
-
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-        >
-          <View style={styles.imagesMainView}>
-            <FlatList
-              horizontal={true}
-              data={this.state.images}
-              extraData={this.state}
-              keyExtractor={(item, index) => item.id }
-              renderItem={this._renderRow.bind(this)}
-              contentContainerStyle={styles.listContents}
+      <LoginStatus>{ loginStatus => (
+        <GetCachedCountry loginStatus={loginStatus}>{ country => (
+          <View style={styles.container}>
+            <BBBHeader
+            title="Create A New Item"
+            leftComponent={leftComponent}
+            rightComponent={rightComponent(loginStatus)}
             />
-          </View>
-          <View style={styles.Descrip}>
-            <Text style={styles.txtTitle}>Title</Text>
-            <Item style={styles.txtInput} regular>
-              <Input  onChangeText={(text) => {
-                console.log("Title",text);
-                this.setState({ title:text});
-              }} />
-            </Item>
-          </View>
 
-          <View style={styles.Descrip}>
-            <Text style={styles.txtTitle}>Description</Text>
-            <Item style={styles.txtInput} regular>
-              <Input
-                multiline={true}
-                style={{
-                  height: Layout.HEIGHT * 0.1,
-                  marginBottom: Layout.HEIGHT * 0.015,
-                }}
-                onChangeText={text => { this.setState({ longDesc:text }); }}
-                maxLength={1024}
-              />
-              <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
-            </Item>
-          </View>
-
-            <View style={styles.dataFacetoFace}>
-              <Text style={styles.txtTitle}>Category</Text>
-              <View>
-                <View style={styles.categoryTxtView}>
-                  <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
-                  {this.state.selectedCateName === null
-                  ? <Text regular>Select Category</Text>
-                  : (
-                    <Text regular>{this.state.selectedCateName}</Text>
-                  )}
-                  </TouchableOpacity>
-                </View>
-                <ModalFilterPicker
-                  key={1}
-                  visible={this.state.visible}
-                  onSelect={this.onSelect}
-                  onCancel={this.onCancel}
-                  selectedOption={w(this, ['state', 'selectedCateId']) ? this.state.selectedCateId.toString() : ''}
-                  options={this.state.allCategoryValueList}
+            <ScrollView
+              style={styles.container}
+              contentContainerStyle={styles.contentContainer}
+            >
+              <View style={styles.imagesMainView}>
+                <FlatList
+                  horizontal={true}
+                  data={this.state.images}
+                  extraData={this.state}
+                  keyExtractor={(item, index) => item.id }
+                  renderItem={this._renderRow.bind(this)}
+                  contentContainerStyle={styles.listContents}
                 />
               </View>
-            </View>
-
-              <View style={styles.exchangeMode}>
-                <Text style={styles.txtExch}>Exchange Mode</Text>
-                <View style={styles.saleview}>
-                  <TouchableOpacity onPress={this.onPressHeadSale}>
-                    <View style={styles.saleHeader}>
-                      {this.state.isCollapsedSale
-                      ? (
-                      <Feather
-                        name="circle"
-                        style={{
-                          width: Layout.moderateScale(30),
-                          height: Layout.moderateScale(30),
-                          fontSize: Layout.moderateScale(30),
-                          color: '#c8c8c8',
-                        }}
-                      />
-                      ) : (
-                      <RedioSelected width={Layout.moderateScale(30)} height={Layout.moderateScale(30)} />
-                      )}
-                      <Text style={styles.txtfacetoFace}>Sale</Text>
-                    </View>
-                  </TouchableOpacity>
-                  {this.state.isCollapsedSale ? null : (
-                  <View style={styles.bottomline} />
-                  )}
-                  <Collapsible collapsed={this.state.isCollapsedSale}>
-                    <View style={styles.saleChild}>
-                      <View style={styles.subFacetoFace}>
-                        <View style={styles.dataFacetoFace}>
-                          <Text style={styles.txtTitle}>Currency</Text>
-                          <Dropdown
-                            data={dataCurrency}
-                            labelHeight={0}
-                            dropdownPosition={0}
-                            baseColor="rgba(0, 0, 0, .00)"
-                            containerStyle={styles.dateDropDown}
-                            onChangeText={(value, index, data) => this.handleCurreny(value)}
-                          />
-                        </View>
-                        <View style={styles.dataFacetoFace}>
-                          <Text style={styles.txtTitle}>Price</Text>
-                          <Item style={styles.txtInput} regular>
-                            <Input keyboardType="numeric"  onChangeText={(text) => this.setState({cost: text})} />
-                          </Item>
-                        </View>
-                      </View>
-                      <CheckBox
-                        style={styles.chboxRemember}
-                        onClick={() => _this.onClick(temp)}
-                        onValueChange={() => this.setState({ counterOffer: !this.state.counterOffer })}
-                        isChecked={this.state.counterOffer}
-                        checkBoxColor={'#fff'}
-                        rightText={'Allow counter offer'}
-                        rightTextStyle={{
-                          color: 'black',
-                            fontSize: 20,
-                            marginLeft: 20,
-                            fontFamily: 'roboto-reguler',
-                        }}
-                        unCheckedImage={
-                          <Ionicons
-                          name="ios-square-outline"
-                          size={Layout.moderateScale(20)}
-                          color="black"
-                          style={styles.cancle}
-                          />
-                        }
-                        checkedImage={
-                          <Ionicons
-                          name="ios-checkbox-outline"
-                          size={Layout.moderateScale(20)}
-                          color="black"
-                          style={styles.cancle}
-                          />
-                        }
-                      />
-                    </View>
-                  </Collapsible>
-                </View>
-
-                <View style={styles.saleview}>
-                  <TouchableOpacity onPress={this.onPressHeadDonate}>
-                    <View style={styles.saleHeader}>
-                      {this.state.isCollapsedDonate ? (
-                        <Feather
-                        name="circle"
-                        style={{
-                          width: Layout.moderateScale(30),
-                            height: Layout.moderateScale(30),
-                            fontSize: Layout.moderateScale(30),
-                            color: '#c8c8c8',
-                        }}
-                        />
-                      ) : (
-                        <RedioSelected
-                        width={Layout.moderateScale(30)}
-                        height={Layout.moderateScale(30)}
-                        />
-                      )}
-                      <Text style={styles.txtfacetoFace}>Donate</Text>
-                    </View>
-                  </TouchableOpacity>
-                  {this.state.isCollapsedDonate ? null : (
-                  <View style={styles.bottomline} />
-                  )}
-                  <Collapsible collapsed={this.state.isCollapsedDonate}>
-                    <View style={styles.saleChild}>
-                      <View style={styles.subFacetoFace}>
-                        <View style={styles.dataFacetoFace}>
-                          <Text style={styles.txtTitle}>Address</Text>
-                          <Item style={styles.txtInput} regular>
-                            <Input />
-                          </Item>
-                        </View>
-                      </View>
-                    </View>
-                  </Collapsible>
-                </View>
+              <View style={styles.Descrip}>
+                <Text style={styles.txtTitle}>Title</Text>
+                <Item style={styles.txtInput} regular>
+                  <Input  onChangeText={(text) => {
+                    console.log("Title",text);
+                    this.setState({ title:text});
+                  }} />
+                </Item>
               </View>
 
-              <View style={styles.deliveryOption}>
-                <Text style={styles.txtDelOpt}>Delivery Options</Text>
-                <View style={styles.faceToFace}>
-                  <Text style={styles.txtfacetoFace}>Face to Face</Text>
-                  <View style={styles.bottomline} />
-                  <View style={styles.subFacetoFace}>
-                    <View style={styles.dataFacetoFace}>
-                      <Text style={styles.txtTitle}>Line 1</Text>
-                      <Item style={styles.txtInput} regular>
-                      <Input  onChangeText={(text) => {
-                        this.setState({ address: { ...this.state.address, lineOne: text} });
-                      }}   />
-                      </Item>
-                      <Text style={styles.txtTitle}>Line 2</Text>
-                      <Item style={styles.txtInput} regular>
-                        <Input onChangeText={(text) => {
-                          this.setState({ address: { ...this.state.address, lineTwo: text} });
-                        }} />
-                      </Item>
-                      <Text style={styles.txtTitle}>Postcode</Text>
-                      <Item style={styles.txtInput} regular>
-                        <Input onChangeText={(text) => {
-                          this.setState({ address: { ...this.state.address, postcode: text} });
-                        }} />
-                      </Item>
-                    </View>
-                    <View style={styles.mapFacetoFace}>
-                      <MapView
-                      style={{ flex: 1 }}
-                      initialRegion={{
-                        latitude: 37.78825,
-                          longitude: -122.4324,
-                          latitudeDelta: 0.0922,
-                          longitudeDelta: 0.0421,
-                      }}
-                      />
-                    </View>
-                  </View>
-                </View>
+              <View style={styles.Descrip}>
+                <Text style={styles.txtTitle}>Description</Text>
+                <Item style={styles.txtInput} regular>
+                  <Input
+                    multiline={true}
+                    style={{
+                      height: Layout.HEIGHT * 0.1,
+                      marginBottom: Layout.HEIGHT * 0.015,
+                    }}
+                    onChangeText={text => { this.setState({ longDesc:text }); }}
+                    maxLength={1024}
+                  />
+                  <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
+                </Item>
+              </View>
 
-                <View style={styles.regPost}>
-                  <Text style={styles.txtfacetoFace}>Registered Post</Text>
-                  <View style={styles.bottomline} />
-                  <View style={styles.subFacetoFace}>
-                    <View style={styles.dataFacetoFace}>
-                    <Text style={styles.txtTitle}>Currency</Text>
-                    <Dropdown
-                    data={dataCurrency}
-                    labelHeight={0}
-                    dropdownPosition={0}
-                    baseColor="rgba(0, 0, 0, .00)"
-                    containerStyle={styles.dateDropDown}
-                      onChangeText={(value, index, data) =>{ this.setState({postCurrency:value}) } }
+                <View style={styles.dataFacetoFace}>
+                  <Text style={styles.txtTitle}>Category</Text>
+                  <View>
+                    <View style={styles.categoryTxtView}>
+                      <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
+                      {this.state.selectedCateName === null
+                      ? <Text regular>Select Category</Text>
+                      : (
+                        <Text regular>{this.state.selectedCateName}</Text>
+                      )}
+                      </TouchableOpacity>
+                    </View>
+                    <ModalFilterPicker
+                      key={1}
+                      visible={this.state.visible}
+                      onSelect={this.onSelect}
+                      onCancel={this.onCancel}
+                      selectedOption={w(this, ['state', 'selectedCateId']) ? this.state.selectedCateId.toString() : ''}
+                      options={this.state.allCategoryValueList}
                     />
-                    </View>
-                    <View style={styles.dataFacetoFace}>
-                      <Text style={styles.txtTitle}>Postal Cost</Text>
-                      <Item style={styles.txtInput} regular>
-                        <Input keyboardType="numeric" onChangeText={(text) =>{ this.setState({postCost:text}) } }/>
-                      </Item>
-                    </View>
                   </View>
                 </View>
-              </View>
 
-              <View style={{ padding: Layout.HEIGHT * 0.1}} />
-        </ScrollView>
+                  <View style={styles.exchangeMode}>
+                    <Text style={styles.txtExch}>Exchange Mode</Text>
+                    <View style={styles.saleview}>
+                      <TouchableOpacity onPress={this.onPressHeadSale}>
+                        <View style={styles.saleHeader}>
+                          {this.state.isCollapsedSale
+                          ? (
+                          <Feather
+                            name="circle"
+                            style={{
+                              width: Layout.moderateScale(30),
+                              height: Layout.moderateScale(30),
+                              fontSize: Layout.moderateScale(30),
+                              color: '#c8c8c8',
+                            }}
+                          />
+                          ) : (
+                          <RedioSelected width={Layout.moderateScale(30)} height={Layout.moderateScale(30)} />
+                          )}
+                          <Text style={styles.txtfacetoFace}>Sale</Text>
+                        </View>
+                      </TouchableOpacity>
+                      {this.state.isCollapsedSale ? null : (
+                      <View style={styles.bottomline} />
+                      )}
+                      <Collapsible collapsed={this.state.isCollapsedSale}>
+                        <View style={styles.saleChild}>
+                          <View style={styles.subFacetoFace}>
+                            <View style={styles.dataFacetoFace}>
+                              <Text style={styles.txtTitle}>Currency</Text>
+                              <Picker
+                                selectedValue={country.currencies[0].iso4217}
+                                style={styles.dateDropDown}
+                                onValueChange={(value, index, data) => { curreny = value }}
+                              >
+                                {country.currencies.map((c, i) => {
+                                  if (i == 0) {
+                                    currency = c.iso4217
+                                  }
+                                  return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
+                                })}
+                              </Picker>
+                            </View>
+                            <View style={styles.dataFacetoFace}>
+                              <Text style={styles.txtTitle}>Price</Text>
+                              <Item style={styles.txtInput} regular>
+                                <Input keyboardType="numeric"  onChangeText={(text) => this.setState({cost: text})} />
+                              </Item>
+                            </View>
+                          </View>
+                          <CheckBox
+                            style={styles.chboxRemember}
+                            onClick={() => _this.onClick(temp)}
+                            onValueChange={() => this.setState({ counterOffer: !this.state.counterOffer })}
+                            isChecked={this.state.counterOffer}
+                            checkBoxColor={'#fff'}
+                            rightText={'Allow counter offer'}
+                            rightTextStyle={{
+                              color: 'black',
+                                fontSize: 20,
+                                marginLeft: 20,
+                                fontFamily: 'roboto-reguler',
+                            }}
+                            unCheckedImage={
+                              <Ionicons
+                              name="ios-square-outline"
+                              size={Layout.moderateScale(20)}
+                              color="black"
+                              style={styles.cancle}
+                              />
+                            }
+                            checkedImage={
+                              <Ionicons
+                              name="ios-checkbox-outline"
+                              size={Layout.moderateScale(20)}
+                              color="black"
+                              style={styles.cancle}
+                              />
+                            }
+                          />
+                        </View>
+                      </Collapsible>
+                    </View>
 
-        <ProgressDialog
-          visible={this.state.progressVisible}
-          message={this.state.progressMsg}
-          activityIndicatorColor='blue'
-        />
+                    <View style={styles.saleview}>
+                      <TouchableOpacity onPress={this.onPressHeadDonate}>
+                        <View style={styles.saleHeader}>
+                          {this.state.isCollapsedDonate ? (
+                            <Feather
+                            name="circle"
+                            style={{
+                              width: Layout.moderateScale(30),
+                                height: Layout.moderateScale(30),
+                                fontSize: Layout.moderateScale(30),
+                                color: '#c8c8c8',
+                            }}
+                            />
+                          ) : (
+                            <RedioSelected
+                            width={Layout.moderateScale(30)}
+                            height={Layout.moderateScale(30)}
+                            />
+                          )}
+                          <Text style={styles.txtfacetoFace}>Donate</Text>
+                        </View>
+                      </TouchableOpacity>
+                      {this.state.isCollapsedDonate ? null : (
+                      <View style={styles.bottomline} />
+                      )}
+                      <Collapsible collapsed={this.state.isCollapsedDonate}>
+                        <View style={styles.saleChild}>
+                          <View style={styles.subFacetoFace}>
+                            <View style={styles.dataFacetoFace}>
+                              <Text style={styles.txtTitle}>Address</Text>
+                              <Item style={styles.txtInput} regular>
+                                <Input />
+                              </Item>
+                            </View>
+                          </View>
+                        </View>
+                      </Collapsible>
+                    </View>
+                  </View>
 
-       <Dialog
-         visible={this.state.showDialog}
-         title={this.state.dialogTitle}
-         onTouchOutside={() => this.setState({showDialog:false})}
-         contentStyle={{ justifyContent: 'center', alignItems: 'center' }}
-         animationType="fade"
-       >
-         <Text style={{ marginBottom: 10,	color: 'black' }}>{this.state.errorMsg}</Text>
-         <TouchableOpacity
-           style={{
-             marginRight:40,
-             marginLeft:40,
-             marginTop:10,
-             paddingTop:10,
-             paddingBottom:10,
-             backgroundColor:'#00A6A4',
-             borderRadius:10,
-             borderWidth: 1,
-             borderColor: '#fff'
-           }}
-           onPress={() => this.setState({showDialog:false})}
-           underlayColor='#fff'
-         >
-           <Text style={{
-             color:'#fff',
-             textAlign:'center',
-             paddingLeft : 10,
-             paddingRight : 10
-           }}>Ok</Text>
-         </TouchableOpacity>
-       </Dialog>
-      </View>
+                  <View style={styles.deliveryOption}>
+                    <Text style={styles.txtDelOpt}>Delivery Options</Text>
+                    <View style={styles.faceToFace}>
+                      <Text style={styles.txtfacetoFace}>Face to Face</Text>
+                      <View style={styles.bottomline} />
+                      <View style={styles.subFacetoFace}>
+                        <View style={styles.dataFacetoFace}>
+                          <Text style={styles.txtTitle}>Line 1</Text>
+                          <Item style={styles.txtInput} regular>
+                          <Input  onChangeText={(text) => {
+                            this.setState({ address: { ...this.state.address, lineOne: text} });
+                          }}   />
+                          </Item>
+                          <Text style={styles.txtTitle}>Line 2</Text>
+                          <Item style={styles.txtInput} regular>
+                            <Input onChangeText={(text) => {
+                              this.setState({ address: { ...this.state.address, lineTwo: text} });
+                            }} />
+                          </Item>
+                          <Text style={styles.txtTitle}>Postcode</Text>
+                          <Item style={styles.txtInput} regular>
+                            <Input onChangeText={(text) => {
+                              this.setState({ address: { ...this.state.address, postcode: text} });
+                            }} />
+                          </Item>
+                        </View>
+                        <View style={styles.mapFacetoFace}>
+                          <MapView
+                          style={{ flex: 1 }}
+                          initialRegion={{
+                            latitude: 37.78825,
+                              longitude: -122.4324,
+                              latitudeDelta: 0.0922,
+                              longitudeDelta: 0.0421,
+                          }}
+                          />
+                        </View>
+                      </View>
+                    </View>
+
+                    <View style={styles.regPost}>
+                      <Text style={styles.txtfacetoFace}>Registered Post</Text>
+                      <View style={styles.bottomline} />
+                      <View style={styles.subFacetoFace}>
+                        <View style={styles.dataFacetoFace}>
+                        <Text style={styles.txtTitle}>Currency</Text>
+                        <Picker
+                          selectedValue={country.currencies[0].iso4217}
+                          style={styles.dateDropDown}
+                          onValueChange={(value, index, data) => { postCurrency = value }}
+                        >
+                          {country.currencies.map((c, i) => {
+                            if (i == 0) {
+                              postCurrency = c.iso4217
+                            }
+                            return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
+                          })}
+                        </Picker>
+                        </View>
+                        <View style={styles.dataFacetoFace}>
+                          <Text style={styles.txtTitle}>Postal Cost</Text>
+                          <Item style={styles.txtInput} regular>
+                            <Input keyboardType="numeric" onChangeText={(text) =>{ this.setState({postCost:text}) } }/>
+                          </Item>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{ padding: Layout.HEIGHT * 0.1}} />
+            </ScrollView>
+
+            <ProgressDialog
+              visible={this.state.progressVisible}
+              message={this.state.progressMsg}
+              activityIndicatorColor='blue'
+            />
+
+           <Dialog
+             visible={this.state.showDialog}
+             title={this.state.dialogTitle}
+             onTouchOutside={() => this.setState({showDialog:false})}
+             contentStyle={{ justifyContent: 'center', alignItems: 'center' }}
+             animationType="fade"
+           >
+             <Text style={{ marginBottom: 10,	color: 'black' }}>{this.state.errorMsg}</Text>
+             <TouchableOpacity
+               style={{
+                 marginRight:40,
+                 marginLeft:40,
+                 marginTop:10,
+                 paddingTop:10,
+                 paddingBottom:10,
+                 backgroundColor:'#00A6A4',
+                 borderRadius:10,
+                 borderWidth: 1,
+                 borderColor: '#fff'
+               }}
+               onPress={() => this.setState({showDialog:false})}
+               underlayColor='#fff'
+             >
+               <Text style={{
+                 color:'#fff',
+                 textAlign:'center',
+                 paddingLeft : 10,
+                 paddingRight : 10
+               }}>Ok</Text>
+             </TouchableOpacity>
+           </Dialog>
+          </View>
+        )}</GetCachedCountry>
+      )}</LoginStatus>
     )
   }
   onShow = () => {
@@ -1335,4 +1345,15 @@ export default class CreateNewItemScreen extends React.Component {
               </View>
             </View>
           </View>
+*/
+
+/*
+                        <Dropdown
+                          data={country.currencies.map( currency => { value: currency.iso4217 } )}
+                          labelHeight={0}
+                          dropdownPosition={0}
+                          baseColor="rgba(0, 0, 0, .00)"
+                          containerStyle={styles.dateDropDown}
+                          onChangeText={(value, index, data) =>{ this.setState({postCurrency:value}) } }
+                        />
 */

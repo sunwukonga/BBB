@@ -50,7 +50,7 @@ render() {
                   color={Colors.secondaryColor}
                   style={styles.menuIcon}
                 />
-                <Text style={styles.link}>Terms of Use -- BebeBargains</Text>
+                <Text style={styles.link}>Privacy Policy -- BebeBargains</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -62,7 +62,7 @@ render() {
                   color={Colors.secondaryColor}
                   style={styles.menuIcon}
                 />
-                <Text style={styles.link}>Privacy Policy -- BebeBargains</Text>
+                <Text style={styles.link}>Terms of Use -- BebeBargains</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.getStartedContainer}>
