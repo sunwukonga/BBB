@@ -69,6 +69,7 @@ export default StyleSheet.create({
 	userdetailSec: {
 		height: Layout.WIDTH * 0.35,
 		marginTop: Layout.moderateScale(3),
+		marginLeft: Layout.moderateScale(3),
 	},
 	userItemDetailsSec: {
 		flexDirection: 'row',

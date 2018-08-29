@@ -17,8 +17,8 @@ import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 import getNestedCategoryList from './NestedCategoryApi';
-import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
-import ExpanableList from 'react-native-expandable-section-flatlist';
+import { ProgressDialog, Dialog } from 'react-native-simple-dialogs';
+import ExpandableList from 'react-native-expandable-section-flatlist';
 // screen style
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
@@ -65,12 +65,19 @@ export default class CategoryScreen extends React.Component {
 
 				const data =[];
 				Object.keys(res.data.allCategoriesNested).forEach((key,index)=>{
-						data.push({name:res.data.allCategoriesNested[key].name,data:res.data.allCategoriesNested[key].children})
-
+          let children = res.data.allCategoriesNested[key].children.map( child => {
+            return {
+              id: child.id.toString()
+            , name: child.name
+            }
+          })
+          data.push({
+            name: res.data.allCategoriesNested[key].name
+          , data: res.data.allCategoriesNested[key].children
+          })
 				});
-
 				this.setState({
-					allCategoryList:data,
+					allCategoryList: data,
 					progressVisible: false,
 				});
 
@@ -87,7 +94,13 @@ export default class CategoryScreen extends React.Component {
 
 	_renderRow = (rowItem, rowId, sectionId) =>
 		 <List style={styles.mainlist}>
-		 <ListItem avatar onPress={() => alert(rowItem.id+","+rowItem.name)}>
+		 <ListItem avatar onPress={() => {
+       this.props.navigation.navigate('searchResultScreen', {
+         searchTerms: this.state.searchTerms
+       , loginStatus: this.props.navigation.state.params.loginStatus
+       , categoryId: rowItem.id
+       })}
+     }>
 					 <Body style={styles.bodys}>
 				 <Text style={styles.bodyTitle}>{rowItem.name}</Text>
 			 </Body>
@@ -128,7 +141,7 @@ export default class CategoryScreen extends React.Component {
 					</Text>)
 					:
 					(
-						<ExpanableList
+						<ExpandableList
 			 				dataSource={this.state.allCategoryList}
 			 				headerKey="name"
 			 				memberKey="data"

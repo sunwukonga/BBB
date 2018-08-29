@@ -34,7 +34,7 @@ class Listing extends Component {
 
   // comparisons of important changes here
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.navigation.state.params.item.liked !== nextProps.navigation.state.params.item.liked) {
+    if (this.props.item.liked !== nextProps.item.liked) {
       return true;
     }
     return false;
@@ -84,7 +84,7 @@ class Listing extends Component {
   }
 
   render() {
-    let {item, loginStatus, chatIndexes, currentUser} = this.props.navigation.state.params
+    let {item, loginStatus, chatIndexes, currentUser} = this.props
 
     return (
       <View>

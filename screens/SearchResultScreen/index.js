@@ -38,6 +38,7 @@ import IdentityVerification from '../../components/IdentityVerification';
 import Stars from '../../components/Stars';
 import LoginStatus from '../HomeScreen/LoginStatus'
 import getSearchProductList from './SearchListing';
+import { w } from '../../utils/helpers.js'
 
 var mode="SALE",searchTerms="",rating=null,verification=null,priceMax=null,priceMin=null,categories=[],templates=[],tags=[],counterOffer=null,distance=null;
 
@@ -45,7 +46,7 @@ export default class SearchResultScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    searchTerms=this.props.navigation.state.params.searchTerms;
+    searchTerms=this.props.navigation.state.params.searchTerms || ""
 	  this.state = {
       searchList:[],
       progressVisible: false,
@@ -60,18 +61,22 @@ export default class SearchResultScreen extends React.Component {
   }
 
   componentDidMount(){
-		this._retrieveCountry();
+		//this._retrieveCountry();
     this.setState({
 			searchList:[],
       progressVisible: true,
     });
+		;
+		if(this.props.navigation.state.params.categoryId){
+			categories.push(this.props.navigation.state.params.categoryId);
+		}
 		setTimeout(() => {
     this.searchProductList();
 		  }, 350);
   }
 
 	componentWillReceiveProps(nextProps) {
-		this._retrieveCountry();
+		//this._retrieveCountry();
 		this.setState({
 			searchList:[],
 			progressVisible: true,
@@ -91,7 +96,7 @@ export default class SearchResultScreen extends React.Component {
 		counterOffer=nextProps.navigation.state.params.counterOffer;
 		priceMax=nextProps.navigation.state.params.maxPrice;
 		priceMin=nextProps.navigation.state.params.minPrice;
-		var category=nextProps.navigation.state.params.category.id;
+		var category=nextProps.navigation.state.params.categoryId;
 		var templateId=nextProps.navigation.state.params.templateId;
 		var tagId=nextProps.navigation.state.params.tagId;
 		if(templateId!=null){
@@ -100,7 +105,7 @@ export default class SearchResultScreen extends React.Component {
 		if(tagId!=null){
 			tags.push(tagId);
 		}
-		if(category!=null){
+		if(category != null){
 			categories.push(category);
 		}
 		setTimeout(() => {
@@ -127,16 +132,26 @@ export default class SearchResultScreen extends React.Component {
 			return;
 		}
     var variables={
-  							"terms": [searchTerms],
-							  "limit": this.state.limit,
-							  "page": this.state.page,
-							  "filter": {"mode": mode,"countryCode": this.state.countryCode,"rating": rating,
-							    "verification": verification,"priceMax": priceMax,"priceMin": priceMin,"categories":categories,
-							    "templates": templates,"tags": tags,"counterOffer": counterOffer,"distance": distance}
-								}
-      console.log(variables);
+      "terms": [searchTerms]
+    , "limit": this.state.limit
+    , "page": this.state.page
+    , "filter": {
+        "mode": mode
+      , "countryCode": this.props.navigation.state.params.loginStatus.countryCode
+      , "rating": rating
+      , "verification": verification
+      , "priceMax": priceMax
+      , "priceMin": priceMin
+      , "categories": categories
+      , "templates": templates
+      , "tags": tags
+      , "counterOffer": counterOffer
+      , "distance": distance
+      }
+    }
+    //  console.log(variables);
       getSearchProductList(variables).then((res)=>{
-        console.log("search Array length-0: "+res.data.searchListings.length);
+     //   console.log("search Array length-0: "+res.data.searchListings.length);
           if(res.data.searchListings.length==0){
             this.setState({
               progressVisible: false,
@@ -155,7 +170,7 @@ export default class SearchResultScreen extends React.Component {
           });
 
           }
-          console.log("search Array length: "+this.state.searchList.length);
+      //    console.log("search Array length: "+this.state.searchList.length);
 
       })
       .catch(error => {
@@ -197,30 +212,29 @@ export default class SearchResultScreen extends React.Component {
             }
 		    })}>
       <View>
-      { item.primaryImage===null || item.primaryImage.imageKey===null
-        ? <Image  source={Images.trollie} style={styles.rowImage} />
-        : <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
+      { w(item, ['primaryImage', 'imageKey'])
+        ? <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
+        : <Baby style={styles.rowImage} />
       }
     </View>
     <View style={styles.userdetailSec}>
       <Item style={styles.userItemDetailsSec}>
         <View style={styles.userProfileSec}>
-
-          {item.user.profileImage===null || item.user.profileImage.imageKey===null ?   <Image  source={Images.tempUser} style={styles.userProfile} /> :
-              <Image source={{ uri: Urls.s3ImagesURL + item.user.primaryImage.imageKey }} style={styles.userProfile} />
+          { w(item, ['user', 'primaryImage', 'imageKey'])
+           ? <Image source={{ uri: Urls.s3ImagesURL + item.user.primaryImage.imageKey }} style={styles.userProfile} />
+           : <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
           }
-
-            <View style={item.user.online ? styles.userOnline : styles.userOffline} />
+          <View style={w(item, ['user', 'online']) ? styles.userOnline : styles.userOffline} />
         </View>
         <View style={styles.userNameSec}>
-          <Text style={styles.userName}>{item.user.profileName}</Text>
+          <Text style={styles.userName}>{w(item, ['user', 'profileName'])}</Text>
         </View>
         <View style={styles.activeuserSec}>
-        <IdentityVerification
-                    width={Layout.moderateScale(30)}
-                    height={Layout.moderateScale(30)}
-                    level={item.user.idVerification}
-                  />
+          <IdentityVerification
+            width={Layout.moderateScale(30)}
+            height={Layout.moderateScale(30)}
+            level={w(item, ['user', 'idVerification'])}
+          />
         </View>
       </Item>
 
@@ -337,10 +351,10 @@ export default class SearchResultScreen extends React.Component {
   					</View>
   				</Content>
           <ProgressDialog
-              visible={this.state.progressVisible}
-               message="Please Wait..."
-              activityIndicatorSize="large"
-                         />
+            visible={this.state.progressVisible}
+            message="Please Wait..."
+            activityIndicatorSize="large"
+          />
   			</Container>
         )}</LoginStatus>
   		);

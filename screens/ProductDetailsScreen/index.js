@@ -28,6 +28,7 @@ import { Layout, Colors, Images } from '../../constants/';
 import LoginStatus from '../HomeScreen/LoginStatus'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import GetProfile from '../../graphql/queries/GetProfile'
+import GetCachedListing from '../../graphql/queries/GetCachedListing'
 import Listing from '../../components/display/Listing'
 
 
@@ -58,19 +59,21 @@ class ProductDetailsScreen extends React.Component {
 		);
 
     return (
-      <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
-          <GetProfile loginStatus={loginStatus}>{ currentUser => (
-            <Container style={styles.container}>
-              <BBBHeader
-                title={item.title}
-                leftComponent={leftComponent}
-              />
-              <Content style={styles.contentStyle}>
-                <Listing item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
-              </Content>
-            </Container>
-          )}</GetProfile>
-      )}</LastMessageIds>
+      <GetCachedListing listingId={item.id}>{ listing => (
+        <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
+            <GetProfile loginStatus={loginStatus}>{ currentUser => (
+              <Container style={styles.container}>
+                <BBBHeader
+                  title={listing.title}
+                  leftComponent={leftComponent}
+                />
+                <Content style={styles.contentStyle}>
+                  <Listing item={listing} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+                </Content>
+              </Container>
+            )}</GetProfile>
+        )}</LastMessageIds>
+      )}</GetCachedListing>
     )
   }
 }

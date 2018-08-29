@@ -46,6 +46,7 @@ import getTemplateList from './SearchTemplateApi';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
 import LoginStatus from '../HomeScreen/LoginStatus'
 import { w } from '../../utils/helpers.js'
+import { StackActions, NavigationActions } from 'react-navigation';
 
 import CreateListing from '../../graphql/mutations/CreateListing'
 import GetCachedCountry from '../../graphql/queries/GetCachedCountry'
@@ -56,6 +57,22 @@ const dataObjectsTags = [];
 var tagsList = [];
 var imageList=[];
 var imageUploadList=[];
+// Navigation Actions
+const SA_CreateToProduct = (item, loginStatus) => StackActions.reset({
+  index: 0
+, actions: [
+    NavigationActions.navigate({
+      routeName: 'homeDrawer'
+    , action: NavigationActions.navigate({
+        routeName: 'productDetailsScreen'
+      , params: {
+          item: item
+        , loginStatus: loginStatus
+        }
+      })
+    })
+  ]
+})
 /**
 Catgeory List Details
 */
@@ -358,13 +375,12 @@ export default class CreateNewItemScreen extends React.Component {
 
     if (item.deleted) {
      return (
-      <View style={styles.imagesSubView}>
-       <View >
-       <Image source={{uri: item.url}}style={styles.rowImage} />
-          <TouchableOpacity style={styles.imageOverlay} onPress={()=>this.deleteImageDetails(item.imageId)}>
-            <Image source={Images.imgDeleted} style={styles.imageReselect} />
-          </TouchableOpacity>
-       </View>
+       <View style={styles.imagesSubView}>
+         <Image source={{uri: item.url}}style={styles.rowImage} />
+         <TouchableOpacity style={styles.imageOverlay} onPress={()=>this.deleteImageDetails(item.imageId)}>
+           <Text style={{textAlign: 'center', paddingTop: Layout.WIDTH * 0.05}}>DELETED</Text>
+           <Icon name="ios-undo" style={{alignSelf: 'center'}} />
+        </TouchableOpacity>
        </View>
      );
    }
@@ -630,24 +646,15 @@ export default class CreateNewItemScreen extends React.Component {
     })
   }
 
-  deleteImageDetails(imgId){
-
-    for(var i=0;i<imageList.length;i++){
-      if(imgId===imageList[i].imageId){
-        if(imageList[i].deleted){
-          imageList[i].deleted=false;
-         console.log("Image UnDeleted",i);
-        } else{
-         imageList[i].deleted=true;
-        console.log("Image Deleted",i);
+  deleteImageDetails(imgId) {
+    imageList.forEach( image => {
+      if(imgId===image.imageId){
+        image.deleted = !image.deleted
       }
-        break;
-      }
-    }
-    this.setState({
-      images:imageList
     })
-
+    this.setState({
+      images: imageList
+    })
   }
 
   _renderRowCategory(rowData) {
@@ -871,13 +878,7 @@ export default class CreateNewItemScreen extends React.Component {
             mutateCreateListing( this.collateVariables( loginStatus.countryCode ))
             .then(({ data }) => {
               console.log("Listing Created: ", data.createListing)
-              this.props.navigation.navigate({
-                routeName: 'productDetailsScreen'
-              , params: {
-                  item: data.createListing
-                , loginStatus: loginStatus
-                }
-              })
+              this.props.navigation.dispatch(SA_CreateToProduct(data.createListing, loginStatus))
             })
           }}>
             <Ionicons

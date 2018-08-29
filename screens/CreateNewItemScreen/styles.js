@@ -43,29 +43,25 @@ export default StyleSheet.create({
 
 	},
 	imageOverlay:{
+    flex: 1,
+		alignItems: 'center',
+		justifyContent: 'center',
 		position: 'absolute',
 		backgroundColor:'#fff',
 		opacity:0.5,
 		height: Layout.HEIGHT * 0.22,
 		width: Layout.HEIGHT * 0.22,
-
 	},
 	imageDeleteContainer:{
-
     flex: 1,
     alignItems: 'stretch',
     justifyContent: 'center',
 
 	},
 	imageReselect:{
-		flexGrow:1,
-	 height:null,
-	 width:null,
-	 margin:Layout.HEIGHT * 0.04,
-	 padding:Layout.moderateScale(10),
-		alignItems:'center',
-		justifyContent:'center',
-
+	  height: Layout.HEIGHT * 0.16,
+	  width: Layout.HEIGHT * 0.16,
+    alignSelf: 'center'
 	},
 	rowDeletedImage: {
 		height: Layout.HEIGHT * 0.22,

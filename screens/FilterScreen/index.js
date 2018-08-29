@@ -165,11 +165,10 @@ export default class FilterScreen extends React.Component {
 
 	onClickCate(data) {
 		selectedCateId=data.id;
-		this._getTemplates();
-		this.setState({
-			selectedCateId:data.id,
-		});
-
+    this._getTemplates();
+    this.setState({
+      selectedCateId:data.id,
+    });
 	}
 
 
@@ -743,9 +742,18 @@ export default class FilterScreen extends React.Component {
 	returnToSearchList(){
 		this.props.navigation.navigate({
 		    routeName: 'searchResultScreen',
-		    params: { previous_screen: 'filterScreen',mode:this.state.mode,rating:this.state.rating,
-				idVerify:this.state.idVerification,categoryId:this.state.selectedCateId
-				,templateId:this.state.templateId,tagId:this.state.tagId,counterOffer:this.state.isCounterOffer,minPrice:this.state.minMaxPrice[0],maxPrice:this.state.minMaxPrice[1]}
+		    params: {
+          previous_screen: 'filterScreen'
+        , mode:this.state.mode
+        , rating:this.state.rating
+        , idVerify:this.state.idVerification
+        , categoryId:this.state.selectedCateId
+				, templateId:this.state.templateId
+        , tagId:this.state.tagId
+        , counterOffer:this.state.isCounterOffer
+        , minPrice:this.state.minMaxPrice[0]
+        , maxPrice:this.state.minMaxPrice[1]
+        }
 		});
 	}
 

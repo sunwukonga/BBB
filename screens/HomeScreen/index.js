@@ -58,7 +58,7 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
           , dest: 'createNewItemScreen'}
 })
 
-const showIcons = false
+const showIcons = true
 
 export default class HomeScreen extends React.Component {
 
@@ -282,21 +282,28 @@ export default class HomeScreen extends React.Component {
       */
   render() {
     // TODO: Change to a function that accepts loginStatus
-    var leftComponent = (
-      <LoginStatus>{ loginStatus => (
-        <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
-          <BBBIcon
-            name="Menu"
-            size={Layout.moderateScale(18)}
-            color={Colors.white}
-            style={{ color: Colors.white }}
-          />
-        </Button>
-      )}</LoginStatus>
-    );
+    var leftComponent = (loginStatus) => (
+      <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
+        { loginStatus.loginStatus ?
+        <BBBIcon
+          name="Menu"
+          size={Layout.moderateScale(18)}
+          color={Colors.white}
+          style={{ color: Colors.white }}
+        />
+        :
+        <Ionicons
+          name="ios-log-in"
+          size={Layout.moderateScale(18)}
+          color={Colors.white}
+          style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}
+        />
+        }
+      </Button>
+    )
 
-    var rightComponent = (
-      <Button transparent onPress={ () => this.props.navigation.navigate('categoryScreen')}>
+    var rightComponent = (loginStatus) => (
+      <Button transparent onPress={ () => this.props.navigation.navigate('categoryScreen', {loginStatus: loginStatus})}>
         <BBBIcon
           name="CategoryIcon"
           size={Layout.moderateScale(18)}
@@ -327,9 +334,9 @@ export default class HomeScreen extends React.Component {
               <Header
                 androidStatusBarColor={Colors.mainheaderbg}
                 style={headerStyles.header}>
-                <Left style={headerStyles.left}>{leftComponent}</Left>
+                <Left style={headerStyles.left}>{leftComponent(loginStatus)}</Left>
                 <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
-                <Right style={headerStyles.right}>{rightComponent}</Right>
+                <Right style={headerStyles.right}>{rightComponent(loginStatus)}</Right>
               </Header>
               <Content style={styles.container}>
                 <View>
@@ -344,11 +351,11 @@ export default class HomeScreen extends React.Component {
                             this.setState({ searchTerms:text});
                         }}
                         onSubmitEditing={ () =>
-                          this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})
+                          this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms, loginStatus: loginStatus})
                         }
                       />
                       <TouchableOpacity onPress={() =>
-                        this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms})
+                        this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms, loginStatus: loginStatus})
                       }>
                         <BBBIcon name="Search" style={styles.searchicon} />
                       </TouchableOpacity>
