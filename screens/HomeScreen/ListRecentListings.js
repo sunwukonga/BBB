@@ -31,7 +31,7 @@ class ListRecentListings extends Component {
   }
 
   render() {
-    let { variables, loginStatus, chatIndexes, currentUser } = this.props
+    let { variables, loginStatus, chatIndexes, currentUser, createNew } = this.props
     console.log("LISTRECENT Render: ", loginStatus.countryCode)
     return (
       <Query
@@ -43,11 +43,15 @@ class ListRecentListings extends Component {
           // https://github.com/apollographql/apollo-client/blob/master/packages/apollo-client/src/core/networkStatus.ts
           // https://github.com/apollographql/apollo-client/issues/3660
           // https://github.com/apollographql/react-apollo/issues/1217
+          let dataPointer = w(data, ['getMostRecentListings'])
           if (networkStatus === 1) {
             return <ActivityIndicator size="large" />;
           }
           if (error) {
             return <Text>Error: {error.message}</Text>;
+          }
+          if (!dataPointer || dataPointer.length == 0) {
+            dataPointer = [{emptyList: true}]
           }
           return (
             <View style={styles.imagesMainView}>
@@ -58,10 +62,9 @@ class ListRecentListings extends Component {
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
                 keyExtractor={(item, index) => index.toString()}
-                data = {data.getMostRecentListings || []}
+                data = {dataPointer}
                 renderItem={({ item }) => {
-                  console.log('LRL: ', item.id)
-                  return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+                  return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} createNew={createNew} />
                 }}
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}

@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import {
   Item
+, Icon
 } from 'native-base';
 import { withNavigation } from 'react-navigation'
 import styles from './styles';
@@ -42,7 +43,18 @@ class PureListItem extends Component {
   }
 
   render() {
-    let {item, loginStatus, chatIndexes, currentUser } = this.props
+    let {item, loginStatus, chatIndexes, currentUser, createNew } = this.props
+    if ( item.emptyList ) {
+      return (
+        <TouchableOpacity onPress={ createNew } >
+          <View style={styles.imagesSubView}>
+            <Text style={{ textAlign: 'center' }}>No recent listings</Text>
+            <Baby style={styles.rowImage} />
+            <Text style={{ textAlign: 'center' }}>Click on me to create a new Listing</Text>
+          </View>
+        </TouchableOpacity>
+      )
+    }
     return (
         <TouchableOpacity
           onPress={ () => this.props.navigation.navigate({

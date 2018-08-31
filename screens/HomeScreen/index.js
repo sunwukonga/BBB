@@ -58,7 +58,7 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
           , dest: 'createNewItemScreen'}
 })
 
-const showIcons = true
+const showIcons = false
 
 export default class HomeScreen extends React.Component {
 
@@ -385,7 +385,12 @@ export default class HomeScreen extends React.Component {
               />
               : null }
 
-                  <ListRecentListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                  <ListRecentListings
+                    loginStatus={loginStatus}
+                    variables={{"limit":this.state.limit,"page":this.state.page}}
+                    chatIndexes={chatIndexes}
+                    currentUser={currentUser}
+                    createNew={() => this.checkAuthForCreate(loginStatus) } />
                   <View style={styles.adSec}>
                     <Text style={styles.mainadText}>
                       Do you have something to sell or give away?
