@@ -32,7 +32,7 @@ class ListRecentListings extends Component {
 
   render() {
     let { variables, loginStatus, chatIndexes, currentUser } = this.props
-    console.log("LISTRECENT Render")
+    console.log("LISTRECENT Render: ", loginStatus.countryCode)
     return (
       <Query
         query = {GET_MOST_RECENT_LIST}

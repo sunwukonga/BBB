@@ -48,29 +48,34 @@ const ratingItems = [
 
 const idVerifications = [
   {
-    id: 1,
-    ratingvalue: 1,
-    checked: false,
+    id: 1
+  , description: "Author has logged in with a social media account"
+  , ratingvalue: 1
+  , checked: false
   },
   {
-    id: 2,
-    ratingvalue: 2,
-    checked: false,
+    id: 2
+  , description: "Author has verified an email address with us"
+  , ratingvalue: 2
+  , checked: false
   },
   {
-    id: 3,
-    ratingvalue: 3,
-    checked: false,
+    id: 3
+  , description: "Author has verified a phone number with us"
+  , ratingvalue: 3
+  , checked: false
   },
   {
-    id: 4,
-    ratingvalue: 4,
-    checked: false,
+    id: 4
+  , description: "Author has submitted a photo ID"
+  , ratingvalue: 4
+  , checked: false
   },
   {
-    id: 5,
-    ratingvalue: 5,
-    checked: false,
+    id: 5
+  , description: "Author has submitted a photo ID and demonstrated good conduct for 3 months or more"
+  , ratingvalue: 5
+  , checked: false
   },
 ];
 
@@ -93,7 +98,8 @@ const filterItem = [
   },
   {
     id: 5,
-    name: 'CurrencySvg',
+    type: 'ion',
+    name: 'logo-usd',
   },
   {
     id: 6,

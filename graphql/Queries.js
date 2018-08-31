@@ -784,6 +784,18 @@ query {
   }
 }`;
 
+const GET_CATEGORY_LIST = gql`
+query {
+  allCategoriesFlat {
+    id
+    name
+    children {
+      id
+      name
+    }
+  }
+}`;
+
 export {
   GET_MOST_RECENT_LIST
 , GET_MOST_VISITED_LIST
@@ -798,4 +810,5 @@ export {
 , GET_PROFILE
 , GET_LISTING
 , GET_NESTED_CATEGORY_LIST
+, GET_CATEGORY_LIST
 }

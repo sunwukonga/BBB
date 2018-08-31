@@ -10,9 +10,10 @@ import styles from './styles';
 import { withNavigation } from 'react-navigation'
 
 import {
-  GET_CATEGORY_LIST
+  GET_NESTED_CATEGORY_LIST
 } from '../../graphql/Queries'
 import CategoryListItem from './CategoryListItem'
+import ExpandableList from 'react-native-expandable-section-flatlist';
 
 
 class ListCategory extends Component {
@@ -20,18 +21,12 @@ class ListCategory extends Component {
     super(props);
   }
 
-  onClickCategory(data) {
-    
-    this.props.onClickCategory(data);
-
-	}
-
   render() {
-     let selectedCateId=this.props.selectedCateId
+    const {categoryIds} = this.props
     return (
       <Query
-        query = {GET_CATEGORY_LIST}
-        fetchPolicy="cache-and-network"
+        query = {GET_NESTED_CATEGORY_LIST}
+        fetchPolicy="cache-only"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
 
@@ -41,19 +36,29 @@ class ListCategory extends Component {
           if (error) {
             return <Text>Error: {error.message}</Text>;
           }
-          if (!data.allCategoriesFlat || data.allCategoriesFlat.length == 0) {
+          if (!data.allCategoriesNested || data.allCategoriesNested.length == 0) {
             return null
           }
+          let inputData = []
+          Object.keys(data.allCategoriesNested).forEach((key,index)=>{
+            inputData.push({
+              id: data.allCategoriesNested[key].id
+            , name: data.allCategoriesNested[key].name
+            , data: data.allCategoriesNested[key].children
+            })
+          });
           return (
             <View>
-              <FlatList
-                contentContainerStyle={styles.listContent}
-                data = {data.allCategoriesFlat || []}
-                extraData={selectedCateId}
-                keyExtractor={item => item.id+""}
-                renderItem={({ item }) =>
-                   <CategoryListItem item={item} selectedItem={selectedCateId}  onClickCategory={(item) => this.onClickCategory(item)} />
-                }
+              <ExpandableList
+                dataSource={inputData}
+                headerKey="name"
+                memberKey="data"
+                renderRow={( item ) => <CategoryListItem item={item} categoryIds={categoryIds}  onClickCategory={(input) => this.props.onClickCategory(input)} /> }
+                renderSectionHeaderX={(section, sectionId)  =>(
+                      <View style={styles.mainlist}>
+                      <Text style={styles.SectionHeaderStyle}>{section}</Text>
+                      </View>
+                    )}
               />
             </View>
           )
@@ -64,3 +69,14 @@ class ListCategory extends Component {
 }
 
 export default withNavigation(ListCategory)
+/*
+              <FlatList
+                contentContainerStyle={styles.listContent}
+                data = {data.allCategoriesFlat || []}
+                extraData={selectedCateId}
+                keyExtractor={item => item.id+""}
+                renderItem={({ item }) =>
+                   <CategoryListItem item={item} selectedItem={selectedCateId}  onClickCategory={(item) => this.props.onClickCategory(item)} />
+                }
+              />
+              */

@@ -342,6 +342,9 @@ export default class HomeScreen extends React.Component {
                 <View>
                   <View style={styles.searchSec}>
                     <Item regular style={styles.searchItem}>
+              {/*TODO: Change searchTerms from String to Array of Strings */
+                console.log("Home: loginStatus: ", loginStatus.countryCode) ? null : null
+              }
                       <Input
                         placeholder="What are you looking for?"
                         style={styles.mainSearch}

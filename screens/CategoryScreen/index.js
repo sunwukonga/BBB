@@ -96,9 +96,8 @@ export default class CategoryScreen extends React.Component {
 		 <List style={styles.mainlist}>
 		 <ListItem avatar onPress={() => {
        this.props.navigation.navigate('searchResultScreen', {
-         searchTerms: this.state.searchTerms
-       , loginStatus: this.props.navigation.state.params.loginStatus
-       , categoryId: rowItem.id
+         loginStatus: this.props.navigation.state.params.loginStatus
+       , filter: { categories: [rowItem.id] }
        })}
      }>
 					 <Body style={styles.bodys}>
@@ -132,7 +131,6 @@ export default class CategoryScreen extends React.Component {
 				<BBBHeader
 					title="Categories"
 					leftComponent={leftComponent}
-					enableSearch
 				/>
 				<Content>
 			{this.state.allCategoryList.length == 0 && this.state.allCategoryList == 'undefiend' ?

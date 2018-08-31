@@ -11,6 +11,18 @@ export default StyleSheet.create({
 		height:
 			Platform.OS === 'ios' ? Layout.HEIGHT * 0.91 : Layout.HEIGHT * 0.875,
 	},
+	mainlist: {
+		backgroundColor: Colors.white,
+		borderBottomWidth: 0.5,
+		borderBottomColor: Colors.mainBottomBorderColor,
+		marginLeft: 0,
+		marginRight: 0,
+	},
+	SectionHeaderStyle:{
+    fontSize :Layout.moderateScale(20),
+    padding: 10,
+    color: '#000',
+  },
 	contents: {
 		width: Layout.WIDTH * 0.15,
 		height: Layout.HEIGHT,
@@ -131,6 +143,7 @@ export default StyleSheet.create({
 		color: '#272727',
 		fontFamily: 'roboto-reguler',
 		fontSize: Layout.moderateScale(11.5),
+    width: Layout.WIDTH * 0.5,
 	},
 
 	thumbImageStyle: {

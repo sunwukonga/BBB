@@ -18,28 +18,22 @@ import Stars from '../../components/Stars';
 import CheckBox from '../../components/CheckBox';
 import CheckboxBlank from '../../components/CheckboxBlank';
 import CheckboxChecked from '../../components/CheckboxChecked';
+
 class CategoryListItem extends Component {
 
   constructor(props) {
     super(props);
   }
 
-  
-  onClickCategory(data) {
-
-    	this.props.onClickCategory(data);
-  }
-
   render() {
-    let item = this.props.item
-    let selectedCateId=this.props.selectedItem
+    const {item, categoryIds} = this.props
 
     return (
       <View style={styles.offersListItem} key={'categories_' + item.id}>
         <CheckBox
           style={styles.chboxRemember}
-          isChecked={item.id == selectedCateId ? true : false}
-          onClick={() => this.onClickCategory(item)}
+          isChecked={categoryIds.includes(item.id)}
+          onClick={() => this.props.onClickCategory({id: item.id, selected: !categoryIds.includes(item.id)})}
           checkBoxColor={'#fff'}
           rightText={item.name}
           rightTextStyle={{

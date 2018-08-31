@@ -49,7 +49,6 @@ export default StyleSheet.create({
 
   },
 	SectionHeaderStyle:{
-
     fontSize :Layout.moderateScale(20),
     padding: 10,
     color: '#000',

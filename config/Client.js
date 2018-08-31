@@ -127,7 +127,6 @@ const stateLink = withClientState({
         return null
       },
       setCountry: (_, args, { cache }) => {
-        console.log('setCountry client-side mutation fired');
         cache.writeData({ data: { countryCode: args.countryCode }});
         return null;
       },

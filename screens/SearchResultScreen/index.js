@@ -40,39 +40,61 @@ import LoginStatus from '../HomeScreen/LoginStatus'
 import getSearchProductList from './SearchListing';
 import { w } from '../../utils/helpers.js'
 
-var mode="SALE",searchTerms="",rating=null,verification=null,priceMax=null,priceMin=null,categories=[],templates=[],tags=[],counterOffer=null,distance=null;
+var searchTerms = ""
+var filterDefaults = {
+  "mode": "SALE"
+, "countryCode": 'SG'
+, "seconds": null
+, "rating": null
+, "verification": null
+, "distance": null
+, "priceMax": null
+, "priceMin": null
+, "categories": []
+, "templates": []
+, "tags": []
+, "counterOffer": null
+}
+var filter = {}
 
 export default class SearchResultScreen extends React.Component {
 
   constructor(props) {
     super(props);
     searchTerms=this.props.navigation.state.params.searchTerms || ""
-	  this.state = {
-      searchList:[],
-      progressVisible: false,
-      showSearchBox:false,
-			countryCode:'',
-			page:1,
-			limit:10,
-			isLoadingMore:false,
-			loadMoreCompleted:false,
-			data:props.navigation.state.params
+    Object.assign(
+      filter
+    , filterDefaults
+    , { countryCode: this.props.navigation.state.params.loginStatus.countryCode }
+    , this.props.navigation.state.params.filter
+    )
+    this.state = {
+      searchList:[]
+    , progressVisible: false
+    , showSearchBox:false
+    , countryCode:''
+    , page:1
+    , limit:10
+    , isLoadingMore:false
+    , loadMoreCompleted:false
+    , data:props.navigation.state.params
     }
   }
 
   componentDidMount(){
-		//this._retrieveCountry();
     this.setState({
-			searchList:[],
-      progressVisible: true,
-    });
-		;
-		if(this.props.navigation.state.params.categoryId){
-			categories.push(this.props.navigation.state.params.categoryId);
-		}
-		setTimeout(() => {
-    this.searchProductList();
-		  }, 350);
+      searchList:[]
+    , progressVisible: true
+    })
+    Object.assign(
+      filter
+    , filterDefaults
+    , { countryCode: this.props.navigation.state.params.loginStatus.countryCode }
+    , this.props.navigation.state.params.filter
+    )
+    setTimeout(() => {
+      this.searchProductList();
+    }, 50);
   }
 
 	componentWillReceiveProps(nextProps) {
@@ -84,49 +106,21 @@ export default class SearchResultScreen extends React.Component {
 			isLoadingMore:false,
 			page:1,
 		});
-		categories=[];
-		tags=[];
-		templates=[];
+    Object.assign(
+      filter
+    , filterDefaults
+    , { countryCode: this.props.navigation.state.params.loginStatus.countryCode }
+    , this.props.navigation.state.params.filter
+    )
 
-		//console.log(nextProps.navigation.state.params);
 		this.setState({ data: nextProps.navigation.state.params });
-		mode=nextProps.navigation.state.params.mode;
-	  rating=nextProps.navigation.state.params.rating;
-		verification=nextProps.navigation.state.params.idVerify;
-		counterOffer=nextProps.navigation.state.params.counterOffer;
-		priceMax=nextProps.navigation.state.params.maxPrice;
-		priceMin=nextProps.navigation.state.params.minPrice;
-		var category=nextProps.navigation.state.params.categoryId;
-		var templateId=nextProps.navigation.state.params.templateId;
-		var tagId=nextProps.navigation.state.params.tagId;
-		if(templateId!=null){
-			templates.push(templateId);
-		}
-		if(tagId!=null){
-			tags.push(tagId);
-		}
-		if(category != null){
-			categories.push(category);
-		}
-		setTimeout(() => {
-		this.searchProductList();
-		}, 350);
-	}
-	_retrieveCountry = async () => {
-	      try {
-	          const value = await AsyncStorage.getItem('countryCode');
-	          if (value !== null) {
-	            console.log(value);
-	            this.setState({
-	              countryCode: value
-	            });
-	          }
-	       } catch (error) {
-	         console.log(error);
-	       }
-	    }
-  searchProductList(){
 
+		setTimeout(() => {
+      this.searchProductList();
+		}, 50);
+	}
+
+  searchProductList() {
 		if(this.state.loadMoreCompleted){
 			console.log("API Completed");
 			return;
@@ -135,19 +129,7 @@ export default class SearchResultScreen extends React.Component {
       "terms": [searchTerms]
     , "limit": this.state.limit
     , "page": this.state.page
-    , "filter": {
-        "mode": mode
-      , "countryCode": this.props.navigation.state.params.loginStatus.countryCode
-      , "rating": rating
-      , "verification": verification
-      , "priceMax": priceMax
-      , "priceMin": priceMin
-      , "categories": categories
-      , "templates": templates
-      , "tags": tags
-      , "counterOffer": counterOffer
-      , "distance": distance
-      }
+    , "filter": filter
     }
     //  console.log(variables);
       getSearchProductList(variables).then((res)=>{
@@ -303,7 +285,11 @@ export default class SearchResultScreen extends React.Component {
   				</Button>
   				<Button
   					transparent
-  					onPress={() => this.props.navigation.navigate('filterScreen')}>
+  					onPress={() => this.props.navigation.navigate({
+                routeName: 'filterScreen'
+              , params: {filter: filter}
+              })
+            }>
   					<BBBIcon
   						name="StrollerFilterSvg"
   						size={Layout.moderateScale(18)}

@@ -38,61 +38,84 @@ import { Layout, Colors, Images } from '../../constants/';
 import FilterConstants from './FilterConstants'
 import getTemplateList from './SearchTemplateApi';
 import ListCategory from './ListCategory';
-var selectedCateId=null;
+
+var internalUpdate = false
+
 export default class FilterScreen extends React.Component {
 	constructor(props) {
 		super(props);
+    this.onClickCategory = this.onClickCategory.bind(this)
+    // TODO: remove state and work directly from the props
 		this.state = {
 			segment: 1,
 			truefalse: false,
 			typography: 'Please select',
 			SliderValue: 0,
-			mode:null,
-			modeItemList:FilterConstants.modeItems,
+
+      filter: this.props.navigation.state.params.filter,
+
+			modeItemList: FilterConstants.modeItems.map( modeItem => {
+        if (modeItem.title.toUpperCase() === this.props.navigation.state.params.filter.mode) {
+          modeItem.checked = true
+        }
+        return modeItem
+      }),
 			ratingItemList:FilterConstants.ratingItems,
 			idVerificationList:FilterConstants.idVerifications,
 			daysList:FilterConstants.filterDays,
-			rating:null,
-			idVerification:null,
       allCategoryValueList:[],
       searchTemplateValueList:[],
 			tagValueList:[],
 			progressVisible:false,
-			selectedCateId:null,
-			templateId:null,
-			tagId:null,
-			isCounterOffer:false,
-			minMaxPrice: [0, 25000],
 			isDateTimePickerVisible: false,
 			dateTime:null,
 			selectedDate:null,
 		};
 	}
 
-	minMaxPriceValuesChange = (values) => {
-		console.log(values);
-	    this.setState({
-	      minMaxPrice: values,
-	    });
-	  }
+  componentDidUpdate(prevProps) {
+    const { filter } = this.props.navigation.state.params
+    const { filter: _filter } = prevProps.navigation.state.params
+    if ( !internalUpdate ) {
+      if ( JSON.stringify( filter ) !== JSON.stringify( _filter ) ) {
+        this.setState({
+          filter: this.props.navigation.state.params.filter
+        })
+      }
+    } else {
+      internalUpdate = false
+    }
+  }
 
-		_showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+  minMaxPriceValuesChange = (values) => {
+    internalUpdate = true
+    this.setState({
+      filter: Object.assign( this.state.filter, { minPrice: values[0], maxPrice: values[1] })
+    })
+  }
 
-		_hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+  _showDateTimePicker = () => {
+    internalUpdate = true
+    this.setState({ isDateTimePickerVisible: true })
+  }
+  _hideDateTimePicker = () => {
+    internalUpdate = true
+    this.setState({ isDateTimePickerVisible: false })
+  }
   _handleDatePicked = (date) => {
     console.log('A date has been picked: ', date.getTime()/1000);
+    internalUpdate = true
 		this.setState({
-			 isDateTimePickerVisible: false,
-			 dateTime:date.getTime()/1000,
-			 selectedDate:""+date,
+			isDateTimePickerVisible: false,
+      filter: Object.assign( this.state.filter, { seconds: date.getTime()/1000 }),
+			selectedDate:""+date,
+      isDateTimePickerVisible: false,
 	 	})
-    this._hideDateTimePicker();
   };
 
-	_getTemplates(){
-		console.log("selected categoryId",selectedCateId);
+	_getTemplates() {
     var variables={
-      "terms":[""],"limit":20,"page":1,"categoryId":[selectedCateId]
+      "terms":[""],"limit":20,"page":1,"categoryId": this.state.filter.categories[0]
     }
     getTemplateList(variables).then((res)=>{
 
@@ -101,6 +124,7 @@ export default class FilterScreen extends React.Component {
           tmpList.push({title:res.data.searchTemplates[key].title,id:res.data.searchTemplates[key].id,checked:false,tagList:res.data.searchTemplates[key].tags});
       });
         console.log("Array New :" , tmpList.length);
+      internalUpdate = true
       this.setState({
         searchTemplateValueList:tmpList,
       })
@@ -117,6 +141,18 @@ export default class FilterScreen extends React.Component {
 		// let msg = data.checked ? 'you checked ' : 'you unchecked ';
 	}
 
+  setMode( mode ) {
+    internalUpdate = true
+    this.setState({
+      modeItemList: this.state.modeItemList.map( modeItem => {
+        if (modeItem.title.toUpperCase() === mode) {
+          modeItem.checked = true
+        }
+        return modeItem
+      })
+    })
+  }
+
 	onClickMode(data) {
 		var tmpList=this.state.modeItemList;
 		for(var i=0;i<tmpList.length;i++){
@@ -125,13 +161,15 @@ export default class FilterScreen extends React.Component {
 				tmpList[i].checked=true;
 			}
 		}
+    internalUpdate = true
 		this.setState({
-			mode:data.title.toUpperCase(),
+      filter: Object.assign( this.state.filter, { mode: data.title.toUpperCase() }),
 			modeItemList:tmpList,
 		});
 	}
 
 	onClickTemplate(data) {
+    //TODO: This is wrong. Should be able to select multiple templates
 		var tmpList=this.state.searchTemplateValueList;
 		var tmpTagList;
 		for(var i=0;i<tmpList.length;i++) {
@@ -142,13 +180,17 @@ export default class FilterScreen extends React.Component {
 			}
 		}
 
+    internalUpdate = true
 		this.setState({
+      filter: Object.assign( this.state.filter, { templates: this.state.filter.templates.concat( [ data.id ] ) }),
 			templateId:data.id,
 			searchTemplateValueList:tmpList,
 			tagValueList:tmpTagList,
 		});
 	}
+
 	onClickTag(data) {
+    //TODO: This is wrong, should be able to select multiple tags
 		var tmpList=this.state.tagValueList;
 		for(var i=0;i<tmpList.length;i++) {
 			tmpList[i].checked=false;
@@ -157,22 +199,34 @@ export default class FilterScreen extends React.Component {
 			}
 		}
 
+    internalUpdate = true
 		this.setState({
-			tagId:data.id,
+      filter: Object.assign( this.state.filter, { tags: this.state.filter.tags.concat( [ data.id ] ) }),
 			tagValueList:tmpList,
 		});
 	}
 
-	onClickCate(data) {
-		selectedCateId=data.id;
+	onClickCategory({id, selected}) {
+    if (!selected) {
+      console.log("Undo click")
+      internalUpdate = true
+      this.setState({
+        filter: Object.assign( this.state.filter, { categories: this.state.filter.categories.filter( categoryId => categoryId != id)})
+      })
+    } else {
+      console.log("Do click: ", this.state.filter.categories)
+      this.state.filter.categories.push( id )
+      internalUpdate = true
+      this.setState({
+        filter: Object.assign( this.state.filter, { categories: this.state.filter.categories})
+      })
+    }
     this._getTemplates();
-    this.setState({
-      selectedCateId:data.id,
-    });
 	}
 
 
 	onClickRating(data) {
+    //TODO: this is wrong, needs to be a bitwise addition of ratings
 		var tmpList=this.state.ratingItemList;
 		for(var i=0;i<tmpList.length;i++){
 			tmpList[i].checked=false;
@@ -180,18 +234,21 @@ export default class FilterScreen extends React.Component {
 				tmpList[i].checked=true;
 			}
 		}
+    internalUpdate = true
 		this.setState({
-			rating:data.ratingvalue,
+      filter: Object.assign( this.state.filter, { rating: data.ratingvalue }),
 			ratingItemList:tmpList,
 		});
 	}
 
 	onClickOffers(){
+    internalUpdate = true
 		this.setState({
-			isCounterOffer:!this.state.isCounterOffer
+      filter: Object.assign( this.state.filter, { counterOffer: !this.state.counterOffer }),
 		})
 	}
 	onClickIdentify(data) {
+    //TODO: this is wrong, needs to be a bitwise addition of verifications
 		var tmpList=this.state.idVerificationList;
 		for(var i=0;i<tmpList.length;i++){
 			tmpList[i].checked=false;
@@ -199,8 +256,9 @@ export default class FilterScreen extends React.Component {
 				tmpList[i].checked=true;
 			}
 		}
+    internalUpdate = true
 		this.setState({
-			idVerification:data.ratingvalue,
+      filter: Object.assign( this.state.filter, { idVerification: data.id }),
 			idVerificationList:tmpList,
 		});
 	}
@@ -257,6 +315,7 @@ export default class FilterScreen extends React.Component {
 	}
 
 	_renderActiveComponent = () => {
+    console.log("Filter_: ", this.state.filter.categories)
 		const { segment } = this.state;
 
 		if (segment === 1) {
@@ -306,7 +365,7 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'dateandtime'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Date & Time</Text>
+						<Text style={styles.filterDetailsTitle}>Listing newer than</Text>
 					</View>
 					<View style={styles.dateTimeSec}>
 
@@ -333,7 +392,8 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'ratings'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Ratings</Text>
+						<Text style={styles.filterDetailsTitle}>Listing Author Ratings</Text>
+						<Text>This feature is experimental. It may not work as expected.</Text>
 					</View>
 					<View>
 						{this.state.ratingItemList.map((item, index) => {
@@ -385,107 +445,63 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'identify'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Identify Verification</Text>
+						<Text style={styles.filterDetailsTitle}>Listing Author Identify Verification</Text>
+						<Text>This feature is experimental. It may not work as expected.</Text>
 					</View>
 					<View>
 						{this.state.idVerificationList.map((item, index) => {
 							return (
 								<View style={styles.offersListItem} key={'identify_' + index}>
-									<CheckBox
-										style={styles.chboxRemember}
-										isChecked={item.checked}
-										onClick={() => this.onClickIdentify(item)}
-										checkBoxColor={'#fff'}
-										rightTextView={this.identifyFn(item.ratingvalue)}
-										rightTextStyle={{
-											color: Colors.secondaryColor,
-											fontSize: Layout.moderateScale(18),
-											marginLeft: Layout.moderateScale(10),
-											fontFamily: 'roboto-reguler',
-										}}
-										unCheckedImage={
-											<CheckboxBlank
-												width={Layout.moderateScale(20)}
-												height={Layout.moderateScale(20)}
-											/>
-										}
-										checkedImage={
-											<CheckboxChecked
-												width={Layout.moderateScale(20)}
-												height={Layout.moderateScale(20)}
-											/>
-										}
-									/>
+                  <View style={styles.row}>
+                    <CheckBox
+                      style={styles.chboxRemember}
+                      isChecked={item.checked}
+                      onClick={() => this.onClickIdentify(item)}
+                      checkBoxColor={'#fff'}
+                      rightTextView={this.identifyFn(item.ratingvalue)}
+                      rightTextStyle={{
+                        color: Colors.secondaryColor,
+                        fontSize: Layout.moderateScale(18),
+                        marginLeft: Layout.moderateScale(10),
+                        fontFamily: 'roboto-reguler',
+                      }}
+                      unCheckedImage={
+                        <CheckboxBlank
+                          width={Layout.moderateScale(20)}
+                          height={Layout.moderateScale(20)}
+                        />
+                      }
+                      checkedImage={
+                        <CheckboxChecked
+                          width={Layout.moderateScale(20)}
+                          height={Layout.moderateScale(20)}
+                        />
+                      }
+                    />
+                    <View style={styles.bulletText}>
+                      <Text style={styles.identityDescText}>{item.description}</Text>
+                    </View>
+                  </View>
 								</View>
 							);
 						})}
-					</View>
-					<View style={styles.offersListItem1}>
-						<Text style={styles.identityDescTitle}>
-							Verified the identity of the user(s) Information
-						</Text>
-
-						<View style={styles.row}>
-							<View style={styles.bulletText}>
-								<Text>{'\u2022' + ' '}</Text>
-							</View>
-							<View style={styles.bulletText}>
-								<Text style={styles.identityDescText}>
-									If they are logged in with an social media account, they have
-									one green bar
-								</Text>
-							</View>
-						</View>
-						<View style={styles.row}>
-							<View style={styles.bulletText}>
-								<Text>{'\u2022' + ' '}</Text>
-							</View>
-							<View style={styles.bulletText}>
-								<Text style={styles.identityDescText}>
-									If they are logged in with an social media account, they have
-									one green bar
-								</Text>
-							</View>
-						</View>
-						<View style={styles.row}>
-							<View style={styles.bulletText}>
-								<Text>{'\u2022' + ' '}</Text>
-							</View>
-							<View style={styles.bulletText}>
-								<Text style={styles.identityDescText}>
-									Lorem Ipsum is simply dummy text of the printing and
-									typesetting industry
-								</Text>
-							</View>
-						</View>
-						<View style={styles.row}>
-							<View style={styles.bulletText}>
-								<Text>{'\u2022' + ' '}</Text>
-							</View>
-							<View style={styles.bulletText}>
-								<Text style={styles.identityDescText}>
-									Lorem Ipsum is simply dummy text of the printing and
-									typesetting industry
-								</Text>
-							</View>
-						</View>
 					</View>
 				</View>
 			);
 		} else if (segment === 5) {
 			return (
-				<View key={'distance'}>
+				<View key={'price'}>
 					<View style={styles.minMaxPrice}>
-							<Text style={{ flex: 1 }}>Price:</Text>
+							<Text style={{ flex: 1 }}>Price Range</Text>
 				<MultiSlider
-				 values={[this.state.minMaxPrice[0], this.state.minMaxPrice[1]]}
-				 onValuesChange={this.minMaxPriceValuesChange}
-				 min={0}
-				 max={25000}
-				 step={500}
-				 allowOverlap
-				 snapped
-			 />
+           values={[this.state.filter.minPrice, this.state.filter.maxPrice]}
+           onValuesChange={this.minMaxPriceValuesChange}
+           min={0}
+           max={25000}
+           step={500}
+           allowOverlap
+           snapped
+         />
 
 			 <View style={{
         flex: 0,
@@ -493,8 +509,8 @@ export default class FilterScreen extends React.Component {
         alignItems: 'center',
     }}>
 
-						<Text style={{ flex: 1 }}>Min: {this.state.minMaxPrice[0]}</Text>
-						<Text style={{ flex: 0 }}>Max: {this.state.minMaxPrice[1]}</Text>
+						<Text style={{ flex: 1 }}>Min: {this.state.filter.minPrice}</Text>
+						<Text style={{ flex: 0 }}>Max: {this.state.filter.maxPrice}</Text>
 				</View>
 
 			 </View>
@@ -510,7 +526,7 @@ export default class FilterScreen extends React.Component {
 						<BBBIcon name="Search" style={styles.filterDetailsTitle} />
 					</View>
 					<View>
-						  <ListCategory selectedCateId={this.state.selectedCateId} onClickCategory={(item) => this.onClickCate(item)} />
+            <ListCategory categoryIds={this.state.filter.categories} onClickCategory={(item) => this.onClickCategory(item)} />
 					</View>
 				</View>
 			);
@@ -571,7 +587,7 @@ export default class FilterScreen extends React.Component {
 								<View style={styles.offersListItem} key={'tags_' + index}>
 									<CheckBox
 										style={styles.chboxRemember}
-										isChecked={item.id===this.state.tagId?true:false}
+										isChecked={this.state.filter.tags.includes( item.id )}
 										onClick={() => this.onClickTag(item)}
 										checkBoxColor={'#fff'}
 										rightText={item.name}
@@ -610,7 +626,7 @@ export default class FilterScreen extends React.Component {
 					<View style={styles.offersListItem}>
 						<CheckBox
 							style={styles.chboxRemember}
-							isChecked={this.state.isCounterOffer}
+							isChecked={this.state.filter.counterOffer}
 							onClick={() => this.onClickOffers()}
 							checkBoxColor={'#fff'}
 							rightText={'Allow counter offer'}
@@ -646,6 +662,7 @@ export default class FilterScreen extends React.Component {
 			if (i < item.ratingvalue) {
 				tempItem.push(
 					<BBBIcon
+            key={i.toString()}
 						name="Star"
 						color="#feb532"
 						size={Layout.moderateScale(16)}
@@ -654,6 +671,7 @@ export default class FilterScreen extends React.Component {
 			} else {
 				tempItem.push(
 					<BBBIcon
+            key={i.toString()}
 						name="Star"
 						color="#bebebe"
 						size={Layout.moderateScale(16)}
@@ -704,7 +722,10 @@ export default class FilterScreen extends React.Component {
 							{FilterConstants.filterItem.map((item, index) => {
 								return (
 									<TouchableOpacity
-										onPress={() => this.setState({ segment: item.id })}
+										onPress={() => {
+                      internalUpdate = true
+                      this.setState({ segment: item.id })
+                    }}
 										style={[
 											styles.filterTitle,
 											{
@@ -715,6 +736,7 @@ export default class FilterScreen extends React.Component {
 											},
 										]}
 										key={index}>
+                    { item.type !== 'ion' ?
 										<BBBIcon
 											name={item.name}
 											size={Layout.moderateScale(18)}
@@ -725,6 +747,18 @@ export default class FilterScreen extends React.Component {
 														: Colors.white,
 											}}
 										/>
+                    :
+                    <Ionicons
+											name={item.name}
+                      size={Layout.moderateScale(18)}
+                      color={
+                        this.state.segment == item.id
+                        ? Colors.secondaryColor
+                        : Colors.white
+                      }
+                      style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}
+                    />
+                    }
 									</TouchableOpacity>
 								);
 							})}
@@ -740,37 +774,35 @@ export default class FilterScreen extends React.Component {
 	}
 
 	returnToSearchList(){
+    console.log("Filter_: ", this.state.filter.categories)
 		this.props.navigation.navigate({
 		    routeName: 'searchResultScreen',
 		    params: {
           previous_screen: 'filterScreen'
-        , mode:this.state.mode
-        , rating:this.state.rating
-        , idVerify:this.state.idVerification
-        , categoryId:this.state.selectedCateId
-				, templateId:this.state.templateId
-        , tagId:this.state.tagId
-        , counterOffer:this.state.isCounterOffer
-        , minPrice:this.state.minMaxPrice[0]
-        , maxPrice:this.state.minMaxPrice[1]
+        , filter: this.state.filter
         }
 		});
 	}
 
 	resetAllValues(){
-
+    internalUpdate = true
 		this.setState({
-			mode:null,
-			rating:null,
-			idVerification:null,
-			templateId:null,
-			tagId:null,
-			categoryId:null,
-			isCounterOffer:false,
-			minMaxPrice:[0,25000],
-		});
+      filter: Object.assign( this.state.filter,
+        { mode: "SALE"
+        , seconds: null
+        , rating: null
+        , verification: null
+        , distance: null
+        , priceMax: null
+        , priceMin: null
+        , categories: []
+        , templates: []
+        , tags: []
+        , counterOffer: null
+        }
+      )
+    })
 		this.resetAllListValues();
-
 	}
 
 	resetAllListValues(){
@@ -801,7 +833,7 @@ export default class FilterScreen extends React.Component {
 		// 	tagTmpList[i].checked=false;
 		// }
 
-
+    internalUpdate = true
 		this.setState({
 			modeItemList:modeTmpList,
 			ratingItemList:ratingTmpList,
