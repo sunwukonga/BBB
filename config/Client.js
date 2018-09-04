@@ -7,10 +7,10 @@ import { onError } from "apollo-link-error";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { Mutation } from "react-apollo";
 
-const default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTI1NTA2MjEyfQ.daamAG6JGC8LnlFRAsN4ppB23HhN_BtiuRA7QnXBqrU';
+const default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlcyI6WyJCQVJHQUlORVIiXSwiY291bnRyeUNvZGUiOiJTRyJ9.TOuq0TrlR4Sd9QHGR72a3_84lW8tmK060hV2G3oUrIU'
 var token = default_token
 //var default_token = await Expo.SecureStore.getItemAsync('defaultToken');
-const BBB_BASE_URL = 'http://notify.parker.sg:3000/graphql'
+const BBB_BASE_URL = 'http://bbb.bebebargains.com:3000/graphql'
 
 const cache = new InMemoryCache({
   dataIdFromObject: object => {
