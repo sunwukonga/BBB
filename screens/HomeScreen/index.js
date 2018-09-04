@@ -32,6 +32,7 @@ import { Ionicons } from '@expo/vector-icons';
 import styles from './styles';
 import headerStyles from '../../components/BBBHeader/styles';
 import { Layout, Colors, Images, IconNames } from '../../constants/';
+import Toast from 'react-native-simple-toast';
 
 // FlatLists with embedded Queries
 import ListRecentListings from './ListRecentListings'
