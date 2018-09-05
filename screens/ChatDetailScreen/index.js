@@ -41,7 +41,7 @@ import { updateChatMessages } from '../../utils/helpers.js'
 
 // screen style
 import styles from './styles';
-import { Layout, Images, Colors } from '../../constants/';
+import { Layout, Images, Colors, Urls } from '../../constants/';
 
 import SendMessageInput from './SendMessageInput'
 import getChatMessages from './GetChatMessages';
@@ -49,6 +49,7 @@ import sendChatMessage from './SendMessage';
 //import createChat from './CreateChat';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';
+import { w } from '../../utils/helpers.js'
 
 var isFromChat=false;
 
@@ -154,24 +155,24 @@ export default class ChatScreen extends Component {
     let profileImage
     let profileName
 
-    if ( chat && chat.listing && chat.listing.user && chat.listing.user.id != chat.userId ) {
-      if ( chat.listing.user.profileImage && chat.listing.user.profileImage.imageKey ) {
+    if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
+      if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) ) {
         profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
       } else {
-        profileImage = <Baby style={styles.profileImage} />
+        profileImage =  <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
       }
-      if ( chat.listing.user.profileName ) {
+      if ( w(chat, ['listing', 'user', 'profileName']) ) {
         profileName = <Title style={styles.headerTitle}>{chat.listing.user.profileName}</Title>
       } else {
         profileName = <Text>Nothing to show</Text>
       }
-    } else if ( chat.initUser.id != chat.userId ) {
-      if ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey ) {
-        profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.primaryImage.imageKey }} style={styles.profileImage} />
+    } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
+      if ( w(chat, ['initUser', 'profileImage', 'imageKey']) ) {
+        profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
       } else {
-        profileImage = <Baby style={styles.profileImage} />
+        profileImage = <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
       }
-      if ( chat.initUser.profileName ) {
+      if ( w(chat, ['initUser', 'profileName']) ) {
         profileName = <Title style={styles.headerTitle}>{chat.initUser.profileName}</Title>
       } else {
         profileName = <Text> Nothing to show </Text>
@@ -287,6 +288,7 @@ export default class ChatScreen extends Component {
               return <ActivityIndicator size="large" />;
             }
             if (error) {
+              // TODO: Turn this error into a retry ICON
               return <Text>Error: {error.message}</Text>;
             }
             if (!data.getChatMessages || data.getChatMessages.length == 0) {
@@ -304,7 +306,7 @@ export default class ChatScreen extends Component {
                   leftComponent={leftComponent}
                 />
                 <View style={styles.notifyContainer}>
-                  { (chat && chat.listing && chat.listing.primaryImage && chat.listing.primaryImage.imageKey)
+                  { (w(chat, ['listing', 'primaryImage', 'imageKey']))
                   ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.primaryImage.imageKey }} style={styles.notifyImage} />
                   : <Baby style={styles.profileImage} />
                   }

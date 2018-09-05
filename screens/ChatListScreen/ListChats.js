@@ -25,6 +25,7 @@ import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 import { withNavigation } from 'react-navigation'
+import { w } from '../../utils/helpers.js'
 
 import {
   GET_CHAT_MESSAGES
@@ -39,37 +40,7 @@ class ListChats extends Component {
     super(props);
   }
 
-  otherImage( chat ) {
-    if ( chat.listing && chat.listing.user && chat.listing.user.id != chat.userId ) {
-      return (
-       ( chat.listing.user.profileImage && chat.listing.user.profileImage.imageKey )
-       ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
-       : <Baby style={styles.rowImage} />
-      )
-    } else if ( chat && chat.initUser ) {
-      return (
-       ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey )
-       ? <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
-       : <Baby style={styles.rowImage} />
-      )
-    }
-  }
-  otherProfileName( chat ) {
-    if ( chat && chat.listing && chat.listing.user && chat.listing.user.id != chat.userId ) {
-      return (
-       ( chat && chat.listing && chat.listing.user && chat.listing.user.profileName )
-       ? <Text style={styles.name}>{chat.listing.user.profileName}</Text>
-       : null
-      )
-    } else if (chat && chat.initUser && chat.initUser.id != chat.userId) {
-      console.log("initUser not me")
-      return (
-       ( chat.initUser.profileName )
-       ? <Text style={styles.name}>{chat.initUser.profileName}</Text>
-       : null
-      )
-    }
-  }
+
 
   deleteChat( chatId, mutateDeleteChat ) {
     Alert.alert(
@@ -87,6 +58,50 @@ class ListChats extends Component {
 //  renderChat = ( { item }) => {
   renderChat = ( item, chatIndexes, loginStatus ) => {
     let { item: chat } = item
+    function OtherImage( props ) {
+      const {chat} = props
+      if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
+        if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) || w(chat, ['listing', 'user', 'profileImage', 'imageURL']) ) {
+          if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) ) {
+            console.log("listingUserKey: ", chat.listing.user.profileImage.imageKey )
+            return <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+          } else {
+            return <Image source={{ uri: chat.listing.user.profileImage.imageURL }} style={styles.profileImage} />
+          }
+        } else {
+          return <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+        }
+      } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
+        if ( w(chat, ['initUser', 'profileImage', 'imageKey']) || w(chat, ['initUser', 'profileImage', 'imageURL']) ) {
+          if ( w(chat, ['initUser', 'profileImage', 'imageKey'])) {
+            console.log("initUserKey: ", chat.initUser.profileImage.imageKey )
+            return <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
+          } else {
+            return <Image source={{ uri: chat.initUser.profileImage.imageURL }} style={styles.profileImage} />
+          }
+        } else {
+          return <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+        }
+      }
+    }
+
+    function OtherProfileName( props ) {
+      const {chat} = props
+      if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
+        if ( w(chat, ['listing', 'user', 'profileName']) ) {
+          return <Title style={styles.headerTitle}>{chat.listing.user.profileName}</Title>
+        } else {
+          return <Text>Nothing to show</Text>
+        }
+      } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
+        if ( w(chat, ['initUser', 'profileName']) ) {
+          return <Title style={styles.headerTitle}>{chat.initUser.profileName}</Title>
+        } else {
+          return <Text> Nothing to show </Text>
+        }
+      }
+    }
+
     return (
       <DeleteChat chat={chat} loginStatus={loginStatus}>{ mutateDeleteChat => (
         <ListItem
@@ -103,7 +118,7 @@ class ListChats extends Component {
         >
           <Left style={styles.left}>
             <View style={styles.bebyview}>
-              { this.otherImage( chat ) }
+              <OtherImage chat={chat} />
             </View>
           </Left>
           <Body style={styles.bodys}>
@@ -115,7 +130,7 @@ class ListChats extends Component {
               <Text style={styles.title}>{chat.listing.title}</Text>
             </View>
             <View style={styles.bottomline} />
-            <View>{ this.otherProfileName( chat ) }</View>
+            <View><OtherProfileName chat={chat} /></View>
             <View style={styles.namecount}>
                 { chat.newMessageCount && chat.newMessageCount > 0
                 ? <Text style={styles.count}>{chat.newMessageCount}</Text>
