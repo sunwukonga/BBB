@@ -4,7 +4,7 @@ import { ApolloLink } from 'apollo-link';
 import { HttpLink } from "apollo-link-http";
 import { withClientState } from "apollo-link-state";
 import { onError } from "apollo-link-error";
-import { InMemoryCache } from "apollo-cache-inmemory";
+import { InMemoryCache, defaultDataIdFromObject } from "apollo-cache-inmemory";
 import { Mutation } from "react-apollo";
 
 const default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlcyI6WyJCQVJHQUlORVIiXSwiY291bnRyeUNvZGUiOiJTRyJ9.TOuq0TrlR4Sd9QHGR72a3_84lW8tmK060hV2G3oUrIU'
@@ -18,7 +18,7 @@ const cache = new InMemoryCache({
       case 'Country': return object.isoCode
       case 'Currency': return object.iso4217
       case 'Language': return object.iso639_2
-      default: return object.id || object._id // fall back to `id` and `_id` for all other types
+      default: return defaultDataIdFromObject(object) // object.id || object._id // fall back to `id` and `_id` for all other types
     }
   },
   cacheRedirects: {

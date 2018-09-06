@@ -21,10 +21,11 @@ export default DeleteChat = graphql(DELETE_CHAT) (
     }
 
     adjustListing = (listing, chat) => {
-      if (listing.id == chat.listing.id) {
-        listing.chatId = -1
+      copyListing = JSON.parse(JSON.stringify( listing ))
+      if (copyListing.id == chat.listing.id) {
+        copyListing.chatId = -1
       }
-      return listing
+      return copyListing
     }
 
     render() {
@@ -35,7 +36,6 @@ export default DeleteChat = graphql(DELETE_CHAT) (
       return this.props.children( () => this.props.mutate({
         variables: { chatId: chat.id },
         update: (cache, { data: { deleteChat } }) => {
-          console.log("deleteChat: ", deleteChat)
           if ( deleteChat ) {
             // ------------------- READING -------------------
             const { getChatMessages } = cache.readQuery({

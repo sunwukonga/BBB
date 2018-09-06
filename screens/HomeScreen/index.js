@@ -73,7 +73,6 @@ export default class HomeScreen extends React.Component {
   }
 
   openDrawerAndSetState = () => {
-    console.log("openDrawerAndSetState")
     this.drawerOpen = true
     this.props.navigation.openDrawer()
   }
@@ -94,16 +93,12 @@ export default class HomeScreen extends React.Component {
     MainDrawer.router.getStateForAction = (action, state) => {
       if (state && action.type === 'Navigation/OPEN_DRAWER') {
         this.drawerOpen = true
-          console.log('<===============>DrawerOpen');
         this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
-          console.log('Listener ADDED && drawerOpen:true');
       }
       if (state && action.type === 'Navigation/DRAWER_CLOSED') {
         this.drawerOpen = false
-          console.log('<|||||||||||||||>DrawerClose');
         this.drawerBackHandler.remove()
         this.drawerBackHandler = null
-          console.log('Listener REMOVED && drawerOpen:false');
       }
       return defaultGetStateForAction(action, state);
     };
@@ -124,7 +119,6 @@ export default class HomeScreen extends React.Component {
   sendLikeRequest(item){
 
     var _like=!item.liked;
-    console.log("Is Liked",_like);
 		var variables={"listingId": item.id,"like": _like}
 		likeProductApi(variables).then((res)=>{
 
@@ -132,11 +126,7 @@ export default class HomeScreen extends React.Component {
           var mostVisitedList=this.state.mostVisitedList;
           for(var i=0;i<mostVisitedList.length;i++){
             if(mostVisitedList[i].id==item.id){
-              console.log("Selected Id: ",item.id);
-                console.log("Is Liked - 1: ",_like);
-                console.log("Selected Item Id","ID:"+item.id+", ID:"+mostVisitedList[i].id+", liked value : "+mostVisitedList[i].liked);
               mostVisitedList[i].liked=_like;
-              console.log(mostVisitedList[i]);
             }
           }
 
@@ -186,13 +176,11 @@ export default class HomeScreen extends React.Component {
     this.willFocusListener = this.props.navigation.addListener(
       'willFocus'
     , payload => {
-        console.log('willFocus')
       }
     )
     this.didFocusListener = this.props.navigation.addListener(
       'didFocus',
       payload => {
-        console.log('didFocus')
         if ( this.drawerOpen ) {
           // reattach the listener as we never closed the drawer
           this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
@@ -208,13 +196,11 @@ export default class HomeScreen extends React.Component {
     this.willBlurListener = this.props.navigation.addListener(
       'willBlur'
     , payload => {
-        console.log('didBlur')
       }
     )
     this.didBlurListener = this.props.navigation.addListener(
       'didBlur'
     , payload => {
-        console.log('didBlur')
         if (this.drawerBackHandler) {
           // Handler still exists. This means that the drawer was not closed before navigating away.
             // I.e. drawerOpen: true
@@ -233,7 +219,6 @@ export default class HomeScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    console.log('willUnmount')
     this.subs.forEach((sub) => {
       sub.remove();
     });
@@ -326,7 +311,6 @@ export default class HomeScreen extends React.Component {
           rightComponent={rightComponent}
         />
         */
-    console.log("HOMESCREEN Render.")
     return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
@@ -344,7 +328,6 @@ export default class HomeScreen extends React.Component {
                   <View style={styles.searchSec}>
                     <Item regular style={styles.searchItem}>
               {/*TODO: Change searchTerms from String to Array of Strings */
-                console.log("Home: loginStatus: ", loginStatus.countryCode) ? null : null
               }
                       <Input
                         placeholder="What are you looking for?"

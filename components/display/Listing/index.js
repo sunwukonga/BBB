@@ -63,21 +63,17 @@ class Listing extends Component {
         // secondary images may exist
         let secImages = item.secondaryImages.filter( image => image.imageKey )
         if ( secImages.length > 0 ) {
-          console.log("sec + pri")
           return item.secondaryImages.slice().unshift( item.primaryImage )
         } else {
-          console.log("pri only")
           return [item.primaryImage]
         }
       } else {
-        console.log("pri only")
         return [item.primaryImage]
       }
     } else {
       // primary image does not exist
       let secImages = item.secondaryImages.filter( image => image.imageKey )
       if ( secImages.length > 0 ) {
-        console.log("sec only")
         return item.secondaryImages
       } else return [{dummy: true}]
     }
@@ -85,6 +81,19 @@ class Listing extends Component {
 
   render() {
     let {item, loginStatus, chatIndexes, currentUser} = this.props
+
+    function OtherImage( props ) {
+      const {item} = props
+      if ( w(item, ['user', 'profileImage', 'imageKey']) || w(item, ['user', 'profileImage', 'imageURL']) ) {
+        if ( w(item, ['user', 'profileImage', 'imageKey']) ) {
+          return <Image source={{ uri: Urls.s3ImagesURL + item.user.profileImage.imageKey }} style={styles.userProfile} />
+        } else {
+          return <Image source={{ uri: item.user.profileImage.imageURL }} style={styles.userProfile} />
+        }
+      } else {
+        return <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+      }
+    }
 
     return (
       <View>
@@ -116,10 +125,7 @@ class Listing extends Component {
         <Item style={styles.userItemDetailsSec}>
           <View style={{ flexDirection: 'row' }}>
             <View style={styles.userProfileSec}>
-              { w(item, ['user', 'profileImage', 'imageKey']) === null
-                ? <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-                : <Image source={{ uri: Urls.s3ImagesURL + item.user.profileImage.imageKey }} style={styles.userProfile} />
-              }
+              <OtherImage item={item} />
               <View style={w(item, ['user', 'online']) ? styles.userOnline : styles.userOffline} />
             </View>
             <View style={styles.userNameSec}>

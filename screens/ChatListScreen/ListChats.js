@@ -63,7 +63,6 @@ class ListChats extends Component {
       if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
         if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) || w(chat, ['listing', 'user', 'profileImage', 'imageURL']) ) {
           if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) ) {
-            console.log("listingUserKey: ", chat.listing.user.profileImage.imageKey )
             return <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
           } else {
             return <Image source={{ uri: chat.listing.user.profileImage.imageURL }} style={styles.profileImage} />
@@ -74,7 +73,6 @@ class ListChats extends Component {
       } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
         if ( w(chat, ['initUser', 'profileImage', 'imageKey']) || w(chat, ['initUser', 'profileImage', 'imageURL']) ) {
           if ( w(chat, ['initUser', 'profileImage', 'imageKey'])) {
-            console.log("initUserKey: ", chat.initUser.profileImage.imageKey )
             return <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
           } else {
             return <Image source={{ uri: chat.initUser.profileImage.imageURL }} style={styles.profileImage} />

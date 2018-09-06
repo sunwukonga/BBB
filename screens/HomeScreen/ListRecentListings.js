@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { Query } from "react-apollo";
 import {
   FlatList
-, View
-, Text
-, ActivityIndicator
+  , View
+  , Text
+  , ActivityIndicator
 } from 'react-native';
 import styles from './styles';
 import { withNavigation } from 'react-navigation'
@@ -32,7 +32,6 @@ class ListRecentListings extends Component {
 
   render() {
     let { variables, loginStatus, chatIndexes, currentUser, createNew } = this.props
-    console.log("LISTRECENT Render: ", loginStatus.countryCode)
     return (
       <Query
         query = {GET_MOST_RECENT_LIST}
@@ -70,8 +69,8 @@ class ListRecentListings extends Component {
                 refreshing={networkStatus === 4 || networkStatus === 3}
                 onRefresh={() => refetch()}
                 onEndReached={() => {
-                  if ( data.getMostRecentListings.length % variables.limit == 0 ) {
-                    let nextPage = (data.getMostRecentListings.length / variables.limit >> 0) + 1
+                  if ( dataPointer.length % variables.limit == 0 ) {
+                    let nextPage = (dataPointer.length / variables.limit >> 0) + 1
                     if ( this.lastFetchedPage < nextPage ) {
                       return fetchMore({
                         variables: Object.assign({}, variables, { page: nextPage }),

@@ -20,10 +20,11 @@ export default CreateChat = graphql(CREATE_CHAT) (
     }
 
     adjustListing = (listing, chat) => {
-      if (listing.id == chat.listing.id) {
-        listing.chatId = chat.id
+      copyListing = JSON.parse(JSON.stringify( listing ))
+      if (copyListing.id == chat.listing.id) {
+        copyListing.chatId = chat.id
       }
-      return listing
+      return copyListing
     }
 
     render() {

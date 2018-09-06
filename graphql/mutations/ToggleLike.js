@@ -36,29 +36,29 @@ export default ToggleLike = graphql(
 
     updateUserLikedListings = (prevArray, newItem) => {
       if (newItem.liked) {
-        return prevArray.filter( item => item.id != newItem.id )
+        return JSON.parse(JSON.stringify( prevArray.filter( item => item.id != newItem.id ) ))
       } else {
         let copiedItem = JSON.parse(JSON.stringify(newItem))
         copiedItem.liked = true
         copiedItem.likes = copiedItem.likes + 1
-        let nextArray = prevArray.filter( item => item.id != newItem.id )
-        nextArray.unshift( copiedItem )
-        return nextArray
+        let copyPrevArray = JSON.parse(JSON.stringify( prevArray.filter( item => item.id != newItem.id ) ))
+        copyPrevArray.unshift( copiedItem )
+        return copyPrevArray
       }
     }
 
     adjustListing = (oldListing, item) => {
-      let listing = JSON.parse(JSON.stringify(oldListing))
-      if (listing.id == item.id) {
-        if (listing.liked) {
-          listing.likes = listing.likes - 1
-          listing.liked = false
+      let copyOldListing = JSON.parse(JSON.stringify(oldListing))
+      if (copyOldListing.id == item.id) {
+        if (copyOldListing.liked) {
+          copyOldListing.likes = copyOldListing.likes - 1
+          copyOldListing.liked = false
         } else {
-          listing.likes = listing.likes + 1
-          listing.liked = true
+          copyOldListing.likes = copyOldListing.likes + 1
+          copyOldListing.liked = true
         }
       }
-      return listing
+      return copyOldListing
     }
 
     render() {

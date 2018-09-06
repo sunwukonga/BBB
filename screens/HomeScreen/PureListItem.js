@@ -55,6 +55,20 @@ class PureListItem extends Component {
         </TouchableOpacity>
       )
     }
+
+    function OtherImage( props ) {
+      const {item} = props
+      if ( w(item, ['user', 'profileImage', 'imageKey']) || w(item, ['user', 'profileImage', 'imageURL']) ) {
+        if ( w(item, ['user', 'profileImage', 'imageKey']) ) {
+          return <Image source={{ uri: Urls.s3ImagesURL + item.user.profileImage.imageKey }} style={styles.userProfile} />
+        } else {
+          return <Image source={{ uri: item.user.profileImage.imageURL }} style={styles.userProfile} />
+        }
+      } else {
+        return <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+      }
+    }
+
     return (
         <TouchableOpacity
           onPress={ () => this.props.navigation.navigate({
@@ -79,13 +93,7 @@ class PureListItem extends Component {
 
           <Item style={styles.userItemDetailsSec}>
             <View style={styles.userProfileSec}>
-
-
-              { w(item, ['user', 'profileImage', 'imageKey']) === null
-                ? <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-                : <Image source={{ uri: Urls.s3ImagesURL + item.user.profileImage.imageKey }} style={styles.userProfile} />
-              }
-
+              <OtherImage item={item} />
               <View style={ w(item, ['user', 'online']) ? styles.userOnline : styles.userOffline} />
             </View>
             <View style={styles.userNameSec}>

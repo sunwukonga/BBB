@@ -26,11 +26,12 @@ export default SetProfileImage = graphql(SET_PROFILE_IMAGE) (
             const getLoginStatus = cache.readQuery({ query: GET_LOGIN_STATUS })
             console.log("GetLoginStatus: ", getLoginStatus)
             // ------------------- MUTATING ------------------
-            getLoginStatus.myProfile.profileImageURL = Urls.s3ImagesURL + setProfileImage.imageKey
+            let copyGetLoginStatus = JSON.parse(JSON.stringify( getLoginStatus ))
+            copyGetLoginStatus.myProfile.profileImageURL = Urls.s3ImagesURL + setProfileImage.imageKey
             // ------------------- WRITING -------------------
             cache.writeQuery({
               query: GET_LOGIN_STATUS
-            , data: getLoginStatus
+            , data: copyGetLoginStatus
             })
           }
         })

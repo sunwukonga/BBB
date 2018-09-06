@@ -58,32 +58,32 @@ export default DeleteListing = graphql(DELETE_LISTING) (
             cache.writeQuery({
               query: GET_USER_LIKED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getUserLikedListings: getUserLikedListings.filter( listing => listing.id != listingId) }
+            , data: { getUserLikedListings: JSON.parse(JSON.stringify( getUserLikedListings.filter( listing => listing.id != listingId))) }
             })
             cache.writeQuery({
               query: GET_USER_VISITED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getUserVisitedListings: getUserVisitedListings.filter( listing => listing.id != listingId) }
+            , data: { getUserVisitedListings: JSON.parse(JSON.stringify( getUserVisitedListings.filter( listing => listing.id != listingId))) }
             })
             cache.writeQuery({
               query: GET_USER_POSTED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getUserPostedListings: getUserPostedListings.filter( listing => listing.id != listingId) }
+            , data: { getUserPostedListings: JSON.parse(JSON.stringify( getUserPostedListings.filter( listing => listing.id != listingId))) }
             })
             cache.writeQuery({
               query: GET_MOST_RECENT_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getMostRecentListings: getMostRecentListings.filter( listing => listing.id != listingId) }
+            , data: { getMostRecentListings: JSON.parse(JSON.stringify( getMostRecentListings.filter( listing => listing.id != listingId))) }
             })
             cache.writeQuery({
               query: GET_MOST_VISITED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getMostVisitedListings: getMostVisitedListings.filter( listing => listing.id != listingId) }
+            , data: { getMostVisitedListings: JSON.parse(JSON.stringify( getMostVisitedListings.filter( listing => listing.id != listingId))) }
             })
             cache.writeQuery({
               query: GET_MOST_LIKED_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getMostLikedListings: getMostLikedListings.filter( listing => listing.id != listingId) }
+            , data: { getMostLikedListings: JSON.parse(JSON.stringify( getMostLikedListings.filter( listing => listing.id != listingId))) }
             })
           } // END if
         }
