@@ -52,6 +52,7 @@ class ListRecentListings extends Component {
           if (!dataPointer || dataPointer.length == 0) {
             dataPointer = [{emptyList: true}]
           }
+                //onRefresh={() => refetch()}
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
@@ -67,7 +68,6 @@ class ListRecentListings extends Component {
                 }}
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
-                onRefresh={() => refetch()}
                 onEndReached={() => {
                   if ( dataPointer.length % variables.limit == 0 ) {
                     let nextPage = (dataPointer.length / variables.limit >> 0) + 1

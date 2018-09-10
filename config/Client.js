@@ -7,11 +7,18 @@ import { onError } from "apollo-link-error";
 import { InMemoryCache, defaultDataIdFromObject } from "apollo-cache-inmemory";
 import { Mutation } from "react-apollo";
 
-const default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlcyI6WyJCQVJHQUlORVIiXSwiY291bnRyeUNvZGUiOiJTRyJ9.TOuq0TrlR4Sd9QHGR72a3_84lW8tmK060hV2G3oUrIU'
-var token = default_token
-//var default_token = await Expo.SecureStore.getItemAsync('defaultToken');
-const BBB_BASE_URL = 'http://bbb.bebebargains.com:3000/graphql'
+let Production = false
+let default_token
+let BBB_BASE_URL
+if (Production) {
+  default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlcyI6WyJCQVJHQUlORVIiXSwiY291bnRyeUNvZGUiOiJTRyJ9.TOuq0TrlR4Sd9QHGR72a3_84lW8tmK060hV2G3oUrIU'
+  BBB_BASE_URL = 'http://bbb.bebebargains.com:3000/graphql'
+} else {
+  default_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiIiLCJyb2xlIjpbeyJuYW1lIjoiR0VORVJBTCJ9XSwiaWF0IjoxNTI1NTA2MjEyfQ.daamAG6JGC8LnlFRAsN4ppB23HhN_BtiuRA7QnXBqrU';
+  BBB_BASE_URL = 'http://notify.parker.sg:3000/graphql'
+}
 
+var token = default_token
 const cache = new InMemoryCache({
   dataIdFromObject: object => {
     switch (object.__typename) {
@@ -84,14 +91,30 @@ const stateLink = withClientState({
     Mutation: {
       setAuthStatus: (_, args, { cache }) => {
         console.log('setAuthStatus client-side mutation fired');
-        token = args.token
-        cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'MyProfile', id: args.id, profileName: args.profileName, nameChangeCount: args.nameChangeCount, profileImageURL: args.profileImageURL }}});
-        return { userId: args.id }
+        if (! args.token ) {
+          // populate from secureStore if available.
+          return Expo.SecureStore.getItemAsync("authStatus")
+          .then( ssAuthStatus => {
+            if (ssAuthStatus) {
+              let authStatus = JSON.parse( ssAuthStatus )
+              token = authStatus.jwt_token
+              cache.writeData({ data: { authorized: true, jwt_token: authStatus.jwt_token, myProfile: {__typename: 'MyProfile', id: authStatus.myProfile.id, profileName: authStatus.myProfile.profileName, nameChangeCount: authStatus.myProfile.nameChangeCount, profileImageURL: authStatus.myProfile.profileImageURL }}});
+              return { userId: authStatus.myProfile.id }
+            } else return null
+          })
+        } else {
+          token = args.token
+          cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'MyProfile', id: args.id, profileName: args.profileName, nameChangeCount: args.nameChangeCount, profileImageURL: args.profileImageURL }}});
+          // populate secureStore
+          Expo.SecureStore.setItemAsync("authStatus", JSON.stringify({ jwt_token: args.token, myProfile: {id: args.id, profileName: args.profileName, nameChangeCount: args.nameChangeCount, profileImageURL: args.profileImageURL }}))
+          return { userId: args.id }
+        }
       },
       unsetAuthStatus: (_, args, { cache }) => {
         console.log('unsetAuthStatus client-side mutation fired');
         token = default_token
         cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: -1, profileName: "", nameChangeCount: 0, profileImageURL: "" }}});
+        Expo.SecureStore.deleteItemAsync("authStatus")
         return null;
       },
       updateAuthStatus: (_, args, { cache }) => {
@@ -128,7 +151,7 @@ const stateLink = withClientState({
       },
       setCountry: (_, args, { cache }) => {
         cache.writeData({ data: { countryCode: args.countryCode }});
-        return null;
+        return args.countryCode;
       },
     }
   },

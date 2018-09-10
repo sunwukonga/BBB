@@ -55,6 +55,7 @@ class ListLikedListings extends Component {
           if (!data.getMostLikedListings || data.getMostLikedListings.length == 0) {
             return null
           }
+                //onRefresh={() => refetch()}
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
@@ -72,7 +73,6 @@ class ListLikedListings extends Component {
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
-                onRefresh={() => refetch()}
                 onEndReached={() => {
                   if ( data.getMostLikedListings.length % variables.limit == 0 ) {
                     let nextPage = (data.getMostLikedListings.length / variables.limit >> 0) + 1

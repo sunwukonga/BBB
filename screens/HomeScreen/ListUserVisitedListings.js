@@ -57,6 +57,7 @@ class ListUserVisitedListings extends Component {
           if (!data.getUserVisitedListings || data.getUserVisitedListings.length == 0) {
             return null
           }
+                //onRefresh={() => refetch()}
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
@@ -74,7 +75,6 @@ class ListUserVisitedListings extends Component {
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
-                onRefresh={() => refetch()}
                 onEndReached={() => {
                   if ( data.getUserVisitedListings.length % variables.limit == 0 ) {
                     let nextPage = (data.getUserVisitedListings.length / variables.limit >> 0) + 1

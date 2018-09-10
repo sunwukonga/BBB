@@ -171,7 +171,6 @@ export default class CreateNewItemScreen extends React.Component {
   _validateAllRequiredFileds() {
     imageList.pop()
     imageUploadList = imageList.map( image => {
-      console.log("ImageList: ", image.id, "Primary: ", image.primary)
       return {
         imageId: image.imageId
       , imageKey: image.imageKey
@@ -222,7 +221,7 @@ export default class CreateNewItemScreen extends React.Component {
     return true
   }
 
-
+  // Not currently used
   _isImageExits(base64){
     if(imageList.length===0){
       return false;
@@ -246,8 +245,6 @@ export default class CreateNewItemScreen extends React.Component {
       Object.keys(res.data.searchTemplates).forEach((key,index)=>{
             tmpList.push({label:res.data.searchTemplates[key].title,key:res.data.searchTemplates[key].id});
       });
-      console.log("Array data:" , _data.length);
-        console.log("Array New :" , tmpList.length);
       this.setState({
         searchTemplateList:_data,
         searchTemplateValueList:tmpList,
@@ -268,10 +265,12 @@ export default class CreateNewItemScreen extends React.Component {
   collateVariables( countryCode ){
 
     if(!this._validateAllRequiredFileds()){
-        return;
+        return false;
+    } else {
+      // Reset images
+      imageList = [{ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true }]
     }
 
-    console.log("Country Code", countryCode);
     var variables = "";
     var post_=null;
     var addr_=null;
@@ -300,7 +299,6 @@ export default class CreateNewItemScreen extends React.Component {
       "countryCode": countryCode
     }}
     //variables.fetchPolicy = 'network-only'
-    console.log(variables)
     return variables
 
     /*
@@ -365,7 +363,6 @@ export default class CreateNewItemScreen extends React.Component {
   onClick(data) {
     data.checked = !data.checked;
     let msg = data.checked ? 'you checked ' : 'you unchecked ';
-    console.log("Checked", data.checked);
   }
   static navigationOptions = {
     header: null,
@@ -428,7 +425,7 @@ export default class CreateNewItemScreen extends React.Component {
       allowsEditing: false,
       //quality: 0.2,
       exif: false,
-      base64: true,
+      base64: false,
     })
 
     if ( ! pickerResult.cancelled ) {
@@ -449,16 +446,13 @@ export default class CreateNewItemScreen extends React.Component {
         if ( fileinfo.height > 1024 ) {
           if (fileinfo.width >= pickerResult.height) {
             // Width needs reduction to 1024
-            console.log("resize width")
             resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: 1024}}])
           } else {
             // Height needs reduction to 1024
-            console.log("resize height")
             resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {height: 1024}}])
           }
         } else if (fileinfo.width > 1024) {
             // Width needs reduction to 1024
-            console.log("resize width")
             resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: 1024}}])
         } // No need for resize
         // #######################################
@@ -477,6 +471,14 @@ export default class CreateNewItemScreen extends React.Component {
         compressed = await this._regressiveCompress(resized, resizedFileinfo)
       }
 
+      // It is pickerResult.base64 that holds the necessary information, and this should be hashed.
+      // This hash should be stored locally and persistently with the UploadedImage information.
+      // Then compared with other attempted uploads. Instead of uploading... it should be associated.
+      // If the image is already in list, it should be undeleted there.
+      // ###############################
+      // Deleting this incompetent shit for now
+      // #######################################
+      /*
       if(this._isImageExits(compressed.base64)){
         this.setState({
           progressVisible: false
@@ -484,6 +486,7 @@ export default class CreateNewItemScreen extends React.Component {
         Toast.show("This image already exists",Toast.SHORT)
         return;
       }
+      */
 
       // https://docs.expo.io/versions/v26.0.0/sdk/imagemanipulator
       await this._uploadImageAsync(compressed.uri,compressed.base64);
@@ -529,10 +532,7 @@ export default class CreateNewItemScreen extends React.Component {
 
   // Not currently used.
   _handleImagePicked = async pickerResult => {
-    console.log('PickerResult: ');
-    console.log(pickerResult);
     if ( ! pickerResult.cancelled ) {
-      console.log("Uri",pickerResult.uri);
       await this._uploadImageAsync(pickerResult.uri,pickerResult.base64);
     }
   }
@@ -576,7 +576,6 @@ export default class CreateNewItemScreen extends React.Component {
     //let signedUrl = getSignedUrl( 'image/jpeg' )
     getSignedUrl( 'image/jpeg' )
       .then( ({ data }) => {
-        console.log("Data Signed Url: ", data);
       //  console.log("Signed Url from server: ", getSignedUrl);
         const formData = new FormData();
         this.storeImageDetails(data.getSignedUrl.key,data.getSignedUrl.id,uri,base64);
@@ -601,11 +600,9 @@ export default class CreateNewItemScreen extends React.Component {
     //{uri: photo.uri, name: 'image.jpg', type: 'multipart/form-data'}
       })
       .then( (data) => {
-         console.log("Response: ", data)
         // post your data.
         return api.post('', data, {
               onUploadProgress: (e) => {
-                //console.log(e)
                 const progress = e.loaded / e.total;
 
               }
@@ -750,7 +747,6 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   _renderRowTags(rowData) {
-    console.log(rowData);
     return (
       <View style={styles.mainRowView}>
         <Text style={styles.txttemp}>{rowData.text}</Text>
@@ -772,7 +768,6 @@ export default class CreateNewItemScreen extends React.Component {
     let tmp_ = dataObjectsTags;
     for (var i = 0; i < tmp_.length; i++) {
       if(tmp_[i].tagId==this.state.selectedTagId){
-        console.log("Tags",this.state.selectedTagId);
         isNew=false;
         return;
       }
@@ -783,7 +778,6 @@ export default class CreateNewItemScreen extends React.Component {
     }
     var idss = dataObjectsTags.length + 1;
     dataObjectsTags.push({ id: idss.toString(), text: this.state.selectedTagName,tagId:this.state.selectedTagId });
-    console.log(dataObjectsTags);
     const ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2,
     });
@@ -875,11 +869,13 @@ export default class CreateNewItemScreen extends React.Component {
       <CreateListing>{ mutateCreateListing => (
         <View>
           <Button transparent onPress={() => {
-            mutateCreateListing( this.collateVariables( loginStatus.countryCode ))
-            .then(({ data }) => {
-              console.log("Listing Created: ", data.createListing)
-              this.props.navigation.dispatch(SA_CreateToProduct(data.createListing, loginStatus))
-            })
+            let collatedVariables = this.collateVariables( loginStatus.countryCode )
+            if (collatedVariables) {
+              mutateCreateListing( collatedVariables )
+              .then(({ data }) => {
+                this.props.navigation.dispatch(SA_CreateToProduct(data.createListing, loginStatus))
+              })
+            }
           }}>
             <Ionicons
             name="md-checkmark"
@@ -920,7 +916,6 @@ export default class CreateNewItemScreen extends React.Component {
                 <Text style={styles.txtTitle}>Title</Text>
                 <Item style={styles.txtInput} regular>
                   <Input  onChangeText={(text) => {
-                    console.log("Title",text);
                     this.setState({ title:text});
                   }} />
                 </Item>
@@ -1249,23 +1244,19 @@ export default class CreateNewItemScreen extends React.Component {
         for(var k=0;k<tagList.length;k++){
           tmpList.push({label:tagList[k].name,key:tagList[k].id});
         }
-          console.log("Tags - ",tmpList.length);
         this.setState({
           allTagList:tmpList,
           selectedTemplateName: this.state.searchTemplateValueList[i].label,
           selectedTemplateId: picked,
           templateVisible: false,
         });
-      console.log("Tags ",this.state.allTagList.length);
         break;
       }
     }
   }
   onSelectTag = (picked) => {
-    console.log(this.state.allTagList);
     for(var i=0;i<this.state.allTagList.length;i++){
       if(this.state.allTagList[i].key==picked){
-        console.log("tags_ ",this.state.allTagList[i].label);
         this.setState({
           textd:picked,
           selectedTagName: this.state.allTagList[i].label,
@@ -1273,7 +1264,6 @@ export default class CreateNewItemScreen extends React.Component {
           tagVisible: false
         });
       setTimeout(() => {
-        console.log("Tag Name: ",this.state.selectedTagName);
         this.onPressAddTag();
           },150);
         break;
