@@ -63,7 +63,9 @@ class Listing extends Component {
         // secondary images may exist
         let secImages = item.secondaryImages.filter( image => image.imageKey )
         if ( secImages.length > 0 ) {
-          return item.secondaryImages.slice().unshift( item.primaryImage )
+          let newSecondaryImages = item.secondaryImages.slice()
+          newSecondaryImages.unshift( item.primaryImage )
+          return newSecondaryImages
         } else {
           return [item.primaryImage]
         }

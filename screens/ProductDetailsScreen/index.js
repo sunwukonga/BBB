@@ -58,20 +58,23 @@ class ProductDetailsScreen extends React.Component {
 			</Button>
 		);
 
+    /*
+            <GetProfile loginStatus={loginStatus}>{ currentUser => (
+            )}</GetProfile>
+            */
+    let currentUser = {}
     return (
       <GetCachedListing listingId={item.id}>{ listing => (
         <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
-            <GetProfile loginStatus={loginStatus}>{ currentUser => (
-              <Container style={styles.container}>
-                <BBBHeader
-                  title={listing.title}
-                  leftComponent={leftComponent}
-                />
-                <Content style={styles.contentStyle}>
-                  <Listing item={listing} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
-                </Content>
-              </Container>
-            )}</GetProfile>
+            <Container style={styles.container}>
+              <BBBHeader
+                title={listing.title}
+                leftComponent={leftComponent}
+              />
+              <Content style={styles.contentStyle}>
+                <Listing item={listing} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+              </Content>
+            </Container>
         )}</LastMessageIds>
       )}</GetCachedListing>
     )

@@ -35,6 +35,7 @@ import {
 import {
   SET_COUNTRY
 , SET_AUTH_STATUS
+, UNSET_AUTH_STATUS
 } from '../../graphql/Mutations'
 
 // Navigation Actions
@@ -45,6 +46,7 @@ const SA_CountryToHome = StackActions.reset({
     , action: NavigationActions.navigate({ routeName: 'homeScreen' })
   })]
 })
+
 
 class CallSetAuthStatus extends React.Component {
   componentDidMount() {
@@ -65,8 +67,9 @@ class CallCountryHandler extends React.Component {
 
 //#############################################################
 const CountryScreen = compose (
-  graphql(GET_NESTED_CATEGORY_LIST)
-, graphql(SET_AUTH_STATUS)
+  graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
+, graphql(SET_AUTH_STATUS, {name: "setAuthStatus"})
+, graphql(GET_NESTED_CATEGORY_LIST)
 )(
   class extends React.Component {
     constructor(props) {
@@ -77,6 +80,19 @@ const CountryScreen = compose (
       this.mutationInFlight = false
       this.gettingCountryCode = false
     }
+getMethods(obj) {
+  var result = []; 
+  for (var id in obj) {
+    try {
+      if (typeof(obj[id]) == "function") {
+      result.push(id);
+      }
+    } catch (err) {
+      result.push(id + ": inaccessible");
+    }
+  }
+  return result;
+}
 
     componentWillMount(props) {
       if (! this.state.countryCode) {
@@ -84,7 +100,6 @@ const CountryScreen = compose (
         let countryCodePromise = Expo.SecureStore.getItemAsync("countryCode")
         Promise.all([countryCodePromise])
         .then( ([ countryCode ]) => {
-          console.log("constructor.countryCode: ", countryCode)
           if (countryCode) {
             this.setState({
               countryCode: countryCode
@@ -118,7 +133,6 @@ const CountryScreen = compose (
     }
 
     renderItem = ({ item }, setCountry) => {
-      console.log("renderItem.item.isoCode: ", item.isoCode)
       return (
         <ListItem
           onPress={() => this.countryHandler( item.isoCode, setCountry, true ) }
@@ -135,7 +149,7 @@ const CountryScreen = compose (
         return null
       }
       return (
-        <CallSetAuthStatus setAuthStatus={this.props.mutate} >
+        <CallSetAuthStatus setAuthStatus={this.props.setAuthStatus} >
           <Mutation
             mutation = { SET_COUNTRY }
             update = {(cache, { data: { setCountry } }) => {
@@ -183,7 +197,7 @@ const CountryScreen = compose (
                         return <ActivityIndicator size="large" />;
                       }
                       if (error) {
-                        // TODO: Retry icon on error
+                        this.props.unSetAuthStatus()
                         return <Text>Error: {error.message}</Text>;
                       }
                       return (

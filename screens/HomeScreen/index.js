@@ -311,11 +311,14 @@ export default class HomeScreen extends React.Component {
           rightComponent={rightComponent}
         />
         */
+            //<GetProfile loginStatus={loginStatus}>{ currentUser => (
+            //)}</GetProfile>
+    // Here because I don't have time to de-thread it through the different components. Just dummy
+    let currentUser = {}
     return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
-            <GetProfile loginStatus={loginStatus}>{ currentUser => (
-      <Container>
+            <Container>
               <Header
                 androidStatusBarColor={Colors.mainheaderbg}
                 style={headerStyles.header}>
@@ -399,8 +402,7 @@ export default class HomeScreen extends React.Component {
               >
                 <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
               </Fab>
-      </Container>
-            )}</GetProfile>
+            </Container>
           )}</LastMessageIds>
         )}</LoginStatus>
     );
