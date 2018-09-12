@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   View
 , Text
@@ -9,7 +9,7 @@ import {
 , Alert
 } from 'react-native';
 // For creating Actions. Will move out to external file later
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions } from 'react-navigation'
 import {
   Icon
 , Button
@@ -23,16 +23,17 @@ import {
 , Container
 , Content
 , Fab
-} from 'native-base';
+} from 'native-base'
 //custom components
-import BBBHeader from '../../components/BBBHeader';
-import BBBIcon from '../../components/BBBIcon';
-import { Ionicons } from '@expo/vector-icons';
+import BBBHeader from '../../components/BBBHeader'
+import BBBIcon from '../../components/BBBIcon'
+import { Ionicons } from '@expo/vector-icons'
 // style
-import styles from './styles';
-import headerStyles from '../../components/BBBHeader/styles';
-import { Layout, Colors, Images, IconNames } from '../../constants/';
-import Toast from 'react-native-simple-toast';
+import styles from './styles'
+import headerStyles from '../../components/BBBHeader/styles'
+import { Layout, Colors, Images, IconNames } from '../../constants/'
+import Toast from 'react-native-simple-toast'
+import { Permissions } from 'expo'
 
 // FlatLists with embedded Queries
 import ListRecentListings from './ListRecentListings'
@@ -85,6 +86,7 @@ export default class HomeScreen extends React.Component {
       page:1,
       searchTerms:'',
     }
+    Permissions.askAsync(Permissions.LOCATION)
 
     this.drawerOpen = false
 
