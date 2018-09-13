@@ -26,14 +26,14 @@ class DeleteButton extends Component {
   }
 
   render() {
-    const {item, loginStatus } = this.props
+    const {item, loginStatus, resetTo } = this.props
 
     if (loginStatus.myProfile.id != w(item, ['user', 'id'])) {
       // Button should not exist, you can only delete your own listings
       return null
     } else {
       return (
-        <DeleteListing listingId={item.id} loginStatus={loginStatus}>{ mutateDeleteListing  => (
+        <DeleteListing listingId={item.id} loginStatus={loginStatus} resetTo={resetTo}>{ mutateDeleteListing  => (
           <TouchableOpacity
             style={styles.chatIconSec}
             onPress={ () => {

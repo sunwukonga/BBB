@@ -17,7 +17,7 @@ import {
 } from '../../graphql/Mutations'
 import PureListItem from './PureListItem'
 import { w } from '../../utils/helpers.js'
-
+import { Locations } from "../../constants/"
 
 const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"}) (
   class extends Component {
@@ -97,7 +97,7 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
                   keyExtractor={(item, index) => index.toString()}
                   data = {dataPointer}
                   renderItem={({ item }) => {
-                    return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} createNew={createNew} />
+                    return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} createNew={createNew} resetTo={Locations.Home} />
                   }}
                   onEndReachedThreshold={0.5}
                   refreshing={networkStatus === 4 || networkStatus === 3}

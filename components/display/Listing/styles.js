@@ -159,6 +159,12 @@ export default StyleSheet.create({
 		borderRadius: Layout.moderateScale(4),
 		backgroundColor: Colors.offerButton,
 	},
+	saleButton: {
+		paddingVertical: Layout.HEIGHT * 0.005,
+		paddingHorizontal: Layout.WIDTH * 0.02,
+		borderRadius: Layout.moderateScale(4),
+		backgroundColor: Colors.saleButton,
+	},
 	regularLarge: {
 		color: Colors.secondaryColor,
 		fontSize: Layout.moderateScale(16),
