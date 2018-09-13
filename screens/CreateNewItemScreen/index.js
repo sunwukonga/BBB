@@ -45,7 +45,7 @@ import getCategoryList from './AllCategoryApi';
 import getTemplateList from './SearchTemplateApi';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
 import LoginStatus from '../HomeScreen/LoginStatus'
-import { w } from '../../utils/helpers.js'
+import { w, getMethods } from '../../utils/helpers.js'
 import { StackActions, NavigationActions } from 'react-navigation';
 
 import CreateListing from '../../graphql/mutations/CreateListing'
@@ -58,21 +58,33 @@ var tagsList = [];
 var imageList=[];
 var imageUploadList=[];
 // Navigation Actions
+const resetAction = StackActions.reset({
+  index: 1,
+  actions: [
+    NavigationActions.navigate({ routeName: 'Profile' }),
+    NavigationActions.navigate({ routeName: 'Settings' }),
+  ],
+});
+//NavigationActions.navigate
 const SA_CreateToProduct = (item, loginStatus) => StackActions.reset({
-  index: 0
+  index: 1
 , actions: [
-    NavigationActions.navigate({
-      routeName: 'homeDrawer'
-    , action: NavigationActions.navigate({
-        routeName: 'productDetailsScreen'
-      , params: {
-          item: item
-        , loginStatus: loginStatus
-        }
-      })
+    StackActions.push({ routeName: 'homeDrawer' })
+  , StackActions.push({
+      routeName: 'productDetailsScreen'
+    , params: {
+        item: item
+      , loginStatus: loginStatus
+      }
     })
   ]
 })
+
+const SALE = 'SALE';
+const BARTER = 'BARTER';
+const DONATE = 'DONATE';
+const SALEDONATE = 'SALEDONATE';
+
 /**
 Catgeory List Details
 */
@@ -99,11 +111,6 @@ export default class CreateNewItemScreen extends React.Component {
     const dsCates = new ListView.DataSource({ rowHasChanged });
     const dsTags = new ListView.DataSource({ rowHasChanged });
 
-    const SALE = 'SALE';
-    const BARTER = 'BARTER';
-    const DONATE = 'DONATE';
-    const SALEDONATE = 'SALEDONATE';
-    
     if (imageList.length == 0) {
       imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
     }
@@ -164,8 +171,13 @@ export default class CreateNewItemScreen extends React.Component {
       textd:''
       // End data for mutation
     };
-
+    this.focusNextField = this.focusNextField.bind(this);
+    this.inputs = {}
     // this.saveToServer = this.saveToServer.bind(this);
+  }
+
+  focusNextField(id) {
+    this.inputs[id].wrappedInstance.focus();
   }
 
   _validateAllRequiredFileds() {
@@ -281,7 +293,6 @@ export default class CreateNewItemScreen extends React.Component {
     if(this.state.address.lineOne.length!=0){
       addr_=this.state.address;
     }
-
     variables = { variables: {
       "mode":this.state.mode,
       "images":imageUploadList,
@@ -364,6 +375,7 @@ export default class CreateNewItemScreen extends React.Component {
     data.checked = !data.checked;
     let msg = data.checked ? 'you checked ' : 'you unchecked ';
   }
+
   static navigationOptions = {
     header: null,
   };
@@ -688,7 +700,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: true,
         isCollapsedDonate: true,
         isCollapsedDnS: true,
-        Mode:"SALE",
+        mode: SALE,
       });
     } else {
       this.setState({ isCollapsedSale: true });
@@ -701,6 +713,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: false,
         isCollapsedDonate: true,
         isCollapsedDnS: true,
+        mode: BARTER,
       });
     } else {
       this.setState({ isCollapsedBarter: true });
@@ -713,6 +726,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: true,
         isCollapsedDonate: false,
         isCollapsedDnS: true,
+        mode: DONATE,
       });
     } else {
       this.setState({ isCollapsedDonate: true });
@@ -725,6 +739,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: true,
         isCollapsedDonate: true,
         isCollapsedDnS: false,
+        mode: SALEDONATE,
       });
     } else {
       this.setState({ isCollapsedDnS: true });
@@ -815,7 +830,6 @@ export default class CreateNewItemScreen extends React.Component {
 
 
   render() {
-
 
     let data = [
       {
@@ -915,9 +929,17 @@ export default class CreateNewItemScreen extends React.Component {
               <View style={styles.Descrip}>
                 <Text style={styles.txtTitle}>Title</Text>
                 <Item style={styles.txtInput} regular>
-                  <Input  onChangeText={(text) => {
-                    this.setState({ title:text});
-                  }} />
+                  <Input
+                    blurOnSubmit={ false }
+                    onSubmitEditing={() => { this.focusNextField("two") }}
+                    returnKeyType={ "next" }
+                    ref={ (el) => this.inputs['one'] = el }
+                    onChangeText={(text) => {
+                      this.setState({ title:text});
+                    }}
+                    maxLength={50}
+                  />
+                  <Text style={styles.txtcount}>{this.state.title.length}/50</Text>
                 </Item>
               </View>
 
@@ -925,15 +947,18 @@ export default class CreateNewItemScreen extends React.Component {
                 <Text style={styles.txtTitle}>Description</Text>
                 <Item style={styles.txtInput} regular>
                   <Input
+                    blurOnSubmit={ false }
                     multiline={true}
                     style={{
                       height: Layout.HEIGHT * 0.1,
                       marginBottom: Layout.HEIGHT * 0.015,
                     }}
+                    returnKeyType={ "done" }
+                    ref={ (el) => this.inputs['two'] = el }
                     onChangeText={text => { this.setState({ longDesc:text }); }}
-                    maxLength={1024}
+                    maxLength={191}
                   />
-                  <Text style={styles.txtcount}>{this.state.longDesc.length}/1024</Text>
+                  <Text style={styles.txtcount}>{this.state.longDesc.length}/191</Text>
                 </Item>
               </View>
 
@@ -1012,8 +1037,7 @@ export default class CreateNewItemScreen extends React.Component {
                           </View>
                           <CheckBox
                             style={styles.chboxRemember}
-                            onClick={() => _this.onClick(temp)}
-                            onValueChange={() => this.setState({ counterOffer: !this.state.counterOffer })}
+                            onClick={() => this.setState({ counterOffer: !this.state.counterOffer })}
                             isChecked={this.state.counterOffer}
                             checkBoxColor={'#fff'}
                             rightText={'Allow counter offer'}

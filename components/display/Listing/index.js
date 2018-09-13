@@ -160,15 +160,22 @@ class Listing extends Component {
             <Text style={styles.ratingmsgct}> ({w(item, ['user', 'sellerRatingCount'])}) </Text>
           </View>
           <View style={styles.priceSec}>
-            <Text style={styles.pricetext}>{item.saleMode.currency!==null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
+            <Text style={styles.pricetext}>{(item.saleMode.currency && item.saleMode.price) ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price.toFixed(2) : ""}</Text>
           </View>
         </View>
 
         <View style={styles.alignmentButton}>
-          <View style={styles.offerButton}>
+          <View style={styles.saleButton}>
             <Text style={styles.regularSmall}>{item.saleMode.mode.toUpperCase()}</Text>
           </View>
         </View>
+        { item.saleMode.counterOffer ?
+        <View style={styles.alignmentButton}>
+          <View style={styles.offerButton}>
+            <Text style={styles.regularSmall}>Counter Offers Welcome</Text>
+          </View>
+        </View>
+        : null }
         <View>
           <Text style={styles.regularLarge}>Category</Text>
           <Text style={[styles.regularSmall, styles.tagContainer]}>

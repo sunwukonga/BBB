@@ -14,6 +14,7 @@ import {
 } from '../../../graphql/Queries'
 import PureListItem from '../../../screens/HomeScreen/PureListItem'
 import { w } from '../../../utils/helpers.js'
+import { Locations } from "../../../constants/"
 
 
 class ListUserLikedListings extends Component {
@@ -71,7 +72,7 @@ class ListUserLikedListings extends Component {
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getUserLikedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} resetTo={Locations.Favorite} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}
