@@ -83,7 +83,7 @@ export default class HomeScreen extends React.Component {
     this.state = {
       limit:10,
       page:1,
-      searchTerms:'',
+      searchTerms:[],
     }
 
     this.drawerOpen = false
@@ -338,14 +338,14 @@ export default class HomeScreen extends React.Component {
                         keyboardType="default"
                         returnKeyType="search"
                         onChangeText={(text) => {
-                            this.setState({ searchTerms:text});
+                            this.setState({ searchTerms: text.split(/\s+/g)});
                         }}
                         onSubmitEditing={ () =>
-                          this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms, loginStatus: loginStatus})
+                          this.props.navigation.navigate('searchResultScreen', { terms: this.state.searchTerms, loginStatus: loginStatus})
                         }
                       />
                       <TouchableOpacity onPress={() =>
-                        this.props.navigation.navigate('searchResultScreen', { searchTerms: this.state.searchTerms, loginStatus: loginStatus})
+                        this.props.navigation.navigate('searchResultScreen', { terms: this.state.searchTerms, loginStatus: loginStatus})
                       }>
                         <BBBIcon name="Search" style={styles.searchicon} />
                       </TouchableOpacity>

@@ -72,7 +72,7 @@ class LikeButton extends Component {
               <BBBIcon
                 name="Favorite"
                 size={Layout.moderateScale(18)}
-                color={item.liked ? Colors.tintColor : Colors.white}
+                color={w(item, ['liked']) ? Colors.tintColor : Colors.white}
                 style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}
               />
             </View>

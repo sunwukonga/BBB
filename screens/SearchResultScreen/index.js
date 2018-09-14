@@ -1,104 +1,66 @@
 import React from 'react'
 import {
-	Image,
-	Platform,
-	ScrollView,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-	FlatList,
-	AsyncStorage,
-	ActivityIndicator,
+  View
 } from 'react-native';
 import {
-	Container,
-	Header,
-	Content,
-	List,
-	ListItem,
-	Left,
-	Body,
-	Right,
-	Thumbnail,
-	Text,
-	Button,
-	Icon,
-	Item,
-	Title,
+  Container,
+  Content,
+  Button,
 } from 'native-base';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { ProgressDialog } from 'react-native-simple-dialogs';
 // custom components
-import Baby from '../../components/Baby';
 import BBBHeader from '../../components/BBBHeader';
 import styles from './styles';
 import BBBIcon from '../../components/BBBIcon';
-import { Layout, Colors, Images, Urls } from '../../constants/';
-import IdentityVerification from '../../components/IdentityVerification';
-import Stars from '../../components/Stars';
+import { Layout, Colors } from '../../constants/';
 import LoginStatus from '../HomeScreen/LoginStatus'
-import getSearchProductList from './SearchListing';
 import { w } from '../../utils/helpers.js'
-
-var searchTerms = ""
-var filterDefaults = {
-  "mode": "SALE"
-, "countryCode": 'SG'
-, "seconds": null
-, "rating": null
-, "verification": null
-, "distance": null
-, "priceMax": null
-, "priceMin": null
-, "categories": []
-, "templates": []
-, "tags": []
-, "counterOffer": null
-}
-var filter = {}
+import ListSearchResults from '../../components/lists/ListSearchResults'
 
 export default class SearchResultScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    searchTerms=this.props.navigation.state.params.searchTerms || ""
-    Object.assign(
-      filter
-    , filterDefaults
-    , { countryCode: this.props.navigation.state.params.loginStatus.countryCode }
-    , this.props.navigation.state.params.filter
-    )
     this.state = {
-      searchList:[]
-    , progressVisible: false
-    , showSearchBox:false
-    , countryCode:''
-    , page:1
+      page:1
     , limit:10
-    , isLoadingMore:false
-    , loadMoreCompleted:false
-    , data:props.navigation.state.params
     }
+    this.filter = {}
+    this.terms = []
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if ( w(this.props.navigation.state.params, ['loginStatus', 'countryCode']) !== w(nextProps.navigation.state.params, ['loginStatus', 'countryCode']) ) {
+      if (!w(this.props.navigation.state.params, ['loginStatus'])) {
+        return true
+      }
+    }
+    if ( w(this.props.navigation.state.params, ['terms']) !== w(nextProps.navigation.state.params, ['terms']) ) {
+      if (!w(this.props.navigation.state.params, ['terms'])) {
+        return true
+      }
+    }
+    if ( JSON.stringify(w(this.props.navigation.state.params, ['filter'])) !== JSON.stringify(w(nextProps.navigation.state.params, ['filter']) )) {
+      if (w(this.props.navigation.state.params, ['filter'])) {
+        return true
+      }
+    }
+    return false;
   }
 
   componentDidMount(){
-    this.setState({
+/*    this.setState({
       searchList:[]
     , progressVisible: true
     })
-    Object.assign(
-      filter
-    , filterDefaults
-    , { countryCode: this.props.navigation.state.params.loginStatus.countryCode }
-    , this.props.navigation.state.params.filter
-    )
     setTimeout(() => {
       this.searchProductList();
     }, 50);
+    */
   }
 
 	componentWillReceiveProps(nextProps) {
 		//this._retrieveCountry();
+    /*
 		this.setState({
 			searchList:[],
 			progressVisible: true,
@@ -106,6 +68,8 @@ export default class SearchResultScreen extends React.Component {
 			isLoadingMore:false,
 			page:1,
 		});
+    */
+/*
     Object.assign(
       filter
     , filterDefaults
@@ -114,12 +78,13 @@ export default class SearchResultScreen extends React.Component {
     )
 
 		this.setState({ data: nextProps.navigation.state.params });
-
 		setTimeout(() => {
       this.searchProductList();
 		}, 50);
+    */
 	}
 
+  /*
   searchProductList() {
 		if(this.state.loadMoreCompleted){
 			console.log("API Completed");
@@ -261,8 +226,19 @@ export default class SearchResultScreen extends React.Component {
     	  </View>
     </TouchableOpacity>
   );
+  */
 
   	render() {
+      let {terms, filter, loginStatus} = this.props.navigation.state.params
+      if (terms) {
+        this.terms = terms
+      } else terms = this.terms
+      if (filter) {
+        this.filter = filter
+      } else filter = this.filter
+      if (loginStatus) {
+        this.loginStatus = loginStatus
+      } else loginStatus = this.loginStatus
 
   		var leftComponent = (
   			<Button transparent onPress={() => this.props.navigation.goBack()}>
@@ -298,55 +274,24 @@ export default class SearchResultScreen extends React.Component {
   				</Button>
   			</View>
   		);
-			if(this.state.searchList.length==0 && !this.state.progressVisible){
-				return(
-					<Container style={styles.container}>
-						<BBBHeader
-							title="Search Result"
-							leftComponent={leftComponent}
-							rightComponent={rightComponent}
-						/>
-					<View style={{flex:1, flexDirection:'row',alignItems:'center',justifyContent:'center'}}><Text>No Result Found.</Text></View>
-					</Container>
-				);
-			}
-  		return (
-        <LoginStatus>{ loginStatus => (
-  			<Container style={styles.container}>
-  				<BBBHeader
-  					title="Search Result"
-  					leftComponent={leftComponent}
-  					rightComponent={rightComponent}
-  				/>
-          <Content>
 
-  					<View style={styles.liststyle}>
-            {this.state.searchList.length==0?(
-								null
-						):
-            <FlatList
-    							data={this.state.searchList}
-    							keyExtractor={listItemData => ''+listItemData.id}
-    							renderItem={(item) => this._renderItem(item, loginStatus)}
-									contentContainerStyle={styles.listContent}
-	                onEndReached={this.onEndReached.bind(this)}
-	                onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
-	                ListFooterComponent={this.renderFooter.bind(this)}
-    						/>
-            }
-  					</View>
-  				</Content>
-          <ProgressDialog
-            visible={this.state.progressVisible}
-            message="Please Wait..."
-            activityIndicatorSize="large"
+    return (
+      <LoginStatus>{ loginStatus => (
+        <Container style={styles.container}>
+          <BBBHeader
+            title="Search Result"
+            leftComponent={leftComponent}
+            rightComponent={rightComponent}
           />
-  			</Container>
-        )}</LoginStatus>
-  		);
-  	}
+          <Content>
+            <ListSearchResults terms={terms} loginStatus={loginStatus} filter={filter} />
+          </Content>
+        </Container>
+      )}</LoginStatus>
+    )}
 
 		/* START LOAD MORE LISTING*/
+  /*
 	  renderFooter () {
 	        return this.state.isLoadingMore && !this.state.loadMoreCompleted ?   <View style={{ flex: 1,  flexDirection: 'column', padding: 10 }}>
 	            <ActivityIndicator size="small" />
@@ -359,5 +304,6 @@ export default class SearchResultScreen extends React.Component {
 	          this.searchProductList();
 	        }
 	  }
+    */
 	/* END LOAD MORE LISTING*/
 }

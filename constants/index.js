@@ -5,5 +5,6 @@ import UserRoles from './UserRoles'
 import Urls from './Urls'
 import IconNames from './IconNames'
 import Locations from './Locations'
+import Constants from './Constants'
 
-export { Colors, Layout, Images, UserRoles, Urls, IconNames, Locations }
+export { Colors, Layout, Images, UserRoles, Urls, IconNames, Locations, Constants }
