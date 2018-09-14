@@ -38,7 +38,7 @@ import createNewItemUrl from './CreateNewItem';
 import styles from './styles';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from 'react-native-check-box';
-import { Layout, Colors, Images } from '../../constants/';
+import { Layout, Colors, Images, Constants } from '../../constants/';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';
 import getCategoryList from './AllCategoryApi';
@@ -79,11 +79,6 @@ const SA_CreateToProduct = (item, loginStatus) => StackActions.reset({
     })
   ]
 })
-
-const SALE = 'SALE';
-const BARTER = 'BARTER';
-const DONATE = 'DONATE';
-const SALEDONATE = 'SALEDONATE';
 
 /**
 Catgeory List Details
@@ -149,7 +144,7 @@ export default class CreateNewItemScreen extends React.Component {
   //    _pickImage = this._pickImage
 
       // Data for mutation i.e. create item
-      mode: SALE,
+      mode: Constants.SALE,
 
       images: imageList,
       cost: 0.0,
@@ -700,7 +695,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: true,
         isCollapsedDonate: true,
         isCollapsedDnS: true,
-        mode: SALE,
+        mode: Constants.SALE,
       });
     } else {
       this.setState({ isCollapsedSale: true });
@@ -713,7 +708,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: false,
         isCollapsedDonate: true,
         isCollapsedDnS: true,
-        mode: BARTER,
+        mode: Constants.BARTER,
       });
     } else {
       this.setState({ isCollapsedBarter: true });
@@ -726,7 +721,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: true,
         isCollapsedDonate: false,
         isCollapsedDnS: true,
-        mode: DONATE,
+        mode: Constants.DONATE,
       });
     } else {
       this.setState({ isCollapsedDonate: true });
@@ -739,7 +734,7 @@ export default class CreateNewItemScreen extends React.Component {
         isCollapsedBarter: true,
         isCollapsedDonate: true,
         isCollapsedDnS: false,
-        mode: SALEDONATE,
+        mode: Constants.SALEDONATE,
       });
     } else {
       this.setState({ isCollapsedDnS: true });

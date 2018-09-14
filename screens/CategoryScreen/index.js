@@ -133,7 +133,7 @@ export default class CategoryScreen extends React.Component {
 					leftComponent={leftComponent}
 				/>
 				<Content>
-			{this.state.allCategoryList.length == 0 && this.state.allCategoryList == 'undefiend' ?
+			{this.state.allCategoryList.length == 0 && this.state.allCategoryList == 'undefined' ?
 					(<Text style={styles.noDataText}>
 						No Data Found
 					</Text>)
