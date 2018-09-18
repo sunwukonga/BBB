@@ -1,11 +1,18 @@
 import React,{Component} from 'react';
-import { Alert, View, Image, TouchableOpacity} from 'react-native';
+import {
+  Alert
+, View
+, Image
+, TouchableOpacity
+, Linking
+} from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { Container, Content, Text, Item } from 'native-base';
 
 // custom components
 import BBBIcon from '../../components/BBBIcon';
 import { Ionicons } from '@expo/vector-icons';
+import Flag from 'react-native-round-flags';
 
 // screen style
 import styles from './styles';
@@ -41,30 +48,33 @@ export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
 
     render() {
       const { navigation } = this.props;
-      console.log("Render DRAWER")
       return (
         <LoginStatus>{ loginStatus => (
           <Container style={styles.container} >
             {loginStatus.loginStatus ?
-              <View style={styles.usersDetailsSec}>
               <TouchableOpacity
                 onPress={() => {
                   this.props.navigation.navigate('profileScreen')
-                }}>
-              {(this.w(loginStatus, ['myProfile', 'profileImageURL']))
-              ? <Image style={styles.userImage} source={{uri: loginStatus.myProfile.profileImageURL}} />
-              : <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-              }
-              </TouchableOpacity>
-              <View style={styles.usersDetails}>
-                <Text style={styles.userName}>{(this.w(loginStatus, ['myProfile', 'profileName'])) ? loginStatus.myProfile.profileName : ""}</Text>
-                {/*
-                <Text style={styles.tokenText}>
-                  BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>
-                </Text>
-                */}
+                }}
+              >
+                <View style={styles.usersDetailsSec}>
+                  <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                    {(this.w(loginStatus, ['myProfile', 'profileImageURL']))
+                    ? <Image style={styles.userImage} source={{uri: loginStatus.myProfile.profileImageURL}} />
+                    : <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+                    }
+                    <Flag code={loginStatus.countryCode} style={styles.flagStyle} />
+                  </View>
+                  <View style={styles.usersDetails}>
+                    <Text style={styles.userName}>{(this.w(loginStatus, ['myProfile', 'profileName'])) ? loginStatus.myProfile.profileName : ""}</Text>
+                    {/*
+                    <Text style={styles.tokenText}>
+                      BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>
+                    </Text>
+                    */}
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             : null }
             <Content style={styles.content}>
               <Item
@@ -134,10 +144,11 @@ export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
                 style={styles.borderView}
                 onPress={() => {
                   Alert.alert(
-                    'Work In Progress',
-                    'This feature is currently in development',
+                    'This is an external link',
+                    'Do you wish to follow it?',
                     [
                       {text: 'OK', onPress: () => {
+                        Linking.openURL( "http://www.bebebargains.com/contact/" )
                       }},
                     ],
                     { cancelable: true }

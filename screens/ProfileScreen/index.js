@@ -16,6 +16,9 @@ import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloProvider, graphql,Mutation } from "react-apollo";
 import { withClientState } from "apollo-link-state";
+import { StackActions } from 'react-navigation'
+import Flag from 'react-native-round-flags';
+import { Ionicons } from '@expo/vector-icons';
 
 import LoginStatus from '../HomeScreen/LoginStatus'
 import ChangeButton from '../../components/buttons/ChangeButton'
@@ -25,6 +28,25 @@ import styles from './styles'
 import { Layout, Colors } from '../../constants/'
 
 
+const SA_changeCountry = (isoCode) => StackActions.reset({
+  index: 0
+, key: null
+, actions: [
+    StackActions.push({
+      routeName: 'countryScreen'
+    , params: { countryCode: isoCode }
+    })
+  ]
+})
+/*
+const SA_changeCountry = StackActions.reset({
+  index: 0
+, key: 'root'
+, actions: [
+    StackActions.push({ routeName: 'loginScreen' })
+  ]
+})
+*/
 
 export default class ProfileScreen extends React.Component {
 
@@ -41,8 +63,8 @@ export default class ProfileScreen extends React.Component {
 render() {
 
     var leftComponent = <Button transparent onPress={()=>this.props.navigation.goBack()}>
-								          <BBBIcon name="BackArrow" size={Layout.moderateScale(18)} style={styles.backarrow}/>
-												</Button>
+                          <BBBIcon name="BackArrow" size={Layout.moderateScale(18)} style={styles.backarrow}/>
+                        </Button>
 
     var DisplayProfileImage = ({imageURL}) => {
       // rowImage, swiperSec, Baby
@@ -60,6 +82,7 @@ render() {
         )
       }
     }
+                //style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}
     return (
       <LoginStatus>{ loginStatus => (
         <Container style={styles.container}>
@@ -88,6 +111,31 @@ render() {
             <View style={styles.getStartedContainer}>
               <View style={styles.hr} />
             </View>
+            <TouchableOpacity
+              onPress = {() => {
+                Expo.SecureStore.deleteItemAsync("countryCode")
+                .then( () => {
+                  this.props.navigation.dispatch(SA_changeCountry(loginStatus.countryCode))
+                })
+              }}
+              style={{flex:1, flexDirection: 'row', justifyContent: 'space-between'}}
+            >
+              <View style={{justifyContent: 'center', alignSelf: 'center', alignItems: 'center', paddingLeft: Layout.WIDTH * 0.05}} >
+                <Text style={{fontWeight: 'bold'}}>Current country: {loginStatus.countryCode}</Text>
+              </View>
+              <View style={styles.changeCountryContainer} >
+                <Flag code={loginStatus.countryCode} style={styles.flagStyle} />
+                <Ionicons
+                  name={'md-sync'}
+                  size={Layout.WIDTH * 0.22}
+                  color={Colors.lightGray}
+                  style={styles.changeCountry}
+                />
+              </View>
+            </TouchableOpacity>
+            <View style={styles.getStartedContainer}>
+              <View style={styles.hr} />
+            </View>
 
           </Content>
         </Container>
@@ -103,3 +151,6 @@ render() {
         // Your ROLES. Must return with GetProfile.
         // Future: Stats associated with ROLES
         //   i.e. BARGAINER, TRANSLATOR, CATALOGUER, ADMIN
+//   
+              //<View style={{ flex: 1, flexDirection: 'row', alignSelf: 'flex-end', width: Layout.Width * 0.30, borderWidth: 1 }} >
+              //</View>

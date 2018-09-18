@@ -30,6 +30,22 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  changeCountryContainer: {
+    paddingTop: Layout.WIDTH * 0.05
+  , paddingRight: Layout.WIDTH * 0.10
+  },
+  changeCountry: {
+    backgroundColor: 'transparent',
+    width: Layout.WIDTH * 0.20,
+    height: Layout.WIDTH * 0.20,
+    position: 'absolute',
+    top: 0,
+    left: Layout.WIDTH * 0.10,
+  },
+  flagStyle: {
+    height: Layout.WIDTH * 0.20,
+    width: Layout.WIDTH * 0.20,
+  },
   nextarrow: {
     color: Colors.primaryColor,
     fontSize: Layout.moderateScale(20),
