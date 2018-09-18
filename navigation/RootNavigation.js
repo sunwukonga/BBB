@@ -9,16 +9,16 @@ import mainStackNavigator from './MainDrawerNavigator';
 
 import LoginScreen from '../screens/LoginScreen';
 import CounrtyScreen from '../screens/CountryScreen';
-
+    //initialRouteKey: 'root',
 const RootStackNavigator = createStackNavigator(
   {
     mainScreen: { screen: mainStackNavigator },
     loginScreen: { screen: LoginScreen },
-    counrtyScreen: { screen: CounrtyScreen },
+    countryScreen: { screen: CounrtyScreen },
   },
   {
     headerMode: 'none',
-    initialRouteName: 'counrtyScreen',
+    initialRouteName: 'countryScreen',
     gesturesEnabled: false,
   }
 );
@@ -54,4 +54,8 @@ export default class RootNavigator extends React.Component {
       `Push notification ${origin} with data: ${JSON.stringify(data)}`
     );
   };
+}
+
+export {
+  RootStackNavigator
 }
