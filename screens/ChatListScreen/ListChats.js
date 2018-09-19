@@ -182,7 +182,6 @@ class ListChats extends Component {
               </View>
             )
           }
-          console.log("CHECK: ", data.getChatMessages)
           /*
           let leftComponent = (
             <Button
