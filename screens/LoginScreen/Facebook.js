@@ -124,7 +124,7 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
                         variables: { id: listingId },
                         fetchOptions: 'network-only'
                       })
-                      .then( ({data: {getListing}}) => {
+                      .then( ({data: {getListing}, error, refetch}) => {
                         console.log("CHECK updated: ", getListing.chatId)
                         if ( (_chatId = getListing.chatId) != -1 ) {
                           this.props.navigation.navigate('chatDetailScreen', {
@@ -144,6 +144,13 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
                             , chatIndexes: []
                             })
                           })
+                          /*
+                          .catch( { data, error } => {
+                            //if (error.message.match(/Chat\salready\sexists/).length > 0) {
+                              //Chat already exists
+                            }
+                          })
+                          */
                         }
                       })
                     }

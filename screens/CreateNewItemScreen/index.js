@@ -113,13 +113,13 @@ export default class CreateNewItemScreen extends React.Component {
     this.state = {
       countryCode: '',
       visible: false,
-     selectedCateName: null,
-     selectedCateId:null,
-     selectedTemplateName: null,
-     selectedTemplateId:null,
-     templateVisible:false,
-     selectedTagName: null,
-     selectedTagId:null,
+      selectedCateName: null,
+      selectedCateId:null,
+      selectedTemplateName: null,
+      selectedTemplateId:null,
+      templateVisible:false,
+      selectedTagName: null,
+      selectedTagId:null,
       tagVisible:false,
       allCategoryList:[],
       allCategoryValueList:[],
@@ -427,10 +427,14 @@ export default class CreateNewItemScreen extends React.Component {
     // This gives a URI, this should be used to
     //  - Send graphql mutation to get upload signed url
 //https://stackoverflow.com/questions/49725746/how-to-hash-image-data-in-react-native-expo
+    const maxPixels = 476
+    // In future, we'll be able to avoid pickerResult compressing the jpg
+    // https://github.com/expo/expo/commit/7548f07cf956d88e15176d3512dd98a83448da6c
+    //
+    //  quality: 0.95,
     let pickerResult = await Expo.ImagePicker.launchImageLibraryAsync({
       mediaTypes: Expo.ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      //quality: 0.2,
       exif: false,
       base64: false,
     })
@@ -441,42 +445,77 @@ export default class CreateNewItemScreen extends React.Component {
         progressMsg:"Validating Image..."
       });
       // https://docs.expo.io/versions/latest/sdk/filesystem#expofilesystemgetinfoasyncfileuri-options
-      let fileinfo = await Expo.FileSystem.getInfoAsync(pickerResult.uri, {size: true})
-      let resized
-      let compressed = pickerResult
+      /*let hashPromise = new Promise(function(resolve, reject) {
+        let sha256 = new jsSHA('SHA-256', 'TEXT');
+        sha256.update(pickerResult.base64);
+        resolve(sha256.getHash("HEX"))
+      });*/
+      // base64hash should form the key of a previously uploaded image record.
+      // should create a temporary link to the image (or add a field) to protect it from deletion
+      // check if deleted
+      //
+      /*
+      hashPromise.then( hash => {
+        console.log("Hash: ", hash)
+      })*/
+      let fileinfo = await Expo.FileSystem.getInfoAsync(pickerResult.uri, { size: true, md5: true })
+      //console.log(fileinfo.md5)
+      //console.log("Hi")
+      //console.log("Starting size: ", fileinfo.size)
+      let tryResize = pickerResult
        // If filesize is below 150kb don't attempt to reduce it further.
+      let compressionFactor = 0.95
 
-      if ( fileinfo.size > 153600 ) {
+      while ( fileinfo.size > 153600 ) {
         // #######################################
-        // Resize any dimension greater than 1024
+        // Resize any dimension greater than maxPixels
         // #######################################
-        if ( fileinfo.height > 1024 ) {
-          if (fileinfo.width >= pickerResult.height) {
-            // Width needs reduction to 1024
-            resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: 1024}}])
+        //console.log("fileinfo: ", fileinfo)
+        //console.log("pickerResult: ", pickerResult)
+        //console.log("size: ", fileinfo.size, " width: ", pickerResult.width, " height: ", pickerResult.height)
+        //console.log("size: ", fileinfo.size)
+        ////
+        if ( pickerResult.height > maxPixels ) {
+          if (pickerResult.width >= pickerResult.height) {
+            // Width needs reduction to maxPixels
+            tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
           } else {
-            // Height needs reduction to 1024
-            resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {height: 1024}}])
+            // Height needs reduction to maxPixels
+            resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {height: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
           }
-        } else if (fileinfo.width > 1024) {
-            // Width needs reduction to 1024
-            resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: 1024}}])
-        } // No need for resize
+        } else if (pickerResult.width > maxPixels) {
+          // Width needs reduction to maxPixels
+          resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
+        } else {
+          // No need for resize
+          resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [], { format: 'jpeg', compress: compressionFactor})
+          //console.log("Pixel size fine: ")
+        }
+        fileinfo = await Expo.FileSystem.getInfoAsync(tryResize.uri, {size: true})
+        ////
+        //console.log("Tried Size: ", fileinfo.size)
+        //console.log("compLevel: ", compressionFactor)
+        compressionFactor -= 0.05
+        if (compressionFactor < 0.01) {
+          break
+        }
         // #######################################
         // End resizing
         // #######################################
+        // #######################################
+        // Apply compression
+        // #######################################
+        //compressed = await this._regressiveCompress(resized, resizedFileinfo)
+      }
+      /*
         let resizedFileinfo
         if (! resized ) {
           resizedFileinfo = fileinfo
           resized = pickerResult
         } {
-          resizedFileinfo = await Expo.FileSystem.getInfoAsync(pickerResult.uri, {size: true})
+          resizedFileinfo = await Expo.FileSystem.getInfoAsync(resized.uri, {size: true})
         }
-        // #######################################
-        // Apply compression
-        // #######################################
-        compressed = await this._regressiveCompress(resized, resizedFileinfo)
-      }
+        */
 
       // It is pickerResult.base64 that holds the necessary information, and this should be hashed.
       // This hash should be stored locally and persistently with the UploadedImage information.
@@ -496,7 +535,7 @@ export default class CreateNewItemScreen extends React.Component {
       */
 
       // https://docs.expo.io/versions/v26.0.0/sdk/imagemanipulator
-      await this._uploadImageAsync(compressed.uri,compressed.base64);
+      await this._uploadImageAsync(tryResize.uri,"");
     }
   }
 
@@ -510,25 +549,24 @@ export default class CreateNewItemScreen extends React.Component {
     // Formula only interpolates between a quality of 55 to 100, but I'm willing to trust it down to 20.
     // A Quality of 20 would need a compression ratio of 65, which seems unlikely given the preceding resize step.
     let Q = Math.floor((C - 80.8777778)/(-0.75777778))/100
-    console.log(Q)
-    console.log(C)
-    console.log(resizedFileinfo.size)
+    console.log("Q: ", Q)
+    console.log("Necessary Compression Ratio: ", C)
+    console.log("Resized File Size: ", resizedFileinfo.size)
     while ( C > 1.5 ) {
       if ( Q > 1 ) {
           console.log("Compression ratio >= 1.5 and Q > 1")
-          compressed = await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 1 })
+          compressed = await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 0 })
       } else if ( Q < 0.1 ) {
         // It is possible that this restriction could result in image sizes greater than 200kb
         console.log("Q < 0.1")
-        return await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 0.1 })
+        return await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 0 })
         //return compressed
       } else {
         console.log("0.1 <= Q <= 1")
-        compressed = await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: Q })
+        compressed = await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 0 })
       }
 
       imageInfo = await Expo.FileSystem.getInfoAsync(compressed.uri, {size: true})
-      // Decremental change for the next run
       Q = Q - 0.1
       // Test for completeness on while
       C = imageInfo.size/102400
@@ -581,21 +619,26 @@ export default class CreateNewItemScreen extends React.Component {
     // create formdata
     //const instanceSignedUrl = new SignedUrl();
     //let signedUrl = getSignedUrl( 'image/jpeg' )
+          //{({ data, fetchMore, networkStatus, refetch, error, variables}) => {
     getSignedUrl( 'image/jpeg' )
-      .then( ({ data }) => {
-      //  console.log("Signed Url from server: ", getSignedUrl);
-        const formData = new FormData();
-        this.storeImageDetails(data.getSignedUrl.key,data.getSignedUrl.id,uri,base64);
-        formData.append('key', data.getSignedUrl.key);
-        formData.append('bucket', data.getSignedUrl.bucket);
-        formData.append('Policy', data.getSignedUrl.policy);
-        formData.append('X-Amz-Algorithm', data.getSignedUrl.X_Amz_Algorithm);
-        formData.append('X-Amz-Credential', data.getSignedUrl.X_Amz_Credential);
-        formData.append('X-Amz-Date', data.getSignedUrl.X_Amz_Date);
-        formData.append('X-Amz-Signature', data.getSignedUrl.X_Amz_Signature);
-        formData.append('file', {uri: uri, type: 'multipart/form-data'} );
+    .then( ({ data, refetch, error }) => {
+      if (error) {
+        console.log("Error: ", error)
+        // Try again?
+        return null
+      }
+      const formData = new FormData();
+      this.storeImageDetails( data.getSignedUrl.key, data.getSignedUrl.id, uri, base64);
+      formData.append('key', data.getSignedUrl.key);
+      formData.append('bucket', data.getSignedUrl.bucket);
+      formData.append('Policy', data.getSignedUrl.policy);
+      formData.append('X-Amz-Algorithm', data.getSignedUrl.X_Amz_Algorithm);
+      formData.append('X-Amz-Credential', data.getSignedUrl.X_Amz_Credential);
+      formData.append('X-Amz-Date', data.getSignedUrl.X_Amz_Date);
+      formData.append('X-Amz-Signature', data.getSignedUrl.X_Amz_Signature);
+      formData.append('file', {uri: uri, type: 'multipart/form-data'} );
 
-        return formData
+      return formData
 //    data.append('key', 'somerandomlygeneratedalphanumeric');
 //    data.append('bucket', 'bbb-app-images');
 //    data.append('Policy', 'eyJleHBpcmF0aW9uIjoiMjAxOC0wNC0xMVQwNzoyMzoxN1oiLCJjb25kaXRpb25zIjpbWyJjb250ZW50LWxlbmd0aC1yYW5nZSIsMCw1MjQyODhdLHsia2V5Ijoic29tZXJhbmRvbWx5Z2VuZXJhdGVkYWxwaGFudW1lcmljIn0seyJidWNrZXQiOiJiYmItYXBwLWltYWdlcyJ9LHsiWC1BbXotQWxnb3JpdGhtIjoiQVdTNC1ITUFDLVNIQTI1NiJ9LHsiWC1BbXotQ3JlZGVudGlhbCI6IkFLSUFKRUpDT01MQjZGSTVFVkVRLzIwMTgwNDExL2FwLXNvdXRoZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LHsiWC1BbXotRGF0ZSI6IjIwMTgwNDExVDA2MjMxN1oifV19');
@@ -603,25 +646,35 @@ export default class CreateNewItemScreen extends React.Component {
 //    data.append('X-Amz-Credential', 'AKIAJEJCOMLB6FI5EVEQ/20180411/ap-southeast-1/s3/aws4_request');
 //    data.append('X-Amz-Date', '20180411T062317Z');
 //    data.append('X-Amz-Signature', '961d824489016a261bab234bb227fdc20de12c67a1724d819ffcba19e69de44c');
-    //data.append('Content-Type', 'image/jpeg');
-    //{uri: photo.uri, name: 'image.jpg', type: 'multipart/form-data'}
-      })
-      .then( (data) => {
-        // post your data.
+  //data.append('Content-Type', 'image/jpeg');
+  //{uri: photo.uri, name: 'image.jpg', type: 'multipart/form-data'}
+    })
+    .then( (data) => {
+      // post your data.
+      if (data) {
         return api.post('', data, {
-              onUploadProgress: (e) => {
-                const progress = e.loaded / e.total;
+          onUploadProgress: (e) => {
+            const progress = e.loaded / e.total;
 
-              }
-            })
-      })
-      .then((res) =>{
-    //     console.log("Response: ", res)
-
+          }
+        })
+      } return null
+    })
+    .then( (response) =>{
+      if ( w(response, ['ok']) ) {
+        //console.log("Response: ", response)
+      } else {
+        // Some kind of error
+//        response.data contains %EntityTooLarge%
+//       response.ok == false
+//       response.problem == "CLIENT_ERROR"
+//       response.status == 400
+      }
+      
       this.setState({
         progressVisible: false,
         progressMsg:"Please Wait..."
-      });
+      })
     })
   }
 
