@@ -281,8 +281,11 @@ export default StyleSheet.create({
 	postDesc: {
 		marginLeft: Layout.moderateScale(10),
 		marginRight: Layout.moderateScale(10),
+    padding: Layout.moderateScale(4),
 		fontSize: Layout.moderateScale(12),
+		borderRadius: Layout.moderateScale(8),
 		color: Colors.menuuserNameandTokenColor,
+		backgroundColor: Colors.lightGray,
 		fontFamily: 'roboto-reguler',
 	},
 	postTitle: {
