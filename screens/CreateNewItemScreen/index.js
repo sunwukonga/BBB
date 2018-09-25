@@ -427,7 +427,7 @@ export default class CreateNewItemScreen extends React.Component {
     // This gives a URI, this should be used to
     //  - Send graphql mutation to get upload signed url
 //https://stackoverflow.com/questions/49725746/how-to-hash-image-data-in-react-native-expo
-    const maxPixels = 476
+    let maxPixels = 476
     // In future, we'll be able to avoid pickerResult compressing the jpg
     // https://github.com/expo/expo/commit/7548f07cf956d88e15176d3512dd98a83448da6c
     //
@@ -481,23 +481,29 @@ export default class CreateNewItemScreen extends React.Component {
             tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
           } else {
             // Height needs reduction to maxPixels
-            resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {height: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
+            tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {height: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
           }
         } else if (pickerResult.width > maxPixels) {
           // Width needs reduction to maxPixels
-          resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
+          tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
         } else {
           // No need for resize
-          resized = await Expo.ImageManipulator.manipulate(pickerResult.uri, [], { format: 'jpeg', compress: compressionFactor})
+          tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [], { format: 'jpeg', compress: compressionFactor})
           //console.log("Pixel size fine: ")
         }
         fileinfo = await Expo.FileSystem.getInfoAsync(tryResize.uri, {size: true})
         ////
-        //console.log("Tried Size: ", fileinfo.size)
+        //console.log("Tried Size: ", fileinfo.size, " maxPixels: ", maxPixels)
         //console.log("compLevel: ", compressionFactor)
         compressionFactor -= 0.05
-        if (compressionFactor < 0.01) {
-          break
+        if (compressionFactor < 0.1) {
+          if (maxPixels > 256) {
+            maxPixels = 256
+            compressionFactor = 0.95
+          } else if (maxPixels > 128) {
+            maxPixels = 128
+            compressionFactor = 0.95
+          } else break;
         }
         // #######################################
         // End resizing
@@ -662,8 +668,10 @@ export default class CreateNewItemScreen extends React.Component {
     })
     .then( (response) =>{
       if ( w(response, ['ok']) ) {
-        //console.log("Response: ", response)
+        console.log("Response: ", response)
+        //
       } else {
+        console.log("Response: ", response)
         // Some kind of error
 //        response.data contains %EntityTooLarge%
 //       response.ok == false
