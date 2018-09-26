@@ -85,17 +85,20 @@ class ListChats extends Component {
 
     function OtherProfileName( props ) {
       const {chat} = props
+      if ( ! w(chat, ['listing']) ) {
+        return <Text>This listing has been deleted</Text>
+      }
       if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
         if ( w(chat, ['listing', 'user', 'profileName']) ) {
           return <Title style={styles.headerTitle}>{chat.listing.user.profileName}</Title>
         } else {
-          return <Text>Nothing to show</Text>
+          return <Text>Other user no longer exists</Text>
         }
       } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
         if ( w(chat, ['initUser', 'profileName']) ) {
           return <Title style={styles.headerTitle}>{chat.initUser.profileName}</Title>
         } else {
-          return <Text> Nothing to show </Text>
+          return <Text>Other user no longer exists</Text>
         }
       }
     }
@@ -121,16 +124,16 @@ class ListChats extends Component {
           </Left>
           <Body style={styles.bodys}>
             <View style={styles.titleview}>
-            { chat.listing.primaryImage===null ||  chat.listing.primaryImage.imageKey===null
-              ? <Baby style={styles.rowImage} />
-              : <Image source={{ uri: Urls.s3ImagesURL + chat.listing.primaryImage.imageKey }} style={styles.rowImage} />
+            { w(chat, ['listing', 'primaryImage', 'imageKey'])
+              ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.primaryImage.imageKey }} style={styles.rowImage} />
+              : <Baby style={styles.rowImage} />
             }
-              <Text style={styles.title}>{chat.listing.title}</Text>
+              <Text style={styles.title}>{w(chat, ['listing', 'title'])}</Text>
             </View>
             <View style={styles.bottomline} />
             <View><OtherProfileName chat={chat} /></View>
             <View style={styles.namecount}>
-                { chat.newMessageCount && chat.newMessageCount > 0
+                { w(chat, ['newMessageCount']) && chat.newMessageCount > 0
                 ? <Text style={styles.count}>{chat.newMessageCount}</Text>
                 : null
                 }

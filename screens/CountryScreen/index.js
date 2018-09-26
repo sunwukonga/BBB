@@ -3,6 +3,7 @@ import { Query, Mutation, graphql, compose } from "react-apollo";
 import {
   FlatList
 , ActivityIndicator
+, BackHandler
 } from 'react-native';
 import {
   ListItem
@@ -13,6 +14,7 @@ import {
 , Text
 } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
+import { RootStackNavigator } from '../../navigation/RootNavigation'
 
 // custom components
 import BBBHeader from '../../components/BBBHeader/';
@@ -21,6 +23,7 @@ import BBBHeader from '../../components/BBBHeader/';
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
 import Flag from 'react-native-round-flags';
+import { w } from '../../utils/helpers.js'
 
 import {
   GET_COUNTRY_LIST
@@ -45,6 +48,35 @@ const SA_CountryToHome = StackActions.reset({
       routeName: 'mainScreen'
     , action: NavigationActions.navigate({ routeName: 'homeScreen' })
   })]
+})
+/*
+const SA_BackToProfile = StackActions.reset({
+    index: 1
+  , actions: [
+      NavigationActions.navigate({
+        routeName: 'mainScreen'
+      , action: StackActions.push({
+          routeName: 'homeScreen'
+        , action: StackActions.push({ routeName: 'profileScreen' })
+        })
+      })
+    ]
+})
+*/
+const SA_BackToProfile = StackActions.reset({
+  index: 0
+, actions: [
+    StackActions.push({
+      routeName: 'mainScreen'
+    , action: StackActions.reset({
+        index: 1
+      , actions: [
+          StackActions.push({ routeName: 'homeDrawer' })
+        , StackActions.push({ routeName: 'profileScreen' })
+        ]
+      })
+    })
+  ]
 })
 
 
@@ -77,37 +109,56 @@ const CountryScreen = compose (
       this.state = {
         countryCode: null
       }
+      this.gettingCountryCode = true
       this.mutationInFlight = false
-      this.gettingCountryCode = false
+      this.countryBackHandler = null
+
+      const defaultGetStateForAction = RootStackNavigator.router.getStateForAction;
+      RootStackNavigator.router.getStateForAction = (action, state) => {
+        if (state && w(action.actions, ['length']) > 0 && action.actions[0].routeName === "countryScreen") {
+          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode))
+        }
+        return defaultGetStateForAction(action, state);
+      };
     }
-getMethods(obj) {
-  var result = []; 
-  for (var id in obj) {
-    try {
-      if (typeof(obj[id]) == "function") {
-      result.push(id);
+
+    onBackPress = (countryCode) => {
+      return Expo.SecureStore.setItemAsync("countryCode", countryCode)
+      .then( () => {
+        this.props.navigation.dispatch( SA_BackToProfile )
+        this.removeCountryHandler()
+        this.mutationInFlight = false
+        this.gettingCountryCode = true
+        return
+      })
+    }
+
+    removeCountryHandler = () => {
+      if (this.countryBackHandler) {
+        this.countryBackHandler.remove()
+        this.countryBackHandler = null
       }
-    } catch (err) {
-      result.push(id + ": inaccessible");
     }
-  }
-  return result;
-}
 
     componentWillMount(props) {
       if (! this.state.countryCode) {
-        this.gettingCountryCode = true
         let countryCodePromise = Expo.SecureStore.getItemAsync("countryCode")
         Promise.all([countryCodePromise])
         .then( ([ countryCode ]) => {
           if (countryCode) {
+            this.gettingCountryCode = false
             this.setState({
               countryCode: countryCode
             })
+          } else {
+            this.gettingCountryCode = false
+            this.setState({
+              countryCode: null
+            })
           }
-          this.gettingCountryCode = false
         })
       }
+
     }
 
     countryHandler( countryCode, setCountry, save ) {
@@ -121,11 +172,15 @@ getMethods(obj) {
               Expo.SecureStore.setItemAsync("countryCode", countryCode)
               .then( () => {
                 this.props.navigation.dispatch(SA_CountryToHome)
+                this.removeCountryHandler()
                 this.mutationInFlight = false
+                this.gettingCountryCode = true
               })
             } else {
               this.props.navigation.dispatch(SA_CountryToHome)
+              this.removeCountryHandler()
               this.mutationInFlight = false
+              this.gettingCountryCode = true
             }
           })
         }

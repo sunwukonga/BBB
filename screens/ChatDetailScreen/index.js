@@ -152,30 +152,24 @@ export default class ChatScreen extends Component {
 
   // Get the other chat participants Image and ProfileName
   otherImageAndName( chat ) {
-    let profileImage
-    let profileName
+    let profileImage =  <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
+    let profileName = <Text style={{ paddingLeft: Layout.WIDTH * 0.05 }}>Other user not found</Text>
 
-    if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
-      if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) ) {
-        profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
-      } else {
-        profileImage =  <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-      }
-      if ( w(chat, ['listing', 'user', 'profileName']) ) {
-        profileName = <Title style={styles.headerTitle}>{chat.listing.user.profileName}</Title>
-      } else {
-        profileName = <Text>Nothing to show</Text>
-      }
-    } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
-      if ( w(chat, ['initUser', 'profileImage', 'imageKey']) ) {
-        profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
-      } else {
-        profileImage = <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
-      }
-      if ( w(chat, ['initUser', 'profileName']) ) {
-        profileName = <Title style={styles.headerTitle}>{chat.initUser.profileName}</Title>
-      } else {
-        profileName = <Text> Nothing to show </Text>
+    if ( w(chat, ['listing']) ) {
+      if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
+        if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) ) {
+          profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+        }
+        if ( w(chat, ['listing', 'user', 'profileName']) ) {
+          profileName = <Title style={styles.headerTitle}>{chat.listing.user.profileName}</Title>
+        }
+      } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
+        if ( w(chat, ['initUser', 'profileImage', 'imageKey']) ) {
+          profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
+        }
+        if ( w(chat, ['initUser', 'profileName']) ) {
+          profileName = <Title style={styles.headerTitle}>{chat.initUser.profileName}</Title>
+        }
       }
     }
     return (
@@ -311,9 +305,9 @@ export default class ChatScreen extends Component {
                   : <Baby style={styles.profileImage} />
                   }
                   <Text style={styles.regularSmall}>
-                    { (chat && chat.listing && chat.listing.title)
-                    ? (chat.listing.title)
-                    : null
+                    { ! w(chat, ['listing'])
+                    ? ("This listing has been deleted")
+                    : w(chat, ['listing', 'title'])
                     }
                   </Text>
                 </View>

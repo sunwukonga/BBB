@@ -30,6 +30,7 @@ import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import GetProfile from '../../graphql/queries/GetProfile'
 import GetCachedListing from '../../graphql/queries/GetCachedListing'
 import Listing from '../../components/display/Listing'
+import { w } from '../../utils/helpers.js'
 
 
 class ProductDetailsScreen extends React.Component {
@@ -68,7 +69,7 @@ class ProductDetailsScreen extends React.Component {
         <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
             <Container style={styles.container}>
               <BBBHeader
-                title={listing.title}
+                title={w(listing, ['title']) ? listing.title : ""}
                 leftComponent={leftComponent}
               />
               <Content style={styles.contentStyle}>

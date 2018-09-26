@@ -159,6 +159,12 @@ export default StyleSheet.create({
 		borderRadius: Layout.moderateScale(4),
 		backgroundColor: Colors.offerButton,
 	},
+	saleButton: {
+		paddingVertical: Layout.HEIGHT * 0.005,
+		paddingHorizontal: Layout.WIDTH * 0.02,
+		borderRadius: Layout.moderateScale(4),
+		backgroundColor: Colors.saleButton,
+	},
 	regularLarge: {
 		color: Colors.secondaryColor,
 		fontSize: Layout.moderateScale(16),
@@ -275,8 +281,11 @@ export default StyleSheet.create({
 	postDesc: {
 		marginLeft: Layout.moderateScale(10),
 		marginRight: Layout.moderateScale(10),
+    padding: Layout.moderateScale(4),
 		fontSize: Layout.moderateScale(12),
+		borderRadius: Layout.moderateScale(8),
 		color: Colors.menuuserNameandTokenColor,
+		backgroundColor: Colors.lightGray,
 		fontFamily: 'roboto-reguler',
 	},
 	postTitle: {

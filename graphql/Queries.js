@@ -796,6 +796,96 @@ query {
   }
 }`;
 
+const SEARCH_LISTINGS = gql`
+query searchListings($terms:[String],$limit:Int,$page:Int,$filter:Filters!){
+  searchListings(terms:$terms,limit:$limit,page:$page,filters:$filter){
+    id
+    title
+    description
+    category {
+      id
+      name
+    }
+    primaryImage {
+      id
+      imageKey
+    }
+    secondaryImages {
+      id
+      imageKey
+    }
+    saleMode {
+      id
+      price
+      counterOffer
+      currency {
+        iso4217
+        currencyName
+        currencySymbol
+      }
+      mode
+      exchangeModes {
+        id
+        mode
+        price
+        currency {
+          iso4217
+          currencyName
+          currencySymbol
+        }
+        location {
+          id
+          lineOne
+          lineTwo
+          postcode
+          long
+          lat
+          directions
+        }
+      }
+    }
+    template {
+      id
+      title
+      description
+      primaryImage {
+        id
+        imageKey
+      }
+      secondaryImages {
+        id
+        imageKey
+      }
+      tags{
+        id
+        name
+      }
+    }
+    tags{
+      id
+      name
+    }
+    viewers
+    likes
+    liked
+    chatId
+    user {
+      id
+      firstName
+      lastName
+      profileName
+      profileImage {
+        id
+        imageURL
+        imageKey
+      }
+      sellerRating
+      sellerRatingCount
+      online
+      idVerification
+    }
+  }
+}`
 export {
   GET_MOST_RECENT_LIST
 , GET_MOST_VISITED_LIST
@@ -811,4 +901,5 @@ export {
 , GET_LISTING
 , GET_NESTED_CATEGORY_LIST
 , GET_CATEGORY_LIST
+, SEARCH_LISTINGS
 }

@@ -14,6 +14,7 @@ import {
 } from '../../../graphql/Queries'
 import PureListItem from '../../../screens/HomeScreen/PureListItem'
 import { w } from '../../../utils/helpers.js'
+import { Locations } from "../../../constants/"
 
 
 class ListUserPostedListings extends Component {
@@ -51,13 +52,12 @@ class ListUserPostedListings extends Component {
           if (!data.getUserPostedListings || data.getUserPostedListings.length == 0) {
             return null
           }
+    console.log("UserPosted: ", Object.assign(variables, { countryCode: loginStatus.countryCode }) )
                 //onRefresh={() => refetch()}
           return (
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
-                <Text style={styles.populerText}>
-                  Your Listed Items
-                </Text>
+                <Text style={styles.populerText}>Your Listed Items</Text>
               </View>
               <FlatList
                 horizontal = {true}
@@ -65,7 +65,7 @@ class ListUserPostedListings extends Component {
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getUserPostedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} resetTo={Locations.OwnListing} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}

@@ -20,7 +20,8 @@ const postmain = '#cfcfcf';
 const iconsec = '#7f7f7f';
 const divider = '#cfcfcf';
 const barterButton = '#f48fb1';
-const offerButton = '#81d4fa';
+const offerButton = '#f2ffb7';
+const saleButton = '#81d4fa';
 
 const tintColor = '#1fa6a4';
 
@@ -57,6 +58,7 @@ export default {
 	divider,
 	barterButton,
 	offerButton,
+	saleButton,
 
 	tintColor,
 	mainheaderbg,

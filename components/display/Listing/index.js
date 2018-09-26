@@ -34,14 +34,16 @@ class Listing extends Component {
 
   // comparisons of important changes here
   shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.item.liked !== nextProps.item.liked) {
+    if (w(this.props, ['liked']) !== w(nextProps.item, ['liked'])) {
       return true;
     }
     return false;
   }
+    //, cache: 'reload'
+  //key={ item.imageKey }
 
   renderItem( item ) {
-    if (!item.imageKey) {
+    if (!w(item, ['imageKey'])) {
       return (
         <View key={item.id} style={styles.swiperSec}>
           <Baby style={styles.rowImage} />
@@ -74,9 +76,11 @@ class Listing extends Component {
       }
     } else {
       // primary image does not exist
-      let secImages = item.secondaryImages.filter( image => image.imageKey )
-      if ( secImages.length > 0 ) {
-        return item.secondaryImages
+      if (w(item, ['secondaryImages', 'length'] ) > 0 ) {
+        let secImages = item.secondaryImages.filter( image => image.imageKey )
+        if ( secImages.length > 0 ) {
+          return item.secondaryImages
+        }
       } else return [{dummy: true}]
     }
   }
@@ -143,10 +147,7 @@ class Listing extends Component {
           </View>
         </Item>
         <View>
-          <Text style={styles.postTitle} numberOfLines={3}>{item.title}</Text>
-        </View>
-        <View>
-          <Text style={styles.postDesc} numberOfLines={3}>{item.description}</Text>
+          <Text style={styles.postTitle} numberOfLines={3}>{w(item, ['title'])}</Text>
         </View>
 
         <View style={styles.productreviewSec}>
@@ -160,20 +161,33 @@ class Listing extends Component {
             <Text style={styles.ratingmsgct}> ({w(item, ['user', 'sellerRatingCount'])}) </Text>
           </View>
           <View style={styles.priceSec}>
-            <Text style={styles.pricetext}>{item.saleMode.currency!==null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
+            <Text style={styles.pricetext}>{(w(item, ['saleMode', 'currency']) && w(item, ['saleMode', 'price'])) ? item.saleMode.currency.currencySymbol : ""}{w(item, ['saleMode', 'price']) ? item.saleMode.price.toFixed(2) : ""}</Text>
           </View>
         </View>
-
-        <View style={styles.alignmentButton}>
-          <View style={styles.offerButton}>
-            <Text style={styles.regularSmall}>{item.saleMode.mode.toUpperCase()}</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{alignSelf: 'flex-start'}}>
+            <Text style={styles.regularLarge}>Category</Text>
+            <Text style={[styles.regularSmall, styles.tagContainer]}>
+              {w(item, ['category', 'name'])}
+            </Text>
+          </View>
+          <View>
+            <View style={styles.alignmentButton}>
+              <View style={styles.saleButton}>
+                <Text style={styles.regularSmall}>{w(item, ['saleMode', 'mode']) ? item.saleMode.mode.toUpperCase() : ""}</Text>
+              </View>
+            </View>
+            { w(item, ['saleMode', 'counterOffer']) ?
+            <View style={styles.alignmentButton}>
+              <View style={styles.offerButton}>
+                <Text style={styles.regularSmall}>Counter Offers Welcome</Text>
+              </View>
+            </View>
+            : null }
           </View>
         </View>
         <View>
-          <Text style={styles.regularLarge}>Category</Text>
-          <Text style={[styles.regularSmall, styles.tagContainer]}>
-            {w(item, ['category', 'name'])}
-          </Text>
+          <Text style={styles.postDesc} >{w(item, ['description'])}</Text>
         </View>
       </View>
     )

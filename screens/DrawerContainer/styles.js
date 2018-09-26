@@ -6,6 +6,11 @@ export default StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.white,
 	},
+  flagStyle: {
+    height: Layout.HEIGHT * 0.08,
+    width: Layout.HEIGHT * 0.08,
+    alignSelf: 'flex-start',
+  },
 	usersDetailsSec: {
 		paddingVertical: Layout.WIDTH * 0.08,
 		paddingHorizontal: Layout.WIDTH * 0.025,
@@ -15,7 +20,7 @@ export default StyleSheet.create({
 	userImage: {
 		width: Layout.WIDTH * 0.28,
 		height: Layout.WIDTH * 0.28,
-		borderRadius: Layout.WIDTH * 0.14,
+		borderRadius: Layout.WIDTH * 0.04,
 		borderWidth: 1,
 		borderColor: Colors.white,
 	},

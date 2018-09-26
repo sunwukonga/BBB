@@ -11,7 +11,7 @@ import {
 } from 'native-base';
 import { withNavigation } from 'react-navigation'
 import styles from './styles';
-import { Layout, Colors, Urls } from '../../constants/';
+import { Layout, Colors, Urls} from '../../constants/';
 import Baby from '../../components/Baby';
 import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
@@ -43,7 +43,7 @@ class PureListItem extends Component {
   }
 
   render() {
-    let {item, loginStatus, chatIndexes, currentUser, createNew } = this.props
+    let {item, loginStatus, chatIndexes, currentUser, createNew, resetTo } = this.props
     if ( item.emptyList ) {
       return (
         <TouchableOpacity onPress={ createNew } >
@@ -68,6 +68,9 @@ class PureListItem extends Component {
         return <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
       }
     }
+    if (item.deleted) {
+      return null
+    }
 
     return (
         <TouchableOpacity
@@ -88,7 +91,7 @@ class PureListItem extends Component {
             }
             <LikeButton item={item} loginStatus={loginStatus} />
             <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
-            <DeleteButton item={item} loginStatus={loginStatus} />
+            <DeleteButton item={item} loginStatus={loginStatus} resetTo={resetTo} />
           </View>
 
           <Item style={styles.userItemDetailsSec}>
@@ -109,7 +112,7 @@ class PureListItem extends Component {
           </Item>
 
           <View>
-            <Text style={styles.postDesc} numberOfLines={3}>{item.description}</Text>
+            <Text style={styles.postDesc} numberOfLines={2}>{item.title}</Text>
           </View>
 
           <View style={styles.productreviewSec}>
@@ -123,7 +126,10 @@ class PureListItem extends Component {
               <Text style={styles.ratingmsgct}> ({ w(item, ['user', 'sellerRatingCount']) }) </Text>
             </View>
             <View style={styles.priceSec}>
-              <Text style={styles.pricetext}>{ w(item, ['saleMode', 'currency']) !== null ? item.saleMode.currency.currencySymbol : ""}{item.saleMode.price ? item.saleMode.price : ""}</Text>
+              <Text style={styles.pricetext}>{w(item, ['saleMode', 'currency']) && w(item, ['saleMode', 'price']) ? item.saleMode.currency.currencySymbol : ""}{w(item, ['saleMode', 'price']) ? item.saleMode.price.toFixed(2) : ""}</Text>
+              { w(item, ['saleMode', 'mode']) === 'DONATE' ?
+              <Text>Donated</Text>
+              : null }
             </View>
           </View>
 
