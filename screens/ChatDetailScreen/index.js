@@ -45,7 +45,7 @@ import { Layout, Images, Colors, Urls } from '../../constants/';
 
 import SendMessageInput from './SendMessageInput'
 import getChatMessages from './GetChatMessages';
-import sendChatMessage from './SendMessage';
+//import sendChatMessage from './SendMessage';
 //import createChat from './CreateChat';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';
@@ -84,30 +84,32 @@ export default class ChatScreen extends Component {
   }
 
   componentDidMount() {
-    console.log("Layout.HEIGHT: ", Layout.HEIGHT)
+    //console.log("Layout.HEIGHT: ", Layout.HEIGHT)
     InteractionManager.runAfterInteractions(() => {
-      this._scrollView.scrollToEnd({animated: true})
+      setTimeout(() => {
+        this._scrollView.scrollToEnd({animated: true})
+      }, 100);
     })
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide.bind(this))
     this.didFocusListener = this.props.navigation.addListener(
       'didFocus',
       payload => {
-        console.log('didFocus-SendMessageInput')
+        //console.log('didFocus-SendMessageInput')
         //this.scrollReporter = setInterval( () => console.log("Scroll.Event: ", this.scrollEvent), 4000)
       }
     )
     this.didBlurListener = this.props.navigation.addListener(
       'didBlur'
     , payload => {
-        console.log('didBlur-SendMessageInput')
+        //console.log('didBlur-SendMessageInput')
         if ( this.keyboardDidHideLister ) {
           this.keyboardDidHideListener.remove()
-        console.log('didBlur-SendMessageInput: removeHideListener')
+        //console.log('didBlur-SendMessageInput: removeHideListener')
         }
         if ( this.keyboardDidShowLister ) {
           this.keyboardDidShowListener.remove()
-        console.log('didBlur-SendMessageInput: removeShowListener')
+        //console.log('didBlur-SendMessageInput: removeShowListener')
         }
       }
 
@@ -122,12 +124,12 @@ export default class ChatScreen extends Component {
   }
 
   componentWillUnmount() {
-    console.log('willUnmount')
+    //console.log('willUnmount')
     this.subs.forEach((sub, i) => {
       if (sub) {
         sub.remove();
       } else {
-        console.log("The listener at: ", i, " did not exist.")
+        //console.log("The listener at: ", i, " did not exist.")
       }
     });
     //clearInterval(scrollReporter)
@@ -157,15 +159,23 @@ export default class ChatScreen extends Component {
 
     if ( w(chat, ['listing']) ) {
       if ( w(chat, ['listing', 'user', 'id']) != chat.userId ) {
-        if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) ) {
-          profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+        if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) || w(chat, ['listing', 'user', 'profileImage', 'imageURL']) ) {
+          if ( w(chat, ['listing', 'user', 'profileImage', 'imageKey']) ) {
+            profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
+          } else {
+            profileImage = <Image source={{ uri: chat.listing.user.profileImage.imageURL }} style={styles.profileImage} />
+          }
         }
         if ( w(chat, ['listing', 'user', 'profileName']) ) {
           profileName = <Title style={styles.headerTitle}>{chat.listing.user.profileName}</Title>
         }
       } else if ( w(chat, ['initUser', 'id']) != chat.userId ) {
-        if ( w(chat, ['initUser', 'profileImage', 'imageKey']) ) {
-          profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
+        if ( w(chat, ['initUser', 'profileImage', 'imageKey']) || w(chat, ['initUser', 'profileImage', 'imageURL']) ) {
+          if ( w(chat, ['initUser', 'profileImage', 'imageKey'])) {
+            profileImage = <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
+          } else {
+            profileImage = <Image source={{ uri: chat.initUser.profileImage.imageURL }} style={styles.profileImage} />
+          }
         }
         if ( w(chat, ['initUser', 'profileName']) ) {
           profileName = <Title style={styles.headerTitle}>{chat.initUser.profileName}</Title>
@@ -248,7 +258,7 @@ export default class ChatScreen extends Component {
 //---------------------------------------RENDER---------------------------------------------------
 //------------------------------------------------------------------------------------------------
   render() {
-    console.log("RENDER CHAT")
+    //console.log("RENDER CHAT")
     //let { chat } = this.props.navigation.state.params
     var leftComponent = (
       <Button transparent onPress={() => this.props.navigation.goBack()}>

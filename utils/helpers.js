@@ -13,13 +13,66 @@ function updateChatMessages(oldChatList, newChatList) {
                 })
 }
 
-function  w( root, nested ) {
+function w( root, nested ) {
   if (!root) return null
   return nested.reduce( (acc, cur) => {
     if (!acc) return null
     if (acc[cur]) return acc[cur]
     else return null
   }, root)
+}
+
+getElementByKey = (o, key) => {
+  var path = []
+  if (findByKey(o, key, path)) {
+  	return w(o, path)
+  } else return null
+}
+findByKey = ( o, key, path ) => {
+  return Object.keys(w(o, path)).some( (e, i, arr) => {
+    path.push(e)
+    if (e !== key) {
+      if (w(o, path) && typeof w(o, path) === 'object') {
+        if (!Array.isArray(w(o, path))) {
+          let result = findByKey(o, key, path)
+          if (!result) {
+            path.pop()
+          }
+          return result
+        } else {
+          // find objects in array and search them.
+          let arrayResult = w(o, path).some( (e, i, a) => {
+            path.push(i)
+            if (typeof e === 'object') {
+              if (!Array.isArray(e)) {
+                let result = findByKey(o, key, path)
+                if (!result) {
+                  path.pop()
+                }
+                return result
+              } else {
+                // Don't bother checking nested arrays.
+                path.pop()
+                return false
+              }
+            } else {
+              path.pop()
+              return false
+            }
+
+          })
+          if (!arrayResult) {
+           	path.pop()
+          }
+          return arrayResult
+        }
+      }
+      path.pop()
+      return false
+    } else {
+      return true
+    } 
+  })
 }
 
 function getMethods(obj) {
@@ -40,4 +93,5 @@ export {
   updateChatMessages
 , w
 , getMethods
+, getElementByKey
 }

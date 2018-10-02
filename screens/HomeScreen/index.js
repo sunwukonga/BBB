@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   View
 , Text
@@ -9,7 +9,7 @@ import {
 , Alert
 } from 'react-native';
 // For creating Actions. Will move out to external file later
-import { NavigationActions } from 'react-navigation';
+import { NavigationActions } from 'react-navigation'
 import {
   Icon
 , Button
@@ -23,16 +23,17 @@ import {
 , Container
 , Content
 , Fab
-} from 'native-base';
+} from 'native-base'
 //custom components
-import BBBHeader from '../../components/BBBHeader';
-import BBBIcon from '../../components/BBBIcon';
-import { Ionicons } from '@expo/vector-icons';
+import BBBHeader from '../../components/BBBHeader'
+import BBBIcon from '../../components/BBBIcon'
+import { Ionicons } from '@expo/vector-icons'
 // style
-import styles from './styles';
-import headerStyles from '../../components/BBBHeader/styles';
-import { Layout, Colors, Images, IconNames } from '../../constants/';
-import Toast from 'react-native-simple-toast';
+import styles from './styles'
+import headerStyles from '../../components/BBBHeader/styles'
+import { Layout, Colors, Images, IconNames } from '../../constants/'
+import Toast from 'react-native-simple-toast'
+import { Permissions } from 'expo'
 
 // FlatLists with embedded Queries
 import ListRecentListings from './ListRecentListings'
@@ -73,7 +74,7 @@ export default class HomeScreen extends React.Component {
   }
 
   openDrawerAndSetState = () => {
-    this.drawerOpen = true
+    //this.drawerOpen = true
     this.props.navigation.openDrawer()
   }
 
@@ -85,23 +86,10 @@ export default class HomeScreen extends React.Component {
       page:1,
       searchTerms:[],
     }
+    Permissions.askAsync(Permissions.LOCATION)
 
-    this.drawerOpen = false
+    //this.drawerOpen = false
 
-    this.drawerBackHandler = null
-    const defaultGetStateForAction = MainDrawer.router.getStateForAction;
-    MainDrawer.router.getStateForAction = (action, state) => {
-      if (state && action.type === 'Navigation/OPEN_DRAWER') {
-        this.drawerOpen = true
-        this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
-      }
-      if (state && action.type === 'Navigation/DRAWER_CLOSED') {
-        this.drawerOpen = false
-        this.drawerBackHandler.remove()
-        this.drawerBackHandler = null
-      }
-      return defaultGetStateForAction(action, state);
-    };
   }
 
   // REDUNDANT; NOT USED
@@ -181,10 +169,12 @@ export default class HomeScreen extends React.Component {
     this.didFocusListener = this.props.navigation.addListener(
       'didFocus',
       payload => {
+        /*
         if ( this.drawerOpen ) {
           // reattach the listener as we never closed the drawer
           this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
         }
+        */
         if ( this.props.navigation.state && this.props.navigation.state.params ) {
           if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
             this.props.navigation.state.params.doAction = ''
@@ -201,11 +191,13 @@ export default class HomeScreen extends React.Component {
     this.didBlurListener = this.props.navigation.addListener(
       'didBlur'
     , payload => {
+      /*
         if (this.drawerBackHandler) {
           // Handler still exists. This means that the drawer was not closed before navigating away.
             // I.e. drawerOpen: true
           this.drawerBackHandler.remove()
         }
+        */
       }
     )
 
@@ -315,6 +307,7 @@ export default class HomeScreen extends React.Component {
             //)}</GetProfile>
     // Here because I don't have time to de-thread it through the different components. Just dummy
     let currentUser = {}
+    //console.log("HomeScreen:Navigation: ", this.props.navigation.state.params.rootNavigation.getChildNavigation(this.props.navigation.state.params.rootNavigation.state.key))
     return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (

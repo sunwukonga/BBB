@@ -47,6 +47,7 @@ import ModalFilterPicker from 'react-native-modal-filter-picker';
 import LoginStatus from '../HomeScreen/LoginStatus'
 import { w, getMethods } from '../../utils/helpers.js'
 import { StackActions, NavigationActions } from 'react-navigation';
+import { Permissions, Location } from 'expo'
 
 import CreateListing from '../../graphql/mutations/CreateListing'
 import GetCachedCountry from '../../graphql/queries/GetCachedCountry'
@@ -90,7 +91,9 @@ var postcurrency = ''
 export default class CreateNewItemScreen extends React.Component {
   constructor(props) {
     super(props);
-
+    //let location = await Location.getCurrentPositionAsync({})
+    //location.coords.latitude; location.coords.longitude
+    // defaultLocation
 
     const rowHasChanged = (r1, r2) => r1 !== r2;
 /*    const dataObjects = [
@@ -111,7 +114,6 @@ export default class CreateNewItemScreen extends React.Component {
     }
 
     this.state = {
-      countryCode: '',
       visible: false,
       selectedCateName: null,
       selectedCateId:null,
@@ -1171,23 +1173,55 @@ export default class CreateNewItemScreen extends React.Component {
                       <View style={styles.bottomline} />
                       <View style={styles.subFacetoFace}>
                         <View style={styles.dataFacetoFace}>
-                          <Text style={styles.txtTitle}>Line 1</Text>
                           <Item style={styles.txtInput} regular>
-                          <Input  onChangeText={(text) => {
-                            this.setState({ address: { ...this.state.address, lineOne: text} });
-                          }}   />
+                            <TextInput
+                              onChangeText={(text) => {
+                                this.setState({ address: { ...this.state.address, name: text} });
+                              }}
+                              style={{  flex:1 }}
+                              placeholder="24"
+                              placeTextColor={Colors.lightGray}
+                            />
                           </Item>
-                          <Text style={styles.txtTitle}>Line 2</Text>
                           <Item style={styles.txtInput} regular>
-                            <Input onChangeText={(text) => {
-                              this.setState({ address: { ...this.state.address, lineTwo: text} });
-                            }} />
+                            <TextInput
+                              onChangeText={(text) => {
+                                this.setState({ address: { ...this.state.address, street: text} });
+                              }}
+                              style={{  flex:1 }}
+                              placeholder="Smith St"
+                              placeTextColor={Colors.lightGray}
+                            />
                           </Item>
-                          <Text style={styles.txtTitle}>Postcode</Text>
                           <Item style={styles.txtInput} regular>
-                            <Input onChangeText={(text) => {
-                              this.setState({ address: { ...this.state.address, postcode: text} });
-                            }} />
+                            <TextInput
+                              onChangeText={(text) => {
+                                this.setState({ address: { ...this.state.address, city: text} });
+                              }}
+                              style={{  flex:1 }}
+                              placeholder={country.name}
+                              placeTextColor={Colors.lightGray}
+                            />
+                          </Item>
+                          <Item style={styles.txtInput} regular>
+                            <TextInput
+                              onChangeText={(text) => {
+                                this.setState({ address: { ...this.state.address, region: text} });
+                              }}
+                              style={{  flex:1 }}
+                              placeholder="Hougang"
+                              placeTextColor={Colors.lightGray}
+                            />
+                          </Item>
+                          <Item style={styles.txtInput} regular>
+                            <TextInput
+                              onChangeText={(text) => {
+                                this.setState({ address: { ...this.state.address, postcode: text} });
+                              }}
+                              style={{  flex:1 }}
+                              placeholder="138325"
+                              placeTextColor={Colors.lightGray}
+                            />
                           </Item>
                         </View>
                         <View style={styles.mapFacetoFace}>
