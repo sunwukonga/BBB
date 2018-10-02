@@ -54,30 +54,34 @@ class SendMessageInput extends Component {
   updateChatMessages = (oldChatList, newChat) => {
     let spliceIndex
     let oldChat = oldChatList.find( (oldChat, index) => {
-      if (newChat.id == oldChat.id) {
-        spliceIndex = index
-        //oldChat.memo = ''
-        return true
-      }
+      if (oldChat) {
+        if (newChat.id == oldChat.id) {
+          spliceIndex = index
+          //oldChat.memo = ''
+          return true
+        } else return false
+      } else return false
     })
-    let deepMessageCopies = newChat.chatMessages.map( chatMessage => {
-      let shallowCopy = Object.assign( Object.assign({}, oldChat.chatMessages[0], chatMessage))
-      if (chatMessage.image) {
-        if (oldChat.chatMessages[0].image) {
-          shallowCopy.image = Object.assign({}, oldChat.chatMessages[0].image, chatMessage.image)
+    if (oldChat) {
+      let deepMessageCopies = newChat.chatMessages.map( chatMessage => {
+        let shallowCopy = Object.assign( Object.assign({}, oldChat.chatMessages[0], chatMessage))
+        if (chatMessage.image) {
+          if (oldChat.chatMessages[0].image) {
+            shallowCopy.image = Object.assign({}, oldChat.chatMessages[0].image, chatMessage.image)
+          } else {
+            // There might be missing values I cannot see here @@id for instance.
+            shallowCopy.image = Object.assign(chatMessage.image, {"__typename": "Image"})
+          }
         } else {
-          // There might be missing values I cannot see here @@id for instance.
-          shallowCopy.image = Object.assign(chatMessage.image, {"__typename": "Image"})
+          shallowCopy.image = null
         }
-      } else {
-        shallowCopy.image = null
-      }
-      return shallowCopy
-    })
-    let deepOldMessagesCopy = JSON.parse(JSON.stringify( oldChat.chatMessages ))
-    plusNewMessages = deepOldMessagesCopy.concat(deepMessageCopies)
-    oldChat.chatMessages = plusNewMessages
-    oldChatList.splice(spliceIndex, 1, oldChat)
+        return shallowCopy
+      })
+      let deepOldMessagesCopy = JSON.parse(JSON.stringify( oldChat.chatMessages ))
+      plusNewMessages = deepOldMessagesCopy.concat(deepMessageCopies)
+      oldChat.chatMessages = plusNewMessages
+      oldChatList.splice(spliceIndex, 1, oldChat)
+    }
     return oldChatList
   }
 

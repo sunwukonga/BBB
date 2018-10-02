@@ -28,6 +28,7 @@ import styles from './styles'
 import { Layout, Colors } from '../../constants/'
 
 
+//const SA_changeCountry = (isoCode, navigation, key) => StackActions.reset({
 const SA_changeCountry = (isoCode) => StackActions.reset({
   index: 0
 , key: null
@@ -61,6 +62,7 @@ export default class ProfileScreen extends React.Component {
 
 
 render() {
+  //console.log("Find Router: ", this.props.navigation)
 
     var leftComponent = <Button transparent onPress={()=>this.props.navigation.goBack()}>
                           <BBBIcon name="BackArrow" size={Layout.moderateScale(18)} style={styles.backarrow}/>
@@ -100,8 +102,7 @@ render() {
                 height:Layout.WIDTH * 0.4,
                 position: 'absolute',
                 top: Layout.WIDTH * 0.02,
-                right: Layout.WIDTH * 0.02,
-                backgroundColor: 'rgba(255, 255, 255, 0)',
+                right: Layout.WIDTH * 0.02, backgroundColor: 'rgba(255, 255, 255, 0)',
                 borderRadius: Layout.moderateScale(8),
               }}>
                 <ChangeButton />
@@ -115,6 +116,8 @@ render() {
               onPress = {() => {
                 Expo.SecureStore.deleteItemAsync("countryCode")
                 .then( () => {
+                  //console.log("key: ", this.props.navigation.state.params.rootNavigation.state.key)
+                  //this.props.navigation.dispatch(SA_changeCountry(loginStatus.countryCode, this.props.navigation, this.props.navigation.state.params.rootNavigation.state.key))
                   this.props.navigation.dispatch(SA_changeCountry(loginStatus.countryCode))
                 })
               }}

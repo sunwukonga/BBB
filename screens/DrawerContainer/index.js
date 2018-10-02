@@ -24,6 +24,7 @@ import {
   UNSET_AUTH_STATUS
 } from '../../graphql/Mutations'
 import LoginStatus from '../HomeScreen/LoginStatus'
+import { w, getElementByKey } from '../../utils/helpers.js'
 //import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 //reset the appolo cache
@@ -37,36 +38,32 @@ export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
       return false
     }
 
-    w = ( root, nested ) => {
-      if (!root) return null
-      return nested.reduce( (acc, cur) => {
-        if (!acc) return null
-        if (acc[cur]) return acc[cur]
-        else return null
-      }, root)
-    }
-
     render() {
       const { navigation } = this.props;
+      //console.log("Navigation: ", navigation)
+      //console.log("navStateParams: ", getElementByKey(navigation, 'rootNavigation'))
       return (
         <LoginStatus>{ loginStatus => (
           <Container style={styles.container} >
             {loginStatus.loginStatus ?
               <TouchableOpacity
                 onPress={() => {
-                  this.props.navigation.navigate('profileScreen')
+                  this.props.navigation.navigate({
+                    routeName: 'profileScreen'
+       //           , params: { rootNavigation: getElementByKey( navigation, 'rootNavigation') }
+                  })
                 }}
               >
                 <View style={styles.usersDetailsSec}>
                   <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                    {(this.w(loginStatus, ['myProfile', 'profileImageURL']))
+                    {(w(loginStatus, ['myProfile', 'profileImageURL']))
                     ? <Image style={styles.userImage} source={{uri: loginStatus.myProfile.profileImageURL}} />
                     : <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
                     }
                     <Flag code={loginStatus.countryCode} style={styles.flagStyle} />
                   </View>
                   <View style={styles.usersDetails}>
-                    <Text style={styles.userName}>{(this.w(loginStatus, ['myProfile', 'profileName'])) ? loginStatus.myProfile.profileName : ""}</Text>
+                    <Text style={styles.userName}>{(w(loginStatus, ['myProfile', 'profileName'])) ? loginStatus.myProfile.profileName : ""}</Text>
                     {/*
                     <Text style={styles.tokenText}>
                       BB Token Balance: <Text style={styles.tokenPrice}>$0.00</Text>

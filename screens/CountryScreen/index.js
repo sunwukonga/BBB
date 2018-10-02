@@ -15,6 +15,7 @@ import {
 } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
 import { RootStackNavigator } from '../../navigation/RootNavigation'
+import MainStackNavigator from '../../navigation/MainDrawerNavigator'
 
 // custom components
 import BBBHeader from '../../components/BBBHeader/';
@@ -42,31 +43,73 @@ import {
 } from '../../graphql/Mutations'
 
 // Navigation Actions
-const SA_CountryToHome = StackActions.reset({
+const SA_CountryToHome = (navigation) => StackActions.reset({
     index: 0
-  , actions: [NavigationActions.navigate({
-      routeName: 'mainScreen'
-    , action: NavigationActions.navigate({ routeName: 'homeScreen' })
-  })]
+  , actions: [ NavigationActions.navigate({ routeName: 'mainScreen' }) ]
 })
 /*
-const SA_BackToProfile = StackActions.reset({
-    index: 1
+const SA_CountryToHome = (navigation) => StackActions.reset({
+    index: 0
   , actions: [
       NavigationActions.navigate({
         routeName: 'mainScreen'
-      , action: StackActions.push({
-          routeName: 'homeScreen'
-        , action: StackActions.push({ routeName: 'profileScreen' })
+      , action: NavigationActions.navigate({
+          routeName: 'homeDrawer'
+        , action: NavigationActions.navigate({
+            routeName: 'homeScreen'
+          , params: { rootNavigation: navigation }
+          })
         })
       })
     ]
 })
 */
+
+const SA_BackToProfile = (navigate, navigation) => navigate( navigation )
+/*
+const SA_BackToProfile = StackActions.reset({
+  index: 1
+, key: 'id-1538193255286-1'
+, actions: [
+    NavigationActions.navigate({
+      routeName: 'homeDrawer'
+    , action: NavigationActions.navigate({ routeName: 'homeScreen' })
+    })
+  , NavigationActions.navigate({ routeName: 'profileScreen' })
+  ]
+})
+*/
+//    "react-navigation": "^2.13.0"
+/*
+const SA_BackToProfile = StackActions.reset({
+    index: 0
+  , actions: [NavigationActions.navigate({
+      routeName: 'homeDrawer'
+    , action: NavigationActions.navigate({
+        routeName: 'profileScreen'
+      })
+    })]
+})
+*/
+/*
+const SA_BackToProfile = StackActions.reset({
+    index: 0
+  , actions: [NavigationActions.navigate({
+      routeName: 'mainScreen'
+    , action: NavigationActions.navigate({
+        routeName: 'homeScreen'
+      , action: NavigationActions.navigate({
+          routeName: 'profileScreen'
+        })
+      })
+    })]
+})
+*/
+/*
 const SA_BackToProfile = StackActions.reset({
   index: 0
 , actions: [
-    StackActions.push({
+    NavigationActions.navigate({
       routeName: 'mainScreen'
     , action: StackActions.reset({
         index: 1
@@ -78,7 +121,7 @@ const SA_BackToProfile = StackActions.reset({
     })
   ]
 })
-
+*/
 
 class CallSetAuthStatus extends React.Component {
   componentDidMount() {
@@ -105,6 +148,7 @@ const CountryScreen = compose (
 )(
   class extends React.Component {
     constructor(props) {
+      //console.log("CountryScreen Constructor")
       super(props)
       this.state = {
         countryCode: null
@@ -116,16 +160,38 @@ const CountryScreen = compose (
       const defaultGetStateForAction = RootStackNavigator.router.getStateForAction;
       RootStackNavigator.router.getStateForAction = (action, state) => {
         if (state && w(action.actions, ['length']) > 0 && action.actions[0].routeName === "countryScreen") {
-          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode))
+          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode, action.actions[0].params.mainNavigation))
         }
         return defaultGetStateForAction(action, state);
       };
     }
 
-    onBackPress = (countryCode) => {
+    onBackPress = (countryCode, navigation) => {
       return Expo.SecureStore.setItemAsync("countryCode", countryCode)
       .then( () => {
-        this.props.navigation.dispatch( SA_BackToProfile )
+        this.props.navigation.dispatch( SA_CountryToHome( this.props.navigation ) )
+        //console.log("routeName: ", navigation.state.routeName)
+        //navigation.navigate({routeName: navigation.state.routeName})
+        //navigation.navigate({ routeName: navigation.state.routeName })
+        /*
+        navigation.reset({
+          index: 1
+        , actions: [
+            navigation.navigate({
+              routeName: 'homeDrawer'
+            , params: {
+                rootNavigation: navigation.state.params.rootNavigation
+              }
+            , action: navigation.navigate({
+                routeName: navigation.state.routeName
+              , params: {
+                  rootNavigation: navigation.state.params.rootNavigation
+                }
+              })
+            })
+          ]
+        })
+        */
         this.removeCountryHandler()
         this.mutationInFlight = false
         this.gettingCountryCode = true
@@ -142,6 +208,7 @@ const CountryScreen = compose (
 
     componentWillMount(props) {
       if (! this.state.countryCode) {
+        //console.log("mainNavigation: ", this.props.navigation)
         let countryCodePromise = Expo.SecureStore.getItemAsync("countryCode")
         Promise.all([countryCodePromise])
         .then( ([ countryCode ]) => {
@@ -171,13 +238,15 @@ const CountryScreen = compose (
             if (save) {
               Expo.SecureStore.setItemAsync("countryCode", countryCode)
               .then( () => {
-                this.props.navigation.dispatch(SA_CountryToHome)
+                this.props.navigation.dispatch(SA_CountryToHome(this.props.navigation))
+                //this.props.navigation.navigate(MainStackNavigator, { params: { rootStackNavigator: RootStackNavigator, mainStackNavigator: MainStackNavigator }})
                 this.removeCountryHandler()
                 this.mutationInFlight = false
                 this.gettingCountryCode = true
               })
             } else {
-              this.props.navigation.dispatch(SA_CountryToHome)
+              this.props.navigation.dispatch(SA_CountryToHome(this.props.navigation))
+              //this.props.navigation.navigate(MainStackNavigator, { params: { rootStackNavigator: RootStackNavigator, mainStackNavigator: MainStackNavigator }})
               this.removeCountryHandler()
               this.mutationInFlight = false
               this.gettingCountryCode = true
@@ -200,6 +269,7 @@ const CountryScreen = compose (
     }
 
     render() {
+      //console.log("Root Navigator: ", this.props.navigation.state)
       if ( this.gettingCountryCode ) {
         return null
       }

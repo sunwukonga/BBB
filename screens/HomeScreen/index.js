@@ -74,7 +74,7 @@ export default class HomeScreen extends React.Component {
   }
 
   openDrawerAndSetState = () => {
-    this.drawerOpen = true
+    //this.drawerOpen = true
     this.props.navigation.openDrawer()
   }
 
@@ -88,22 +88,8 @@ export default class HomeScreen extends React.Component {
     }
     Permissions.askAsync(Permissions.LOCATION)
 
-    this.drawerOpen = false
+    //this.drawerOpen = false
 
-    this.drawerBackHandler = null
-    const defaultGetStateForAction = MainDrawer.router.getStateForAction;
-    MainDrawer.router.getStateForAction = (action, state) => {
-      if (state && action.type === 'Navigation/OPEN_DRAWER') {
-        this.drawerOpen = true
-        this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
-      }
-      if (state && action.type === 'Navigation/DRAWER_CLOSED') {
-        this.drawerOpen = false
-        this.drawerBackHandler.remove()
-        this.drawerBackHandler = null
-      }
-      return defaultGetStateForAction(action, state);
-    };
   }
 
   // REDUNDANT; NOT USED
@@ -183,10 +169,12 @@ export default class HomeScreen extends React.Component {
     this.didFocusListener = this.props.navigation.addListener(
       'didFocus',
       payload => {
+        /*
         if ( this.drawerOpen ) {
           // reattach the listener as we never closed the drawer
           this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
         }
+        */
         if ( this.props.navigation.state && this.props.navigation.state.params ) {
           if ( this.props.navigation.state.params.doAction == 'openDrawer' ) {
             this.props.navigation.state.params.doAction = ''
@@ -203,11 +191,13 @@ export default class HomeScreen extends React.Component {
     this.didBlurListener = this.props.navigation.addListener(
       'didBlur'
     , payload => {
+      /*
         if (this.drawerBackHandler) {
           // Handler still exists. This means that the drawer was not closed before navigating away.
             // I.e. drawerOpen: true
           this.drawerBackHandler.remove()
         }
+        */
       }
     )
 
@@ -317,6 +307,7 @@ export default class HomeScreen extends React.Component {
             //)}</GetProfile>
     // Here because I don't have time to de-thread it through the different components. Just dummy
     let currentUser = {}
+    //console.log("HomeScreen:Navigation: ", this.props.navigation.state.params.rootNavigation.getChildNavigation(this.props.navigation.state.params.rootNavigation.state.key))
     return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (

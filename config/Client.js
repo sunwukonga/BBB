@@ -7,7 +7,7 @@ import { onError } from "apollo-link-error";
 import { InMemoryCache, defaultDataIdFromObject } from "apollo-cache-inmemory";
 import { Mutation } from "react-apollo";
 
-let Production = false
+let Production = true
 let default_token
 let BBB_BASE_URL
 if (Production) {

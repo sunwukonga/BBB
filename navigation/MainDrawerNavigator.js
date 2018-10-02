@@ -28,7 +28,7 @@ import DrawerContainer from '../screens/DrawerContainer/';
 
 
 // drawer stack
-const DrawerNavigator = createDrawerNavigator(
+export const DrawerNavigator = createDrawerNavigator(
   {
     homeScreen: { screen: HomeScreen },
   },

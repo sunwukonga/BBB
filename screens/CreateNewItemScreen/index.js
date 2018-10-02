@@ -1196,10 +1196,10 @@ export default class CreateNewItemScreen extends React.Component {
                           <Item style={styles.txtInput} regular>
                             <TextInput
                               onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, postcode: text} });
+                                this.setState({ address: { ...this.state.address, city: text} });
                               }}
                               style={{  flex:1 }}
-                              placeholder="138325"
+                              placeholder={country.name}
                               placeTextColor={Colors.lightGray}
                             />
                           </Item>
@@ -1216,20 +1216,10 @@ export default class CreateNewItemScreen extends React.Component {
                           <Item style={styles.txtInput} regular>
                             <TextInput
                               onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, city: text} });
+                                this.setState({ address: { ...this.state.address, postcode: text} });
                               }}
                               style={{  flex:1 }}
-                              placeholder={country.name}
-                              placeTextColor={Colors.lightGray}
-                            />
-                          </Item>
-                          <Item style={styles.txtInput} regular>
-                            <TextInput
-                              onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, country: text} });
-                              }}
-                              style={{  flex:1 }}
-                              placeholder={country.name}
+                              placeholder="138325"
                               placeTextColor={Colors.lightGray}
                             />
                           </Item>
