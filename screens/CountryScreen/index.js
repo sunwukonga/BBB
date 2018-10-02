@@ -160,13 +160,13 @@ const CountryScreen = compose (
       const defaultGetStateForAction = RootStackNavigator.router.getStateForAction;
       RootStackNavigator.router.getStateForAction = (action, state) => {
         if (state && w(action.actions, ['length']) > 0 && action.actions[0].routeName === "countryScreen") {
-          this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode, action.actions[0].params.mainNavigation))
+          this.countryBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode))
         }
         return defaultGetStateForAction(action, state);
       };
     }
 
-    onBackPress = (countryCode, navigation) => {
+    onBackPress = (countryCode) => {
       return Expo.SecureStore.setItemAsync("countryCode", countryCode)
       .then( () => {
         this.props.navigation.dispatch( SA_CountryToHome( this.props.navigation ) )
@@ -238,16 +238,16 @@ const CountryScreen = compose (
             if (save) {
               Expo.SecureStore.setItemAsync("countryCode", countryCode)
               .then( () => {
+                this.removeCountryHandler()
                 this.props.navigation.dispatch(SA_CountryToHome(this.props.navigation))
                 //this.props.navigation.navigate(MainStackNavigator, { params: { rootStackNavigator: RootStackNavigator, mainStackNavigator: MainStackNavigator }})
-                this.removeCountryHandler()
                 this.mutationInFlight = false
                 this.gettingCountryCode = true
               })
             } else {
+              this.removeCountryHandler()
               this.props.navigation.dispatch(SA_CountryToHome(this.props.navigation))
               //this.props.navigation.navigate(MainStackNavigator, { params: { rootStackNavigator: RootStackNavigator, mainStackNavigator: MainStackNavigator }})
-              this.removeCountryHandler()
               this.mutationInFlight = false
               this.gettingCountryCode = true
             }
