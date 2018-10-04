@@ -80,7 +80,11 @@ export default class ChatScreen extends Component {
 
   keyboardDidHide(e) {
     this.setState({ keyboardPadding: Layout.HEIGHT * 0.08 })
-    this._scrollView.scrollToEnd({animated: true})
+    try {
+      this._scrollView.scrollToEnd({animated: true})
+    } catch(e) {
+      Alert.alert("Error:" + e.message)
+    }
   }
 
   componentDidMount() {
@@ -274,6 +278,7 @@ export default class ChatScreen extends Component {
     return (
         <Query
           query = {GET_CHAT_MESSAGES}
+          errorPolicy="all"
           variables = {{ chatIndexes: chatIndexes }}
           fetchPolicy = "network-only"
           update={(cache, { data: { getChatMessages } }) => {
