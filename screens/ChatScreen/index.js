@@ -32,7 +32,8 @@ import { Layout, Images, Colors } from '../../constants/';
 import getChatMessages from './GetChatMessages';
 import sendChatMessage from './SendMessage';
 import { ProgressDialog } from 'react-native-simple-dialogs';
-import Toast from 'react-native-simple-toast';
+//import Toast from 'react-native-simple-toast';
+import Toast, {DURATION} from 'react-native-easy-toast';
 var chatIds=[];
 var chatMessageList=[];
 export default class ChatDetailScreen extends React.Component {
@@ -94,8 +95,9 @@ export default class ChatDetailScreen extends React.Component {
 
     if(this.state.newPost.length===0){
       // this.setState({errorMsg:"Please Enter Title",showDialog:true,dialogTitle:"Error!"})
-      Toast.show("Please Enter Message",Toast.SHORT)
-        return false;
+      //Toast.show("Please Enter Message",Toast.SHORT)
+      this.toast.show("Please enter a message", DURATION.LENGTH_LONG);
+      return false;
     }
     this.setState({
       progressVisible: false,
@@ -158,6 +160,7 @@ export default class ChatDetailScreen extends React.Component {
           titleComponent={titleComponent}
           leftComponent={leftComponent}
         />
+        <Toast ref={component => this.toast = component}/>
         <View style={styles.notifyContainer}>
           <Image source={Images.trollie} style={styles.notifyImage} />
           <Text style={styles.regularSmall}>

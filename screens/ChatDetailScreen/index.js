@@ -31,7 +31,6 @@ import {
 } from '../../graphql/Queries'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 //custom components
 import BBBHeader from '../../components/BBBHeader';
@@ -48,7 +47,7 @@ import getChatMessages from './GetChatMessages';
 //import sendChatMessage from './SendMessage';
 //import createChat from './CreateChat';
 import { ProgressDialog } from 'react-native-simple-dialogs';
-import Toast from 'react-native-simple-toast';
+//import Toast from 'react-native-simple-toast';
 import { w } from '../../utils/helpers.js'
 
 var isFromChat=false;

@@ -40,7 +40,8 @@ import BBBIcon from '../../components/BBBIcon';
 import CheckBox from 'react-native-check-box';
 import { Layout, Colors, Images, Constants } from '../../constants/';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
-import Toast from 'react-native-simple-toast';
+import Toast, {DURATION} from 'react-native-easy-toast';
+//import Toast from 'react-native-simple-toast';
 import getCategoryList from './AllCategoryApi';
 import getTemplateList from './SearchTemplateApi';
 import ModalFilterPicker from 'react-native-modal-filter-picker';
@@ -189,29 +190,29 @@ export default class CreateNewItemScreen extends React.Component {
     })
 
     if (this.state.title.length===0){
-        Toast.show("Please Enter Title",Toast.SHORT)
+        this.toast.show("Please Enter Title", DURATION.LENGTH_LONG);
         return false;
     }
 
     if(this.state.longDesc.length===0){
-        Toast.show("Please Enter Description",Toast.SHORT)
+        this.toast.show("Please Enter Description", DURATION.LENGTH_LONG);
         return false;
     }
     if(this.state.category.length===0){
-        Toast.show("Please Select Category",Toast.SHORT)
+        this.toast.show("Please Select Category", DURATION.LENGTH_LONG);
         return false;
     }
     if(this.state.address.lineOne.length>=1 || this.state.address.lineTwo.length>=1 || this.state.address.postcode.length>=1){
       if(this.state.address.lineOne.length===0){
-        Toast.show("Please Enter Address Line 1",Toast.SHORT)
+        this.toast.show("Please Enter Address Line 1", DURATION.LENGTH_LONG);
         return false;
       }
       if(this.state.address.lineTwo.length===0){
-         Toast.show("Please Enter Address Line 2",Toast.SHORT)
+        this.toast.show("Please Enter Address Line 2", DURATION.LENGTH_LONG);
           return false;
       }
       if(this.state.address.postcode.length===0){
-          Toast.show("Please Enter Postcode",Toast.SHORT)
+        this.toast.show("Please Enter Postcode", DURATION.LENGTH_LONG);
           return false;
       }
     }
@@ -219,11 +220,11 @@ export default class CreateNewItemScreen extends React.Component {
 
     if(postCurrency.length == 0 || (this.state.postCost && this.state.postCost == 0.0)){
       if (postCurrency.length===0){
-          Toast.show("Please Select Post Currency",Toast.SHORT)
+        this.toast.show("Please Select Post Currency", DURATION.LENGTH_LONG);
           return false;
       }
       if(this.state.postCost.length===0){
-          Toast.show("Please Enter Post Cost",Toast.SHORT)
+        this.toast.show("Please Enter Post Cost", DURATION.LENGTH_LONG);
           return false;
       }
     }
@@ -969,7 +970,7 @@ export default class CreateNewItemScreen extends React.Component {
             leftComponent={leftComponent}
             rightComponent={rightComponent(loginStatus)}
             />
-
+            <Toast ref={component => this.toast = component}/>
             <ScrollView
               style={styles.container}
               contentContainerStyle={styles.contentContainer}
@@ -1317,14 +1318,14 @@ export default class CreateNewItemScreen extends React.Component {
   }
   onShowTemplate = () => {
     if(this.state.searchTemplateValueList.length==0){
-        Toast.show("Please Select Category",Toast.SHORT);
+        this.toast.show("Please Select Category", DURATION.LENGTH_LONG);
         return;
     }
     this.setState({ templateVisible: true,visible:false });
   }
   onShowTags = () => {
     if(this.state.allTagList.length==0){
-        Toast.show("Please Select Template",Toast.SHORT);
+        this.toast.show("Please Select Template", DURATION.LENGTH_LONG);
         return;
     }
     this.setState({ templateVisible: false,visible:false,tagVisible:true });

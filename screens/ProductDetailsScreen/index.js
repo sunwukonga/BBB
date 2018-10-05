@@ -13,7 +13,8 @@ import Swiper from 'react-native-swiper';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationActions } from 'react-navigation';
 import { ProgressDialog } from 'react-native-simple-dialogs';
-import Toast from 'react-native-simple-toast';
+//import Toast from 'react-native-simple-toast';
+//import Toast, {DURATION} from 'react-native-easy-toast';
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';

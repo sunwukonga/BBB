@@ -32,7 +32,8 @@ import { Ionicons } from '@expo/vector-icons'
 import styles from './styles'
 import headerStyles from '../../components/BBBHeader/styles'
 import { Layout, Colors, Images, IconNames } from '../../constants/'
-import Toast from 'react-native-simple-toast'
+//import Toast from 'react-native-simple-toast'
+//import Toast, {DURATION} from 'react-native-easy-toast';
 import { Permissions } from 'expo'
 
 // FlatLists with embedded Queries
@@ -135,7 +136,7 @@ export default class HomeScreen extends React.Component {
 				progressVisible: false,
 			});
 			console.log("Error:" + error.message);
-			Toast.show(error.message,Toast.SHORT);
+			//Toast.show(error.message,Toast.SHORT);
 
 		});
 	}
