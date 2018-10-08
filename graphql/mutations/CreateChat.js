@@ -13,14 +13,14 @@ import {
 } from '../Queries'
 //import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 
-export default CreateChat = graphql(CREATE_CHAT) (
+export const CreateChat = graphql(CREATE_CHAT) (
   class extends Component {
     constructor(props) {
       super(props)
     }
 
     adjustListing = (listing, chat) => {
-      copyListing = JSON.parse(JSON.stringify( listing ))
+      let copyListing = JSON.parse(JSON.stringify( listing ))
       if (copyListing.id == chat.listing.id) {
         copyListing.chatId = chat.id
       }

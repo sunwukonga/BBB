@@ -9,7 +9,7 @@ import {
 
 import { Urls } from '../../constants/';
 
-export default SetProfileImage = graphql(SET_PROFILE_IMAGE) (
+export const SetProfileImage = graphql(SET_PROFILE_IMAGE) (
   class extends Component {
     constructor(props) {
       super(props)

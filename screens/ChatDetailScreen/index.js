@@ -30,7 +30,8 @@ import {
   GET_CHAT_MESSAGES
 } from '../../graphql/Queries'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+//import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 //custom components
 import BBBHeader from '../../components/BBBHeader';
@@ -57,6 +58,7 @@ export default class ChatScreen extends Component {
   constructor(props) {
     super(props);
 
+    this.newRender = true
     this.yOffset = null
     this.scrollEvent = null
     this.textInputHeight = Layout.HEIGHT * 0.08
@@ -89,9 +91,7 @@ export default class ChatScreen extends Component {
   componentDidMount() {
     //console.log("Layout.HEIGHT: ", Layout.HEIGHT)
     InteractionManager.runAfterInteractions(() => {
-      setTimeout(() => {
-        this._scrollView.scrollToEnd({animated: true})
-      }, 100);
+      this.firstRender = true
     })
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide.bind(this))
@@ -280,24 +280,42 @@ export default class ChatScreen extends Component {
           errorPolicy="all"
           variables = {{ chatIndexes: chatIndexes }}
           fetchPolicy = "network-only"
-          update={(cache, { data: { getChatMessages } }) => {
-            const data = cache.readQuery({
-              query: GET_CHAT_MESSAGES
-            })
-            const updatedChats = updateChatMessages( data.getChatMessages, getChatMessages )
-            cache.writeQuery({
-              query: GET_CHAT_MESSAGES,
-              data: { getChatMessages : updatedChats }
-            })
+          update={(cache, { data: { getChatMessages } }, error) => {
+            if (error) {
+              console.log("Error: ")
+            } else {
+              let cachedData = cache.readQuery({
+                query: GET_CHAT_MESSAGES
+              })
+              cache.writeQuery({
+                query: GET_CHAT_MESSAGES,
+                data: { getChatMessages : updateChatMessages( cachedData.getChatMessages, getChatMessages ) }
+              })
+            }
           }}
         >
-          {({ data, networkStatus, error }) => {
+          {({ data, networkStatus, error, loading, refetch }) => {
             if (networkStatus === 1) {
               return <ActivityIndicator size="large" />;
             }
+            if (loading) {
+              return <Text>{"NetworkStatus: " + networkStatus}</Text>
+            }
             if (error) {
               // TODO: Turn this error into a retry ICON
-              return <Text>Error: {error.message}</Text>;
+              return (
+                <View style={{flex:1, flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+                  <Text>Unable to reach server</Text>
+                  <Text>Try again?</Text>
+                  <TouchableOpacity transparent onPress={() => refetch()} >
+                    <Ionicons
+                      name={'md-sync'}
+                      size={Layout.WIDTH * 0.30}
+                      color={Colors.primaryColor}
+                      style={styles.refetch}
+                    />
+                  </TouchableOpacity>
+                </View>)
             }
             if (!data.getChatMessages || data.getChatMessages.length == 0) {
               return (
@@ -307,6 +325,12 @@ export default class ChatScreen extends Component {
               )
             }
             let chat = data.getChatMessages.find( chat => chat.id == chatId )
+            if (this.newRender) {
+              setTimeout(() => {
+                this._scrollView.scrollToEnd({animated: true})
+              }, 200);
+              this.newRender = false
+            }
             return (
               <View style={{ flex: 1, height: Layout.HEIGHT }}>
                 <BBBHeader

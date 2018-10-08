@@ -15,7 +15,7 @@ import {
 //import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 import { w } from '../../utils/helpers.js'
 
-export default DeleteChat = graphql(DELETE_CHAT) (
+export const DeleteChat = graphql(DELETE_CHAT) (
   class extends Component {
     constructor(props) {
       super(props)

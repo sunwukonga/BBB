@@ -32,7 +32,7 @@ import {
 } from '../../graphql/Queries'
 import { updateChatMessages } from '../../utils/helpers.js'
 import LastMessageIds from './LastMessageIds'
-import DeleteChat from '../../graphql/mutations/DeleteChat'
+import { DeleteChat } from '../../graphql/mutations/DeleteChat'
 
 
 class ListChats extends Component {

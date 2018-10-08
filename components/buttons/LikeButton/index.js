@@ -16,7 +16,7 @@ import {
   GET_USER_LIKED_LIST
 } from '../../../graphql/Queries'
 import { w } from '../../../utils/helpers.js'
-import ToggleLike from '../../../graphql/mutations/ToggleLike'
+import { ToggleLike } from '../../../graphql/mutations/ToggleLike'
 
 const NA_LikeToLoginToHome = ( item, mutateToggleLike ) => NavigationActions.navigate({
   routeName: 'loginScreen'

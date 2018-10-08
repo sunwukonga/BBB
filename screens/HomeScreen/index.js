@@ -34,7 +34,7 @@ import headerStyles from '../../components/BBBHeader/styles'
 import { Layout, Colors, Images, IconNames } from '../../constants/'
 //import Toast from 'react-native-simple-toast'
 //import Toast, {DURATION} from 'react-native-easy-toast';
-import { Permissions } from 'expo'
+//import { Permissions } from 'expo'
 
 // FlatLists with embedded Queries
 import ListRecentListings from './ListRecentListings'
@@ -87,7 +87,7 @@ export default class HomeScreen extends React.Component {
       page:1,
       searchTerms:[],
     }
-    Permissions.askAsync(Permissions.LOCATION)
+    //Permissions.askAsync(Permissions.LOCATION)
 
     //this.drawerOpen = false
 

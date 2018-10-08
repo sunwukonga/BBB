@@ -7,8 +7,8 @@ import styles from './styles';
 import { Layout, Colors } from '../../../constants/';
 import { Ionicons } from '@expo/vector-icons';
 
-import SetProfileImage from '../../../graphql/mutations/SetProfileImage'
-import SelectAndUploadImage from '../../../graphql/mutations/SelectAndUploadImage'
+import { SetProfileImage } from '../../../graphql/mutations/SetProfileImage'
+import { SelectAndUploadImage } from '../../../graphql/mutations/SelectAndUploadImage'
 
 class ChangeButton extends Component {
   constructor(props) {

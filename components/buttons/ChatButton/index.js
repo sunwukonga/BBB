@@ -9,7 +9,7 @@ import { Layout, Colors } from '../../../constants/';
 import BBBIcon from '../../BBBIcon';
 import { withNavigation, NavigationActions } from 'react-navigation'
 import { w } from '../../../utils/helpers.js'
-import CreateChat from '../../../graphql/mutations/CreateChat'
+import { CreateChat } from '../../../graphql/mutations/CreateChat'
 
 const NA_HomeToLoginToChat = ( item, mutateCreateChat ) => NavigationActions.navigate({
   routeName: 'loginScreen'

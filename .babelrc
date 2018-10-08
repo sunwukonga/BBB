@@ -1,8 +1,43 @@
 {
   "presets": ["babel-preset-expo"],
   "env": {
+    "test": {
+      "presets": [
+        [
+          "env",
+          {
+            "modules": "commonjs",
+            "useBuiltIns": "usage",
+            "debug": false
+          }
+        ],
+        "babel-preset-react",
+        "jest"
+      ],
+      "plugins": [
+        "transform-react-jsx-source",
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs"
+      ]
+    },
     "development": {
-      "plugins": ["transform-react-jsx-source"]
-    }
+      "presets": [
+        [
+          "env",
+          {
+            "modules": "commonjs",
+            "useBuiltIns": "usage",
+            "debug": false
+          }
+        ],
+        "babel-preset-react",
+        "jest"
+      ],
+      "plugins": [
+        "transform-react-jsx-source",
+        "transform-class-properties",
+        "transform-es2015-modules-commonjs"
+      ]
+    },
   }
 }

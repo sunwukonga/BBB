@@ -2,10 +2,17 @@
   "main": "node_modules/expo/AppEntry.js",
   "private": true,
   "scripts": {
-    "test": "node ./node_modules/jest/bin/jest.js --watchAll"
+    "test": "node_modules/.bin/jest --no-watchman --runInBand"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "verbose": true,
+    "moduleDirectories": [
+      "node_modules"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-native|native-base-shoutem-theme|expo-react-native-adapter|expo|@expo|expo-constants|expo-location|expo-asset|react-native-easy-grid|react-native-drawer|native-base|react-native-keyboard-aware-scroll-view|react-native-iphone-x-helper|react-native-svg|react-navigation|react-native-simple-toast|react-native-simple-dialogs|react-native-expandable-section-flatlist|react-native-material-ripple|react-native-material-textfield|react-native-material-buttons|@ptomasroos|react-native-modal-datetime-picker|react-native-modal|react-native-animatable|react-native-swiper|react-native-check-box|react-native-easy-toast|react-native-modal-filter-picker|react-native-collapsible|react-native-round-flags|react-navigation-drawer|react-navigation-stack|react-native-screens|react-native-elements|react-native-vector-icons)/)"
+    ]
   },
   "dependencies": {
     "@expo/samples": "2.1.1",
@@ -28,9 +35,9 @@
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-check-box": "^2.1.0",
     "react-native-collapsible": "^0.13.0",
+    "react-native-easy-toast": "^1.1.0",
     "react-native-elements": "^0.19.1",
     "react-native-expandable-section-flatlist": "^1.1.7",
-    "react-native-keyboard-aware-scroll-view": "^0.6.0",
     "react-native-material-buttons": "^0.5.0",
     "react-native-material-ripple": "^0.8.0",
     "react-native-material-textfield": "^0.12.0",
@@ -44,6 +51,11 @@
     "react-navigation": "^2.17.0"
   },
   "devDependencies": {
-    "jest-expo": "^30.0.0"
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "jest-expo": "^30.0.0",
+    "react-dom": "^16.5.2"
   }
 }

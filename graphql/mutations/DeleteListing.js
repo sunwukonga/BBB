@@ -29,7 +29,7 @@ const SA_resetOwnListing = StackActions.reset({
   ]
 })
 
-export default DeleteListing = compose(
+export const DeleteListing = compose(
   graphql(DELETE_LISTING)
 , withApollo
 , withNavigation

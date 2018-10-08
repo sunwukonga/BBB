@@ -28,7 +28,7 @@ import { w, getElementByKey } from '../../utils/helpers.js'
 //import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 //reset the appolo cache
-export default LoggedinState = graphql(UNSET_AUTH_STATUS)(
+export const DrawerContainer = graphql(UNSET_AUTH_STATUS)(
   class extends Component {
     constructor(props) {
       super(props)

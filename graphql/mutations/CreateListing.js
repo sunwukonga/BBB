@@ -4,7 +4,7 @@ import {
   CREATE_LISTING
 } from '../../graphql/Mutations'
 
-export default CreateListing = graphql(CREATE_LISTING) (
+export const CreateListing = graphql(CREATE_LISTING) (
   class extends Component {
     constructor(props) {
       super(props)

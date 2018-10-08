@@ -24,7 +24,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import AboutUsScreen from '../screens/AboutUsScreen';
 
 
-import DrawerContainer from '../screens/DrawerContainer/';
+import { DrawerContainer } from '../screens/DrawerContainer/';
 
 
 // drawer stack

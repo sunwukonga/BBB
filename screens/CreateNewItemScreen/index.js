@@ -20,7 +20,7 @@ import {
   Item,
   Input,
 } from 'native-base';
-import { MapView } from 'expo';
+import { MapView, Location, Permissions, Constants as eConstants } from 'expo';
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
 import RedioSelected from '../../components/RedioSelected';
@@ -48,14 +48,13 @@ import ModalFilterPicker from 'react-native-modal-filter-picker';
 import LoginStatus from '../HomeScreen/LoginStatus'
 import { w, getMethods } from '../../utils/helpers.js'
 import { StackActions, NavigationActions } from 'react-navigation';
-import { Permissions, Location } from 'expo'
 
-import CreateListing from '../../graphql/mutations/CreateListing'
+import { CreateListing } from '../../graphql/mutations/CreateListing'
 import GetCachedCountry from '../../graphql/queries/GetCachedCountry'
 
 import Collapsible from 'react-native-collapsible';
-const dataObjectsCates = [];
-const dataObjectsTags = [];
+var dataObjectsCates = [];
+var dataObjectsTags = [];
 var tagsList = [];
 var imageList=[];
 var imageUploadList=[];
@@ -88,7 +87,7 @@ Catgeory List Details
 var allCategoryList = [];
 var allCategoryValueList = [];
 var currency = ''
-var postcurrency = ''
+var postCurrency = ''
 export default class CreateNewItemScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -97,13 +96,6 @@ export default class CreateNewItemScreen extends React.Component {
     // defaultLocation
 
     const rowHasChanged = (r1, r2) => r1 !== r2;
-/*    const dataObjects = [
-      { id: 'aimg0001', source: Images.logo, inputFlag: false },
-      { id: 'aimg0001', source: Images.logo, inputFlag: false },
-      { id: 'aimg0001', source: Images.logo, inputFlag: false },
-      { id: 'aimg0001', inputFlag: true },
-    ];
-    */
 
     // DataSource configured
     const ds = new ListView.DataSource({ rowHasChanged });
@@ -114,61 +106,71 @@ export default class CreateNewItemScreen extends React.Component {
       imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
     }
 
+//TODO: add toast to display errors
     this.state = {
-      visible: false,
-      selectedCateName: null,
-      selectedCateId:null,
-      selectedTemplateName: null,
-      selectedTemplateId:null,
-      templateVisible:false,
-      selectedTagName: null,
-      selectedTagId:null,
-      tagVisible:false,
-      allCategoryList:[],
-      allCategoryValueList:[],
-      searchTemplateList:[],
-      searchTemplateValueList:[],
-      allTagIdList:[],
-      allTagList:[],
-      progressVisible:false,
+      visible: false
+    , marker: null
+    , location: null
+    , region: {
+        latitude: 37.78825
+      , longitude: -122.4324
+      , latitudeDelta: 0.0922
+      , longitudeDelta: 0.0421
+      }
+    , errorMessage: ''
+    , selectedCateName: null
+    , selectedCateId:null
+    , selectedTemplateName: null
+    , selectedTemplateId:null
+    , templateVisible:false
+    , selectedTagName: null
+    , selectedTagId:null
+    , tagVisible:false
+    , allCategoryList:[]
+    , allCategoryValueList:[]
+    , searchTemplateList:[]
+    , searchTemplateValueList:[]
+    , allTagIdList:[]
+    , allTagList:[]
+    , progressVisible:false
       //dataSource: ds.cloneWithRows(dataObjects),
-      dataSourceCates: dsCates.cloneWithRows(dataObjectsCates),
-      dataSourceTags: dsTags.cloneWithRows(dataObjectsTags),
-      texts: '',
-      isCollapsedSale: false,
-      isCollapsedBarter: true,
-      isCollapsedDonate: true,
-      isCollapsedDnS: true,
-      progressMsg:"Please Wait...",
-      showDialog:false,
-      errorMsg:'',
-      dialogTitle:'',
+    , dataSourceCates: dsCates.cloneWithRows(dataObjectsCates)
+    , dataSourceTags: dsTags.cloneWithRows(dataObjectsTags)
+    , texts: ''
+    , isCollapsedSale: false
+    , isCollapsedBarter: true
+    , isCollapsedDonate: true
+    , isCollapsedDnS: true
+    , progressMsg:"Please Wait..."
+    , showDialog:false
+    , errorMsg:''
+    , dialogTitle:''
 
   //    _pickImage = this._pickImage
 
       // Data for mutation i.e. create item
-      mode: Constants.SALE,
-
-      images: imageList,
-      cost: 0.0,
-      counterOffer: false,
-      template: null,
-      barterTemplates: [], // [ [{template, qty}, {template, qty}], [{template, qty}] ]
-      address: { lineOne: ''
-               , lineTwo: ''
-               , postcode: ''
-                , long:0.0
-               , lat: 0.0
-               , directions: ''
-      },
-      postCost: 0.0,
-      shortDesc: null,
-      longDesc: '',
-      category: '',
-      title:'',
-      textd:''
+    , mode: Constants.SALE
+    , images: imageList
+    , cost: 0.0
+    , counterOffer: false
+    , template: null
+    , barterTemplates: [] // [ [{template, qty}, {template, qty}], [{template, qty}] ]
+    , address: {
+        lineOne: ''
+      , lineTwo: ''
+      , postcode: ''
+      , long:0.0
+      , lat: 0.0
+      , directions: ''
+      }
+    , postCost: 0.0
+    , shortDesc: null
+    , longDesc: ''
+    , category: ''
+    , title:''
+    , textd:''
       // End data for mutation
-    };
+    }
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {}
     // this.saveToServer = this.saveToServer.bind(this);
@@ -178,8 +180,33 @@ export default class CreateNewItemScreen extends React.Component {
     this.inputs[id].wrappedInstance.focus();
   }
 
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage: 'Permission to access location was denied',
+      });
+    } else {
+      let location = await Location.getCurrentPositionAsync({});
+      this.setState({
+        region: { ...this.state.region, longitude: location.coords.longitude, latitude: location.coords.latitude }
+      })
+    }
+  };
+
   _validateAllRequiredFileds() {
     imageList.pop()
+    for (var i = 0, len = imageList.length, primarySet = false; i < len; i++) {
+      if (primarySet) {
+        imageList[i].primary = false
+      } else {
+        if (!imageList[i].deleted) {
+          imageList[i].primary = true
+          primarySet = true
+        }
+      }
+    }
+
     imageUploadList = imageList.map( image => {
       return {
         imageId: image.imageId
@@ -341,9 +368,15 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   componentDidMount(){
+    if (Platform.OS === 'android' && !eConstants.isDevice) {
+      this.setState({
+        errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
+      });
+    } else {
+      this._getLocationAsync();
+    }
     this.setState({
       progressVisible: true,
-
     });
     getCategoryList().then((res)=>{
         Object.keys(res.data.allCategoriesFlat).forEach((key,index)=>{
@@ -437,12 +470,13 @@ export default class CreateNewItemScreen extends React.Component {
     //  quality: 0.95,
     let pickerResult = await Expo.ImagePicker.launchImageLibraryAsync({
       mediaTypes: Expo.ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
+      allowsEditing: true,
       exif: false,
       base64: false,
     })
 
     if ( ! pickerResult.cancelled ) {
+      //console.log("EXIF: ", pickerResult.exif)
       this.setState({
         progressVisible: true,
         progressMsg:"Validating Image..."
@@ -671,10 +705,10 @@ export default class CreateNewItemScreen extends React.Component {
     })
     .then( (response) =>{
       if ( w(response, ['ok']) ) {
-        console.log("Response: ", response)
+        //console.log("Response: ", response)
         //
       } else {
-        console.log("Response: ", response)
+        //console.log("Response: ", response)
         // Some kind of error
 //        response.data contains %EntityTooLarge%
 //       response.ok == false
@@ -693,7 +727,15 @@ export default class CreateNewItemScreen extends React.Component {
     let inputTile = imageList.pop()
     var _id=imageList.length+1;
     var isPrimary=_id===1;
-    imageList.push({ id: "_"+_id,imageId:imgId,url: uri,inputFlag:false,imageKey:imageKey,primary:isPrimary,deleted:false });
+    imageList.push({
+      id: "_"+_id
+    , imageId:imgId
+    , url: uri
+    , inputFlag:false
+    , imageKey:imageKey
+    , primary:isPrimary
+    , deleted:false
+    })
     imageList.push(inputTile)
 
   /*  realm.write(() => {
@@ -890,45 +932,6 @@ export default class CreateNewItemScreen extends React.Component {
 
   render() {
 
-    let data = [
-      {
-        value: 'Banana',
-      },
-      {
-        value: 'Mango',
-      },
-      {
-        value: 'Pear',
-      },
-    ];
-    // Need to fetch
-    let dataCurrency = [
-      {
-        value: 'USD',
-      },
-      {
-        value: 'SGD',
-      },
-    ];
-    let dataTime = [
-      {
-        value: 'AM',
-      },
-      {
-        value: 'PM',
-      },
-    ];
-    let dataCate = [ ];
-    var temp = [
-      {
-        path: 'Android',
-        name: 'Android',
-        checked: true,
-      },
-    ];
-
-
-
     var leftComponent = (
       <Button transparent onPress={() => this.props.navigation.goBack()}>
       <Icon
@@ -963,7 +966,14 @@ export default class CreateNewItemScreen extends React.Component {
 
     return (
       <LoginStatus>{ loginStatus => (
-        <GetCachedCountry loginStatus={loginStatus}>{ country => (
+        <GetCachedCountry loginStatus={loginStatus}>{ country => {
+          if (currency === '') {
+            currency = country.currencies[0].iso4217
+          }
+          if (postCurrency === '') {
+            postCurrency = country.currencies[0].iso4217
+          }
+          return (
           <View style={styles.container}>
             <BBBHeader
             title="Create A New Item"
@@ -1075,14 +1085,10 @@ export default class CreateNewItemScreen extends React.Component {
                             <View style={styles.dataFacetoFace}>
                               <Text style={styles.txtTitle}>Currency</Text>
                               <Picker
-                                selectedValue={country.currencies[0].iso4217}
                                 style={styles.dateDropDown}
-                                onValueChange={(value, index, data) => { curreny = value }}
+                                onValueChange={(value, index, data) => { currency = value }}
                               >
                                 {country.currencies.map((c, i) => {
-                                  if (i == 0) {
-                                    currency = c.iso4217
-                                  }
                                   return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
                                 })}
                               </Picker>
@@ -1172,6 +1178,22 @@ export default class CreateNewItemScreen extends React.Component {
                     <View style={styles.faceToFace}>
                       <Text style={styles.txtfacetoFace}>Face to Face</Text>
                       <View style={styles.bottomline} />
+                      <Item style={styles.txtInput} regular>
+                        <TextInput
+                          onChangeText={(text) => {
+                            this.setState({ searchAddress: text })
+                          }}
+                          onSubmitEditing={() => {
+                            
+                          }}
+                          style={{ flex:1 }}
+                          placeholder="search"
+                          placeTextColor={Colors.lightGray}
+                        />
+                      </Item>
+                      <TouchableOpacity onPress={() => null }>
+                        <BBBIcon name="Search" style={styles.searchicon} />
+                      </TouchableOpacity>
                       <View style={styles.subFacetoFace}>
                         <View style={styles.dataFacetoFace}>
                           <Item style={styles.txtInput} regular>
@@ -1227,14 +1249,18 @@ export default class CreateNewItemScreen extends React.Component {
                         </View>
                         <View style={styles.mapFacetoFace}>
                           <MapView
-                          style={{ flex: 1 }}
-                          initialRegion={{
-                            latitude: 37.78825,
-                              longitude: -122.4324,
-                              latitudeDelta: 0.0922,
-                              longitudeDelta: 0.0421,
-                          }}
-                          />
+                            style={{ flex: 1 }}
+                            region={this.state.region}
+                            onPress={(press) => console.log("LongPress: ", press)}
+                          >
+                            { this.state.marker &&
+                              <Marker
+                                coordinate={this.state.marker.latlng}
+                                title={this.state.marker.title}
+                                description={this.state.marker.description}
+                              />
+                            }
+                          </MapView>
                         </View>
                       </View>
                     </View>
@@ -1246,14 +1272,10 @@ export default class CreateNewItemScreen extends React.Component {
                         <View style={styles.dataFacetoFace}>
                         <Text style={styles.txtTitle}>Currency</Text>
                         <Picker
-                          selectedValue={country.currencies[0].iso4217}
                           style={styles.dateDropDown}
                           onValueChange={(value, index, data) => { postCurrency = value }}
                         >
                           {country.currencies.map((c, i) => {
-                            if (i == 0) {
-                              postCurrency = c.iso4217
-                            }
                             return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
                           })}
                         </Picker>
@@ -1309,7 +1331,7 @@ export default class CreateNewItemScreen extends React.Component {
              </TouchableOpacity>
            </Dialog>
           </View>
-        )}</GetCachedCountry>
+        )}}</GetCachedCountry>
       )}</LoginStatus>
     )
   }

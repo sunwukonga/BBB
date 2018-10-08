@@ -22,13 +22,14 @@ function w( root, nested ) {
   }, root)
 }
 
-getElementByKey = (o, key) => {
+function getElementByKey(o, key) {
   var path = []
   if (findByKey(o, key, path)) {
-  	return w(o, path)
+    return w(o, path)
   } else return null
 }
-findByKey = ( o, key, path ) => {
+
+function findByKey( o, key, path ) {
   return Object.keys(w(o, path)).some( (e, i, arr) => {
     path.push(e)
     if (e !== key) {

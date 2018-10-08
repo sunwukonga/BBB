@@ -13,7 +13,7 @@ import {
 } from '../Queries'
 //import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 
-export default ToggleLike = graphql(
+export const ToggleLike = graphql(
   LIKE_LISTING
 /*, {
     options: (props) => ({

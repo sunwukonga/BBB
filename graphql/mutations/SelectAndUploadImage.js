@@ -6,7 +6,7 @@ import {
   GET_S3_SIGNED_URL
 } from '../../graphql/Mutations'
 
-export default SelectAndUploadImage = graphql(GET_S3_SIGNED_URL) (
+export const SelectAndUploadImage = graphql(GET_S3_SIGNED_URL) (
   class extends Component {
     constructor(props) {
       super(props)

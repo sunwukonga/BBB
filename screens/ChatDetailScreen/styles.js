@@ -22,6 +22,11 @@ export default StyleSheet.create({
     borderBottomWidth: 0,
     paddingTop: Layout.HEIGHT * 0.015,
   },
+  refetch: {
+    backgroundColor: 'transparent',
+    width: Layout.WIDTH * 0.19,
+    height: Layout.WIDTH * 0.28,
+  },
   left: {
     flex: 1,
     paddingLeft: Layout.moderateScale(5),

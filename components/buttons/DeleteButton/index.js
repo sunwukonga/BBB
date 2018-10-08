@@ -11,7 +11,7 @@ import BBBIcon from '../../BBBIcon';
 import { Ionicons } from '@expo/vector-icons';
 import { withNavigation, NavigationActions } from 'react-navigation'
 import { w } from '../../../utils/helpers.js'
-import DeleteListing from '../../../graphql/mutations/DeleteListing'
+import { DeleteListing } from '../../../graphql/mutations/DeleteListing'
 
 class DeleteButton extends Component {
   constructor(props) {
