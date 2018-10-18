@@ -10,6 +10,7 @@ import {
 , GET_USER_VISITED_LIST
 , GET_USER_LIKED_LIST
 , GET_USER_POSTED_LIST
+, GET_CHAT_MESSAGES
 } from '../Queries'
 //import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 
@@ -36,6 +37,11 @@ export const CreateChat = graphql(CREATE_CHAT) (
         variables: { listingId: item.id },
         update: (cache, { data: { createChat } }) => {
           // ------------------- READING -------------------
+          console.log("CreateChat: ", createChat)
+          const { getChatMessages } = cache.readQuery({
+            query: GET_CHAT_MESSAGES
+          })
+          console.log("getChatMessages: ", getChatMessages)
           const { getUserLikedListings } = cache.readQuery({
             query: GET_USER_LIKED_LIST
           , variables: {"countryCode": loginStatus.countryCode}
@@ -61,6 +67,12 @@ export const CreateChat = graphql(CREATE_CHAT) (
           , variables: {"countryCode": loginStatus.countryCode}
           })
           // ------------------- WRITING -------------------
+          let copiedChatMessages = JSON.parse(JSON.stringify( getChatMessages ))
+          copiedChatMessages.push( JSON.parse(JSON.stringify( createChat )))
+          cache.writeQuery({
+            query: GET_CHAT_MESSAGES
+          , data: { getChatMessages: copiedChatMessages }
+          })
           cache.writeQuery({
             query: GET_USER_LIKED_LIST
           , variables: {"countryCode": loginStatus.countryCode}

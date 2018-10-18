@@ -3,26 +3,18 @@ import { Mutation } from "react-apollo";
 import {
   View
 , TouchableOpacity
-, ScrollView
 , TextInput
 , Keyboard
 } from 'react-native';
+/*
 import {
-  Container,
-  Content,
-  Header,
-  Left,
-  Body,
-  Right,
-  Title,
-  Button,
-  Icon,
   Input,
 } from 'native-base';
+*/
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
-import BBBIcon from '../../components/BBBIcon';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { w } from '../../utils/helpers.js'
 
 import {
   SEND_MESSAGE
@@ -39,6 +31,20 @@ class SendMessageInput extends Component {
     this.state = {
       message: ''
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    let { chatId, lastMessageId } = this.props.variables
+    if ( w(this.props, ['variables', 'chatId']) !== w(nextProps, ['variables', 'chatId']) ) {
+      return true
+    }
+    if ( w(this.props, ['variables', 'lastMessageId']) !== w(nextProps, ['variables', 'lastMessageId']) ) {
+      return true
+    }
+    if ( w(this.state, ['message']) !== w(nextState, ['message']) ) {
+      return true
+    }
+    return false;
   }
 
               /*text={this.state.message}
@@ -87,15 +93,16 @@ class SendMessageInput extends Component {
 
   render() {
     let { chatId, lastMessageId } = this.props.variables
+    console.log("state.message: ", this.state.message)
     return (
       <Mutation
         mutation={SEND_MESSAGE}
         variables= {{ chatId: chatId, message: this.state.message, lastMessageId: lastMessageId }}
         update={(cache, { data: { sendChatMessage } }) => {
-          const { getChatMessages } = cache.readQuery({
+          let { getChatMessages } = cache.readQuery({
             query: GET_CHAT_MESSAGES
           })
-          const updatedChats = this.updateChatMessages( getChatMessages, {id: chatId, chatMessages: sendChatMessage} )
+          let updatedChats = this.updateChatMessages( getChatMessages, {id: chatId, chatMessages: sendChatMessage} )
           cache.writeQuery({
             query: GET_CHAT_MESSAGES,
             data: { getChatMessages : updatedChats }
@@ -104,22 +111,25 @@ class SendMessageInput extends Component {
       >
         {(sendChatMessage, { data }) => (
           <View style={styles.footerStyle} >
-            <Input
+            <TextInput
               value={this.state.message}
               keyboardType='default'
               style={styles.newPostStyle}
-              onChangeText={ messageInput => this.setState({ message: messageInput })}
+              onChangeText={ messageInput => { this.setState({ message: messageInput }); console.log("onChangeText") }}
               onSubmitEditing = { () => {
-                this.setState({ message: ''})
-                sendChatMessage()
+                console.log("onSubmitEditing")
+                if (this.state.message != '') {
+                  sendChatMessage()
+                  this.setState({ message: ''})
+                }
               }}
               returnKeyType="send"
             />
             <TouchableOpacity
               onPress = { () => {
+                sendChatMessage()
                 this.setState({ message: ''})
                 Keyboard.dismiss()
-                sendChatMessage()
               }}
               disabled={this.state.message == ''}
               style={styles.postBtn}>

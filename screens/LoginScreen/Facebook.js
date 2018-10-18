@@ -125,8 +125,9 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
                         fetchOptions: 'network-only'
                       })
                       .then( ({data: {getListing}, error, refetch}) => {
-                        console.log("CHECK updated: ", getListing.chatId)
+                        //console.log("CHECK updated: ", getListing.chatId)
                         if ( (_chatId = getListing.chatId) != -1 ) {
+                          //console.log("Chat existed on listing")
                           this.props.navigation.navigate('chatDetailScreen', {
                             chatId: _chatId
                           , chatIndexes: []
@@ -134,7 +135,7 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
                         } else {
                           mutateCreateChat()
                           .then( ({ data: { createChat }, error }) => {
-                            console.log("After create chat promise, ChatId: ", createChat.id)
+                            //console.log("After create chat promise, ChatId: ", createChat.id)
                             if (error) {
                               console.log("Have ERROR", error)
                             }

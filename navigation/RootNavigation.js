@@ -30,13 +30,21 @@ export default class RootNavigator extends React.Component {
     super()
     //console.log("RootNav:constructor")
     this.homeBackExitHandler = null
+//    this.dummyHandler = null
   }
 
   handleBackExit() {
     BackHandler.exitApp()
     return true
   }
+  /*
+  handleDummy() {
+    console.log('this.props:', this.props);
+    return false
+  }
+  */
   componentDidMount() {
+    //this.dummyHandler = BackHandler.addEventListener('hardwareBackPress', this.handleDummy.bind(this));
     //console.log("RootNav:componentDidMount")
     //this._notificationSubscription = this._registerForPushNotifications();
     const defaultGetStateForAction = DrawerNavigator.router.getStateForAction
@@ -46,6 +54,7 @@ export default class RootNavigator extends React.Component {
 
       //***********************************************
       // Hardware back button handling for home screen
+      /*
       if (state && state.routeName === "homeDrawer" && action && action.type === "Navigation/COMPLETE_TRANSITION") {
         if (!state.isDrawerOpen) {
           if (!this.homeBackExitHandler) {
@@ -82,6 +91,7 @@ export default class RootNavigator extends React.Component {
           }
         }
       }
+      */
       //***********************************************
       /*
       if (this.homeBackExitHandler) {
@@ -184,6 +194,7 @@ export default class RootNavigator extends React.Component {
   componentWillUnmount() {
     //console.log("RootNav:componentWillUnmount")
  //   this._notificationSubscription && this._notificationSubscription.remove();
+    //this.dummyHandler && this.dummyHandler.remove()
   }
 
   render() {

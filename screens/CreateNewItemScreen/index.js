@@ -105,11 +105,24 @@ export default class CreateNewItemScreen extends React.Component {
     if (imageList.length == 0) {
       imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
     }
-
+/*
+      coordinates: {
+        latitudenull
+                                coordinate={this.state.marker.latlng}
+                                title={this.state.marker.title}
+                                description={this.state.marker.description}
+                                */
 //TODO: add toast to display errors
     this.state = {
       visible: false
-    , marker: null
+    , marker: {
+        latlng: {
+          latitude: 1.3688819
+        , longitude: 103.8969434
+        }
+      , description: "Description"
+      , title: "Title"
+    }
     , location: null
     , region: {
         latitude: 37.78825
@@ -188,6 +201,7 @@ export default class CreateNewItemScreen extends React.Component {
       });
     } else {
       let location = await Location.getCurrentPositionAsync({});
+      console.log("Location: ", location.coords)
       this.setState({
         region: { ...this.state.region, longitude: location.coords.longitude, latitude: location.coords.latitude }
       })
@@ -928,8 +942,52 @@ export default class CreateNewItemScreen extends React.Component {
     postCurrency = value
   }
 
+  longPressEvent(name) {
+    return e => {
+      if (e.persist) {
+        e.persist();  // Avoids warnings relating to https://fb.me/react-event-pooling
+      }
+      console.log("LongPressEvent: ", e)
+      /*
+      this.setState(prevState => ({
+        marker: { ...this.state.marker, [
+          this.makeEvent(e, name),
+          ...prevState.events.slice(0, 10),
+        ],
+      }))
+      */
+    };
+  }
+  pressEvent(name) {
+    return e => {
+      if (e.persist) {
+        e.persist();  // Avoids warnings relating to https://fb.me/react-event-pooling
+      }
+      console.log("PressEvent: ", e)
+      /*
+      this.setState(prevState => ({
+        marker: { ...this.state.marker, [
+          this.makeEvent(e, name),
+          ...prevState.events.slice(0, 10),
+        ],
+      }))
+      */
+    };
+  }
 
+  /*
+                            provider={MapView.PROVIDER_GOOGLE}
+                            tappable
+                            onLongPress={this.longPressEvent('Map::onLongPress')}
 
+                            { this.state.marker &&
+                              <MapView.Marker
+                                coordinate={this.state.marker.latlng}
+                                title={this.state.marker.title}
+                                description={this.state.marker.description}
+                              />
+                            }
+                            */
   render() {
 
     var leftComponent = (
@@ -1190,10 +1248,10 @@ export default class CreateNewItemScreen extends React.Component {
                           placeholder="search"
                           placeTextColor={Colors.lightGray}
                         />
+                        <TouchableOpacity onPress={() => null }>
+                          <BBBIcon name="Search" style={styles.searchicon} />
+                        </TouchableOpacity>
                       </Item>
-                      <TouchableOpacity onPress={() => null }>
-                        <BBBIcon name="Search" style={styles.searchicon} />
-                      </TouchableOpacity>
                       <View style={styles.subFacetoFace}>
                         <View style={styles.dataFacetoFace}>
                           <Item style={styles.txtInput} regular>
@@ -1249,17 +1307,18 @@ export default class CreateNewItemScreen extends React.Component {
                         </View>
                         <View style={styles.mapFacetoFace}>
                           <MapView
-                            style={{ flex: 1 }}
                             region={this.state.region}
-                            onPress={(press) => console.log("LongPress: ", press)}
+                            style={{ flex: 1 }}
+                            onPress={(e) => console.log("onPressEvent: ", e.nativeEvent ? e.nativeEvent : e)}
+                            onLongPress={(e) => console.log("onLongPressEvent: ", e.nativeEvent ? e.nativeEvent : e)}
+                            showsUserLocation
+                            showsMyLocationButton
                           >
-                            { this.state.marker &&
-                              <Marker
-                                coordinate={this.state.marker.latlng}
-                                title={this.state.marker.title}
-                                description={this.state.marker.description}
-                              />
-                            }
+                            <MapView.Marker
+                              coordinate={this.state.marker.latlng}
+                              title={this.state.marker.title}
+                              description={this.state.marker.description}
+                            />
                           </MapView>
                         </View>
                       </View>

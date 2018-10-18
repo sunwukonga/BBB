@@ -45,6 +45,7 @@ import {
 // Navigation Actions
 const SA_CountryToHome = (navigation) => StackActions.reset({
     index: 0
+  , key: null
   , actions: [ NavigationActions.navigate({ routeName: 'mainScreen' }) ]
 })
 /*

@@ -63,6 +63,17 @@ mutation createChat($listingId: Int!) {
         id
         name
       }
+      user {
+        id
+        firstName
+        lastName
+        profileName
+        profileImage {
+          id
+          imageURL
+          imageKey
+        }
+      }
       primaryImage {
         id
         imageKey
@@ -71,45 +82,11 @@ mutation createChat($listingId: Int!) {
         id
         imageKey
       }
-      saleMode {
-        id
-        price
-        counterOffer
-        currency {
-          iso4217
-          currencyName
-          currencySymbol
-        }
-        mode
-        exchangeModes {
-          id
-          mode
-          price
-          currency {
-            iso4217
-            currencyName
-            currencySymbol
-          }
-          location {
-            id
-            lineOne
-            lineTwo
-            postcode
-            long
-            lat
-            directions
-          }
-        }
-      }
       template {
         id
         title
         description
         primaryImage {
-          id
-          imageKey
-        }
-        secondaryImages {
           id
           imageKey
         }
@@ -122,25 +99,6 @@ mutation createChat($listingId: Int!) {
         id
         name
       }
-      viewers
-      likes
-      liked
-      chatId
-      user {
-        id
-        firstName
-        lastName
-        profileName
-        profileImage {
-          id
-          imageURL
-          imageKey
-        }
-        sellerRating
-        sellerRatingCount
-        online
-        idVerification
-      }
     }
     initUser {
       id
@@ -152,10 +110,6 @@ mutation createChat($listingId: Int!) {
         imageURL
         imageKey
       }
-      sellerRating
-      sellerRatingCount
-      online
-      idVerification
     }
     chatMessages {
       id

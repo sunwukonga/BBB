@@ -10,6 +10,7 @@ import {
 , Alert
 , TouchableWithoutFeedback
 , Keyboard
+, TextInput
 , ActivityIndicator
 , InteractionManager
 } from 'react-native';
@@ -58,6 +59,7 @@ export default class ChatScreen extends Component {
   constructor(props) {
     super(props);
 
+    console.log("Constructor")
     this.newRender = true
     this.yOffset = null
     this.scrollEvent = null
@@ -68,6 +70,7 @@ export default class ChatScreen extends Component {
 
     this.state = {
       keyboardPadding: Layout.HEIGHT * 0.08
+//    , lastMessageId: 0
     }
   }
 
@@ -82,7 +85,10 @@ export default class ChatScreen extends Component {
   keyboardDidHide(e) {
     this.setState({ keyboardPadding: Layout.HEIGHT * 0.08 })
     try {
-      this._scrollView.scrollToEnd({animated: true})
+      if (this._scrollView) {
+        console.log("Scroll on Hide")
+        this._scrollView.scrollToEnd({animated: false})
+      }
     } catch(e) {
       Alert.alert("Error:" + e.message)
     }
@@ -90,29 +96,30 @@ export default class ChatScreen extends Component {
 
   componentDidMount() {
     //console.log("Layout.HEIGHT: ", Layout.HEIGHT)
+    this.newRender = true
     InteractionManager.runAfterInteractions(() => {
-      this.firstRender = true
     })
+    console.log("keyboardListeners Added")
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide.bind(this))
     this.didFocusListener = this.props.navigation.addListener(
       'didFocus',
       payload => {
-        //console.log('didFocus-SendMessageInput')
+        console.log('didFocus-SendMessageInput')
         //this.scrollReporter = setInterval( () => console.log("Scroll.Event: ", this.scrollEvent), 4000)
       }
     )
     this.didBlurListener = this.props.navigation.addListener(
       'didBlur'
     , payload => {
-        //console.log('didBlur-SendMessageInput')
+        console.log('didBlur-SendMessageInput')
         if ( this.keyboardDidHideLister ) {
           this.keyboardDidHideListener.remove()
-        //console.log('didBlur-SendMessageInput: removeHideListener')
+          console.log('didBlur-SendMessageInput: removeHideListener')
         }
         if ( this.keyboardDidShowLister ) {
           this.keyboardDidShowListener.remove()
-        //console.log('didBlur-SendMessageInput: removeShowListener')
+          console.log('didBlur-SendMessageInput: removeShowListener')
         }
       }
 
@@ -131,8 +138,9 @@ export default class ChatScreen extends Component {
     this.subs.forEach((sub, i) => {
       if (sub) {
         sub.remove();
+        console.log("Subscriptions removed for didFocus, didBlur, didShow, didHide")
       } else {
-        //console.log("The listener at: ", i, " did not exist.")
+        console.log("The listener at: ", i, " did not exist.")
       }
     });
     //clearInterval(scrollReporter)
@@ -279,7 +287,7 @@ export default class ChatScreen extends Component {
           query = {GET_CHAT_MESSAGES}
           errorPolicy="all"
           variables = {{ chatIndexes: chatIndexes }}
-          fetchPolicy = "network-only"
+          fetchPolicy = "cache-only"
           update={(cache, { data: { getChatMessages } }, error) => {
             if (error) {
               console.log("Error: ")
@@ -295,6 +303,7 @@ export default class ChatScreen extends Component {
           }}
         >
           {({ data, networkStatus, error, loading, refetch }) => {
+            console.log("GetChatMessages Ran.")
             if (networkStatus === 1) {
               return <ActivityIndicator size="large" />;
             }
@@ -317,18 +326,41 @@ export default class ChatScreen extends Component {
                   </TouchableOpacity>
                 </View>)
             }
-            if (!data.getChatMessages || data.getChatMessages.length == 0) {
+            if (!data.getChatMessages || data.getChatMessages.length == 0 ) {
               return (
                 <View style={styles.left}>
                   <Text style={[styles.title, styles.clearMarginTop]}>Apparently there's no chat by that ID</Text>
                 </View>
               )
             }
+
+            //console.log("ChatID: ", chatId)
+            //console.log("Data: ", data.getChatMessages)
             let chat = data.getChatMessages.find( chat => chat.id == chatId )
+            if (!chat) {
+              return (
+                <View style={styles.left}>
+                  <Text style={[styles.title, styles.clearMarginTop]}>Apparently there's no chat</Text>
+                </View>
+              )
+            }/* else {
+              if (chat.chatMessages.length > 0) {
+                if (chat.chatMessages[chat.chatMessages.length-1].id > this.state.lastMessageId) {
+                  this.setState({lastMessageId:  chat.chatMessages[chat.chatMessages.length-1].id})
+                }
+              }
+            }*/
             if (this.newRender) {
               setTimeout(() => {
-                this._scrollView.scrollToEnd({animated: true})
-              }, 200);
+                try {
+                  if (this._scrollView) {
+                    console.log("Scroll on visual")
+                    this._scrollView.scrollToEnd({animated: false})
+                  }
+                } catch(e) {
+                  Alert.alert("Error:" + e.message)
+                }
+              }, 300);
               this.newRender = false
             }
             return (
@@ -349,77 +381,77 @@ export default class ChatScreen extends Component {
                     }
                   </Text>
                 </View>
-              <View style={{ flex: 1 }}>
-                <ScrollView
-                  contentContainerStyle={{ flexGrow: 1 }}
-                  ref={component => this._scrollView = component}
-                  onScroll={event => {
-                    this.yOffset = event.nativeEvent.contentOffset.y
-                    this.scrollEvent = event.nativeEvent
-                  }}
-                  onScrollEndDrag={event => {
-                    this.yOffset = event.nativeEvent.contentOffset.y
-                    this.scrollEvent = event.nativeEvent
-                  }}
-                  scrollEventThrottle={160}
-                >
-                  <View style={styles.contentStyle}>
-                    {chat.chatMessages.map((chatMessage, index) => {
-                      return (
-                        <View key={index} style={(chatMessage.authorId == chat.userId) ? {alignSelf: 'flex-end'} : {alignSelf: 'flex-start'}}>
-                          <TouchableOpacity key={index} onLongPress={()=> this.deleteItem(chatMessage)}>
-                            <View
-                              key={index}
-                              style={[{marginHorizontal: Layout.moderateScale(10)}, styles.chat ]}>
-                              {chatMessage.authorId == chat.userId ? (
-                                <BBBIcon
-                                  name="MsgRightSvg"
-                                  color={Colors.avtarBorder}
-                                  size={Layout.moderateScale(15)}
-                                  style={{
-                                    position: 'absolute',
-                                    right: Layout.moderateScale(-10),
-                                  }}
-                                />
-                              ) : (
-                                <BBBIcon
-                                  name="MsgLeftSvg"
-                                  color="#f5f5f5"
-                                  size={Layout.moderateScale(15)}
-                                  style={{
-                                    position: 'absolute',
-                                    left: Layout.moderateScale(-12.5),
-                                  }}
-                                />
-                              )}
-                              {(chatMessage.authorId == chat.userId)
-                              ? (
-                              <View>
-                                <Text style={[styles.regularSmall, {textAlign: 'right'}]}>{chatMessage.message}</Text>
-                                <Text style={[styles.timeStyle, {textAlign: 'right'}]}>{this.formatTime(chatMessage.time)}</Text>
+                <View style={{ flex: 1 }}>
+                  <ScrollView
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    ref={component => this._scrollView = component}
+                    onScroll={event => {
+                      this.yOffset = event.nativeEvent.contentOffset.y
+                      this.scrollEvent = event.nativeEvent
+                    }}
+                    onScrollEndDrag={event => {
+                      this.yOffset = event.nativeEvent.contentOffset.y
+                      this.scrollEvent = event.nativeEvent
+                    }}
+                    scrollEventThrottle={160}
+                  >
+                    <View style={styles.contentStyle}>
+                      {chat.chatMessages.map((chatMessage, index) => {
+                        return (
+                          <View key={index} style={(chatMessage.authorId == chat.userId) ? {alignSelf: 'flex-end'} : {alignSelf: 'flex-start'}}>
+                            <TouchableOpacity key={index} onLongPress={()=> this.deleteItem(chatMessage)}>
+                              <View
+                                key={index}
+                                style={[{marginHorizontal: Layout.moderateScale(10)}, styles.chat ]}>
+                                {chatMessage.authorId == chat.userId ? (
+                                  <BBBIcon
+                                    name="MsgRightSvg"
+                                    color={Colors.avtarBorder}
+                                    size={Layout.moderateScale(15)}
+                                    style={{
+                                      position: 'absolute',
+                                      right: Layout.moderateScale(-10),
+                                    }}
+                                  />
+                                ) : (
+                                  <BBBIcon
+                                    name="MsgLeftSvg"
+                                    color="#f5f5f5"
+                                    size={Layout.moderateScale(15)}
+                                    style={{
+                                      position: 'absolute',
+                                      left: Layout.moderateScale(-12.5),
+                                    }}
+                                  />
+                                )}
+                                {(chatMessage.authorId == chat.userId)
+                                ? (
+                                <View>
+                                  <Text style={[styles.regularSmall, {textAlign: 'right'}]}>{chatMessage.message}</Text>
+                                  <Text style={[styles.timeStyle, {textAlign: 'right'}]}>{this.formatTime(chatMessage.time)}</Text>
+                                </View>
+                                )
+                                :(
+                                <View>
+                                  <Text style={[styles.regularSmall, {textAlign: 'left'}]}>{chatMessage.message}</Text>
+                                  <Text style={[styles.timeStyle, {textAlign: 'left'}]}>{this.formatTime(chatMessage.time)}</Text>
+                                </View>
+                                )}
                               </View>
-                              )
-                              :(
-                              <View>
-                                <Text style={[styles.regularSmall, {textAlign: 'left'}]}>{chatMessage.message}</Text>
-                                <Text style={[styles.timeStyle, {textAlign: 'left'}]}>{this.formatTime(chatMessage.time)}</Text>
-                              </View>
-                              )}
-                            </View>
-                          </TouchableOpacity>
-                        </View>
-                      )
-                    })}
+                            </TouchableOpacity>
+                          </View>
+                        )
+                      })}
+                    </View>
+                  </ScrollView>
+                  <View style={{paddingBottom: this.state.keyboardPadding}}>
+                    <View style={styles.footerStyle} >
+                      <SendMessageInput variables={
+                        { chatId: chatId
+                        , lastMessageId: (chat.chatMessages.length > 0) ? chat.chatMessages[chat.chatMessages.length-1].id : 0
+                        }} />
+                    </View>
                   </View>
-                </ScrollView>
-              </View>
-                <View>
-                <SendMessageInput variables = {
-                  { chatId: chat.id
-                  , lastMessageId: (chat.chatMessages.length > 0) ? chat.chatMessages[chat.chatMessages.length-1].id : 0
-                  }} />
-                </View>
-                <View style={{paddingBottom: this.state.keyboardPadding}}>
                 </View>
               </View>
             )
@@ -430,3 +462,14 @@ export default class ChatScreen extends Component {
 } // Class
 
 //)}</LastMessageIds>
+/*
+                <SendMessageInput variables = {
+                  { chatId: chat.id
+                  , lastMessageId: (chat.chatMessages.length > 0) ? chat.chatMessages[chat.chatMessages.length-1].id : 0
+                  }} />
+                      <SendMessageInput variables = {
+                        { chatId: chatId
+                        , lastMessageId: (chat.chatMessages.length > 0) ? chat.chatMessages[chat.chatMessages.length-1].id : 0
+                        }} />
+
+*/

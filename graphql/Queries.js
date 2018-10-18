@@ -596,7 +596,7 @@ query getCachedCountry($isoCode: Int!) {
 
 const GET_CHAT_MESSAGES = gql`
 query getChatMessages($chatIndexes:[ChatIndex]) {
-  getChatMessages(chatIndexes:$chatIndexes) {
+  getChatMessages(chatIndexes:$chatIndexes) @connection(key: "getChatMessages") {
     id
     userId
     listing {
