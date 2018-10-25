@@ -13,6 +13,7 @@ import {
 , TextInput
 , ActivityIndicator
 , InteractionManager
+, AsyncStorage
 } from 'react-native';
 import {
   Container
@@ -59,7 +60,6 @@ export default class ChatScreen extends Component {
   constructor(props) {
     super(props);
 
-    console.log("Constructor")
     this.newRender = true
     this.yOffset = null
     this.scrollEvent = null
@@ -86,7 +86,6 @@ export default class ChatScreen extends Component {
     this.setState({ keyboardPadding: Layout.HEIGHT * 0.08 })
     try {
       if (this._scrollView) {
-        console.log("Scroll on Hide")
         this._scrollView.scrollToEnd({animated: false})
       }
     } catch(e) {
@@ -99,27 +98,27 @@ export default class ChatScreen extends Component {
     this.newRender = true
     InteractionManager.runAfterInteractions(() => {
     })
-    console.log("keyboardListeners Added")
+    //console.log("keyboardListeners Added")
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this))
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide.bind(this))
     this.didFocusListener = this.props.navigation.addListener(
       'didFocus',
       payload => {
-        console.log('didFocus-SendMessageInput')
+        //console.log('didFocus-SendMessageInput')
         //this.scrollReporter = setInterval( () => console.log("Scroll.Event: ", this.scrollEvent), 4000)
       }
     )
     this.didBlurListener = this.props.navigation.addListener(
       'didBlur'
     , payload => {
-        console.log('didBlur-SendMessageInput')
+        //console.log('didBlur-SendMessageInput')
         if ( this.keyboardDidHideLister ) {
           this.keyboardDidHideListener.remove()
-          console.log('didBlur-SendMessageInput: removeHideListener')
+         // console.log('didBlur-SendMessageInput: removeHideListener')
         }
         if ( this.keyboardDidShowLister ) {
           this.keyboardDidShowListener.remove()
-          console.log('didBlur-SendMessageInput: removeShowListener')
+          //console.log('didBlur-SendMessageInput: removeShowListener')
         }
       }
 
@@ -138,9 +137,9 @@ export default class ChatScreen extends Component {
     this.subs.forEach((sub, i) => {
       if (sub) {
         sub.remove();
-        console.log("Subscriptions removed for didFocus, didBlur, didShow, didHide")
+        //console.log("Subscriptions removed for didFocus, didBlur, didShow, didHide")
       } else {
-        console.log("The listener at: ", i, " did not exist.")
+        //console.log("The listener at: ", i, " did not exist.")
       }
     });
     //clearInterval(scrollReporter)
@@ -263,6 +262,29 @@ export default class ChatScreen extends Component {
     }
     return preEnd + number + " " + nom + postscript + psEnd
   }
+
+  _retrieveLastReadMessageIds = async () => {
+    try {
+      const value = await AsyncStorage.getItem('lastReadMessages')
+      if (value !== null) {
+        // We have data!!
+        //console.log("retrieved: ", value);
+        return value
+      }
+     } catch (error) {
+       // Error retrieving data
+       //console.log("Retrieve error: ", error)
+       return null
+     }
+  }
+  _storeLastReadMessageIds = async ( stringified ) => {
+    try {
+      await AsyncStorage.setItem('lastReadMessages', stringified)
+    } catch (error) {
+      // Error saving data
+      console.log(error)
+    }
+  }
       //<KeyboardAvoidingView behavior="padding" contentContainerStyle={{flex: 1, justifyContent: 'space-between' }}>
       //</KeyboardAvoidingView>
 //------------------------------------------------------------------------------------------------
@@ -285,13 +307,14 @@ export default class ChatScreen extends Component {
     return (
         <Query
           query = {GET_CHAT_MESSAGES}
-          errorPolicy="all"
           variables = {{ chatIndexes: chatIndexes }}
-          fetchPolicy = "cache-only"
+          fetchPolicy = "cache-and-network"
+          pollInterval={10000}
           update={(cache, { data: { getChatMessages } }, error) => {
             if (error) {
               console.log("Error: ")
             } else {
+              /*
               let cachedData = cache.readQuery({
                 query: GET_CHAT_MESSAGES
               })
@@ -299,16 +322,15 @@ export default class ChatScreen extends Component {
                 query: GET_CHAT_MESSAGES,
                 data: { getChatMessages : updateChatMessages( cachedData.getChatMessages, getChatMessages ) }
               })
+              */
+              // Set asyncStorage for id's and chats
             }
           }}
         >
-          {({ data, networkStatus, error, loading, refetch }) => {
-            console.log("GetChatMessages Ran.")
+          {({ data, networkStatus, error, loading, refetch, startPolling, stopPolling }) => {
+            //console.log("GetChatMessages Ran.")
             if (networkStatus === 1) {
               return <ActivityIndicator size="large" />;
-            }
-            if (loading) {
-              return <Text>{"NetworkStatus: " + networkStatus}</Text>
             }
             if (error) {
               // TODO: Turn this error into a retry ICON
@@ -334,9 +356,20 @@ export default class ChatScreen extends Component {
               )
             }
 
+            let chat = data.getChatMessages.find( chat => chat.id == chatId )
+            this._retrieveLastReadMessageIds()
+            .then( ids => {
+              let lastReadMessages = {}
+              if (ids) {
+                lastReadMessages = JSON.parse( ids )
+              }
+              if (w(chat, ["chatMessages", "length"]) > 0) {
+                lastReadMessages[chat.id] = chat.chatMessages[chat.chatMessages.length-1].id
+              } else lastReadMessages[chat.id] = 0
+              this._storeLastReadMessageIds(JSON.stringify(lastReadMessages))
+            })
             //console.log("ChatID: ", chatId)
             //console.log("Data: ", data.getChatMessages)
-            let chat = data.getChatMessages.find( chat => chat.id == chatId )
             if (!chat) {
               return (
                 <View style={styles.left}>
@@ -354,7 +387,7 @@ export default class ChatScreen extends Component {
               setTimeout(() => {
                 try {
                   if (this._scrollView) {
-                    console.log("Scroll on visual")
+                    //console.log("Scroll on visual")
                     this._scrollView.scrollToEnd({animated: false})
                   }
                 } catch(e) {

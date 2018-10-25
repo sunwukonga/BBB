@@ -90,14 +90,7 @@ class SendMessageInput extends Component {
     }
     return oldChatList
   }
-
-  render() {
-    let { chatId, lastMessageId } = this.props.variables
-    console.log("state.message: ", this.state.message)
-    return (
-      <Mutation
-        mutation={SEND_MESSAGE}
-        variables= {{ chatId: chatId, message: this.state.message, lastMessageId: lastMessageId }}
+/*
         update={(cache, { data: { sendChatMessage } }) => {
           let { getChatMessages } = cache.readQuery({
             query: GET_CHAT_MESSAGES
@@ -108,6 +101,14 @@ class SendMessageInput extends Component {
             data: { getChatMessages : updatedChats }
           })
         }}
+        */
+  render() {
+    let { chatId, lastMessageId } = this.props.variables
+    return (
+      <Mutation
+        mutation={SEND_MESSAGE}
+        variables={{ chatId: chatId, message: this.state.message, lastMessageId: lastMessageId }}
+        refetchQueries={[{query: GET_CHAT_MESSAGES}]}
       >
         {(sendChatMessage, { data }) => (
           <View style={styles.footerStyle} >
@@ -115,9 +116,9 @@ class SendMessageInput extends Component {
               value={this.state.message}
               keyboardType='default'
               style={styles.newPostStyle}
-              onChangeText={ messageInput => { this.setState({ message: messageInput }); console.log("onChangeText") }}
+              onChangeText={ messageInput => { this.setState({ message: messageInput }) }}
               onSubmitEditing = { () => {
-                console.log("onSubmitEditing")
+                //console.log("onSubmitEditing")
                 if (this.state.message != '') {
                   sendChatMessage()
                   this.setState({ message: ''})

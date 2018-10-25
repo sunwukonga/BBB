@@ -8,6 +8,7 @@ import {
 , Alert
 , ActivityIndicator
 , TouchableOpacity
+, AsyncStorage
 } from 'react-native';
 import {
   Button
@@ -38,9 +39,49 @@ import { DeleteChat } from '../../graphql/mutations/DeleteChat'
 class ListChats extends Component {
   constructor(props) {
     super(props);
+    this.renderChat = this.renderChat.bind(this)
+    this.state = {
+      lastReadMessageIds: {}
+    }
   }
 
+  componentDidMount() {
+    this.willFocusListener = this.props.navigation.addListener(
+      'willFocus'
+    , payload => {
+        this._fetchLastReadMessages()
+      }
+    )
+    this.subs = [
+      this.willFocusListener
+    ]
+  }
 
+  componentWillMount(){
+    this._fetchLastReadMessages()
+  }
+  componentWillUnmount() {
+    this.subs.forEach((sub, i) => {
+      if (sub) {
+        sub.remove();
+      } else {
+        console.log("The listener at: ", i, " did not exist.")
+      }
+    });
+  }
+
+  _fetchLastReadMessages() {
+    AsyncStorage.getItem('lastReadMessages')
+    .then((item)=>{
+      let parsedItem = JSON.parse(item)
+      if (this.state.lastReadMessageIds !== parsedItem) {
+        this.setState({
+          lastReadMessageIds: JSON.parse(item)
+        })
+      }
+    })
+
+  }
 
   deleteChat( chatId, mutateDeleteChat ) {
     Alert.alert(
@@ -102,6 +143,25 @@ class ListChats extends Component {
         }
       }
     }
+    // find chat in this.state.lastReadMessageId and get last message ID
+    // get index of ID in chat.chatMessages
+           // if (w(chat, ["chatMessages", "length"]) > 0) {
+    // this.state.lastReadMessageIds[chat.id]
+    let newMessageCount = null
+    //console.log("LRMI: ", this.state.lastReadMessageIds)
+    //console.log("chatID: ", chat.id)
+    if (w(this.state.lastReadMessageIds, [chat.id])) {
+      let lastMessageId = this.state.lastReadMessageIds[chat.id]
+      chat.chatMessages.find(function(element, index, array) {
+        if (element.id === lastMessageId) {
+          newMessageCount = array.length - index - 1
+          return true
+        } else {
+          return false
+        }
+      })
+    } else newMessageCount = w(chat, ['chatMessages', 'length'])
+    //console.log("NewMessages: ", newMessageCount)
 
     return (
       <DeleteChat chat={chat} loginStatus={loginStatus}>{ mutateDeleteChat => (
@@ -131,12 +191,14 @@ class ListChats extends Component {
               <Text style={styles.title}>{w(chat, ['listing', 'title'])}</Text>
             </View>
             <View style={styles.bottomline} />
-            <View><OtherProfileName chat={chat} /></View>
-            <View style={styles.namecount}>
-                { w(chat, ['newMessageCount']) && chat.newMessageCount > 0
-                ? <Text style={styles.count}>{chat.newMessageCount}</Text>
-                : null
-                }
+            <View style={{flex:1, flexDirection:'row', justifyContent:'space-around', alignContent: 'center'}}>
+              <OtherProfileName chat={chat} />
+              <View style={styles.namecount}>
+                  { newMessageCount > 0
+                  ? <Text style={styles.count}>{newMessageCount}</Text>
+                  : null
+                  }
+              </View>
             </View>
           </Body>
         </ListItem>
@@ -150,13 +212,7 @@ class ListChats extends Component {
   // too many resources. A better approach is to fetch the preceding 20 messages,
   // then give the option in the ChatScreen to fetch more from the cache as neede.
   // I.e. the user scrolls up.
-  render() {
-    let { chatIndexes, loginStatus } = this.props
-    return (
-      <Query
-        query = {GET_CHAT_MESSAGES}
-        variables = {{chatIndexes: chatIndexes}}
-        fetchPolicy = "network-only"
+  /*
         update={(cache, { data: { getChatMessages } }) => {
           const data = cache.readQuery({
             query: GET_CHAT_MESSAGES
@@ -167,8 +223,17 @@ class ListChats extends Component {
             data: { getChatMessages : updatedChats }
           })
         }}
+        */
+  render() {
+    let { chatIndexes, loginStatus } = this.props
+    return (
+      <Query
+        query = {GET_CHAT_MESSAGES}
+        variables = {{chatIndexes: chatIndexes}}
+        fetchPolicy = "network-and-cache"
+        pollInterval={10000}
       >
-        {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
+        {({ data, fetchMore, networkStatus, error, variables}) => {
           if (networkStatus === 1) {
             return <ActivityIndicator size="large" />;
           }
@@ -194,15 +259,46 @@ class ListChats extends Component {
               />
             </Button>
           )*/
+          let mapped = data.getChatMessages.map( (chat, index) => {
+            if (w(chat, ["chatMessages", "length"]) > 0) {
+              return {index: index, id: chat.id, value: chat.chatMessages[chat.chatMessages.length -1].id}
+            } else return {index: index, id: chat.id, value: 0}
+          })
+          mapped.sort( (a, b) => {
+            if (a.value > b.value) {
+              return -1
+            }
+            if (a.value < b.value) {
+              return 1
+            }
+            if (a.id < b.id) {
+              return 1
+            }
+            if (a.id > b.id) {
+              return -1
+            }
+            return 0
+          })
+          let sortedGetChatMessages = mapped.map( el => {
+            return JSON.parse(JSON.stringify(data.getChatMessages[el.index]))
+          })
+          /*
+          sortedGetChatMessages.map( chat => {
+            if (w(chat, ["chatMessages", "length"]) > 0) {
+              console.log(chat.chatMessages[chat.chatMessages.length -1].id)
+            }
+          })
+          */
+
           return (
                 <FlatList
                   horizontal = {false}
                   contentContainerStyle={styles.listContent}
                   keyExtractor={(item, index) => index.toString()}
-                  data = {data.getChatMessages || []}
+                  data = {sortedGetChatMessages || []}
+                  extradata = {this.state.lastReadMessageIds}
                   renderItem={ (item) => this.renderChat(item, chatIndexes, loginStatus)}
                   refreshing={networkStatus === 4 || networkStatus === 3}
-                  onRefresh={() => refetch()}
                 />
           )
         }}
