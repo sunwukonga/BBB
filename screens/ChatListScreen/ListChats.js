@@ -31,6 +31,7 @@ import { w } from '../../utils/helpers.js'
 import {
   GET_CHAT_MESSAGES
 } from '../../graphql/Queries'
+import GetChatMessages from '../../graphql/queries/GetChatMessages'
 import { updateChatMessages } from '../../utils/helpers.js'
 import LastMessageIds from './LastMessageIds'
 import { DeleteChat } from '../../graphql/mutations/DeleteChat'
@@ -40,8 +41,10 @@ class ListChats extends Component {
   constructor(props) {
     super(props);
     this.renderChat = this.renderChat.bind(this)
+    this.fetchLastReadMessages = this._fetchLastReadMessages.bind(this)
     this.state = {
       lastReadMessageIds: {}
+    , toggle: true
     }
   }
 
@@ -49,17 +52,28 @@ class ListChats extends Component {
     this.willFocusListener = this.props.navigation.addListener(
       'willFocus'
     , payload => {
-        this._fetchLastReadMessages()
+        console.log("willFocus")
+        this.fetchLastReadMessages()
       }
     )
+    /*
+    this.didFocusListener = this.props.navigation.addListener(
+      'didFocus'
+    , payload => {
+        console.log("didFocus")
+      }
+    )
+    */
     this.subs = [
       this.willFocusListener
+    //, this.didFocusListener
     ]
   }
-
+/*
   componentWillMount(){
     this._fetchLastReadMessages()
   }
+  */
   componentWillUnmount() {
     this.subs.forEach((sub, i) => {
       if (sub) {
@@ -70,17 +84,19 @@ class ListChats extends Component {
     });
   }
 
-  _fetchLastReadMessages() {
-    AsyncStorage.getItem('lastReadMessages')
-    .then((item)=>{
-      let parsedItem = JSON.parse(item)
-      if (this.state.lastReadMessageIds !== parsedItem) {
-        this.setState({
-          lastReadMessageIds: JSON.parse(item)
-        })
-      }
-    })
-
+  _fetchLastReadMessages = async () => {
+    let item = await AsyncStorage.getItem('lastReadMessages')
+    let parsedItem = JSON.parse(item)
+    console.log("Item: ", item)
+    console.log("Stringify state: ", JSON.stringify(this.state.lastReadMessageIds))
+    if (JSON.stringify(this.state.lastReadMessageIds) !== item) {
+      console.log("Stored value different")
+      this.setState({
+        lastReadMessageIds: parsedItem
+      , toggle: !this.state.toggle
+      })
+      console.log("State: ", this.state.lastReadMessageIds)
+    } else console.log("Stored value NOT different")
   }
 
   deleteChat( chatId, mutateDeleteChat ) {
@@ -98,6 +114,7 @@ class ListChats extends Component {
 // TODO: Change target to chatScreen
 //  renderChat = ( { item }) => {
   renderChat = ( item, chatIndexes, loginStatus ) => {
+    console.log("renderChat")
     let { item: chat } = item
     function OtherImage( props ) {
       const {chat} = props
@@ -148,8 +165,6 @@ class ListChats extends Component {
            // if (w(chat, ["chatMessages", "length"]) > 0) {
     // this.state.lastReadMessageIds[chat.id]
     let newMessageCount = null
-    //console.log("LRMI: ", this.state.lastReadMessageIds)
-    //console.log("chatID: ", chat.id)
     if (w(this.state.lastReadMessageIds, [chat.id])) {
       let lastMessageId = this.state.lastReadMessageIds[chat.id]
       chat.chatMessages.find(function(element, index, array) {
@@ -224,15 +239,19 @@ class ListChats extends Component {
           })
         }}
         */
-  render() {
-    let { chatIndexes, loginStatus } = this.props
-    return (
+  /*
       <Query
         query = {GET_CHAT_MESSAGES}
         variables = {{chatIndexes: chatIndexes}}
         fetchPolicy = "network-and-cache"
         pollInterval={10000}
       >
+      */
+  render() {
+    let { chatIndexes, loginStatus } = this.props
+    console.log("Render")
+    return (
+      <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} renderControl={this.state.toggle}>
         {({ data, fetchMore, networkStatus, error, variables}) => {
           if (networkStatus === 1) {
             return <ActivityIndicator size="large" />;
@@ -290,19 +309,20 @@ class ListChats extends Component {
           })
           */
 
+          console.log("GetChatMessages ran")
           return (
                 <FlatList
                   horizontal = {false}
                   contentContainerStyle={styles.listContent}
                   keyExtractor={(item, index) => index.toString()}
                   data = {sortedGetChatMessages || []}
-                  extradata = {this.state.lastReadMessageIds}
+                  extradata = {this.state.toggle}
                   renderItem={ (item) => this.renderChat(item, chatIndexes, loginStatus)}
                   refreshing={networkStatus === 4 || networkStatus === 3}
                 />
           )
         }}
-      </Query>
+      </GetChatMessages>
     )
   }
 }

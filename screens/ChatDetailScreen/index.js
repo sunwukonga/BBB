@@ -46,7 +46,8 @@ import styles from './styles';
 import { Layout, Images, Colors, Urls } from '../../constants/';
 
 import SendMessageInput from './SendMessageInput'
-import getChatMessages from './GetChatMessages';
+//import getChatMessages from './GetChatMessages';
+import GetChatMessages from '../../graphql/queries/GetChatMessages'
 //import sendChatMessage from './SendMessage';
 //import createChat from './CreateChat';
 import { ProgressDialog } from 'react-native-simple-dialogs';
@@ -278,6 +279,7 @@ export default class ChatScreen extends Component {
      }
   }
   _storeLastReadMessageIds = async ( stringified ) => {
+    console.log("Storing lastReadMessages")
     try {
       await AsyncStorage.setItem('lastReadMessages', stringified)
     } catch (error) {
@@ -305,28 +307,7 @@ export default class ChatScreen extends Component {
     let { chatId, chatIndexes } = this.props.navigation.state.params
       //<LastMessageIds loginStatus={{loginStatus: true}}>{ chatIndexes => (
     return (
-        <Query
-          query = {GET_CHAT_MESSAGES}
-          variables = {{ chatIndexes: chatIndexes }}
-          fetchPolicy = "cache-and-network"
-          pollInterval={10000}
-          update={(cache, { data: { getChatMessages } }, error) => {
-            if (error) {
-              console.log("Error: ")
-            } else {
-              /*
-              let cachedData = cache.readQuery({
-                query: GET_CHAT_MESSAGES
-              })
-              cache.writeQuery({
-                query: GET_CHAT_MESSAGES,
-                data: { getChatMessages : updateChatMessages( cachedData.getChatMessages, getChatMessages ) }
-              })
-              */
-              // Set asyncStorage for id's and chats
-            }
-          }}
-        >
+        <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000}>
           {({ data, networkStatus, error, loading, refetch, startPolling, stopPolling }) => {
             //console.log("GetChatMessages Ran.")
             if (networkStatus === 1) {
@@ -489,7 +470,7 @@ export default class ChatScreen extends Component {
               </View>
             )
           }}
-        </Query>
+        </GetChatMessages>
     ) // Render Return
   } // Render Method
 } // Class

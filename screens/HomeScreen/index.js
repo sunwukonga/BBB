@@ -32,6 +32,7 @@ import { Ionicons } from '@expo/vector-icons'
 import styles from './styles'
 import headerStyles from '../../components/BBBHeader/styles'
 import { Layout, Colors, Images, IconNames } from '../../constants/'
+import { fetchLastReadMessages, w} from '../../utils/helpers.js'
 //import Toast from 'react-native-simple-toast'
 //import Toast, {DURATION} from 'react-native-easy-toast';
 //import { Permissions } from 'expo'
@@ -46,6 +47,7 @@ import likeProductApi from './LikeProductApi';
 import LoginStatus from './LoginStatus'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import GetProfile from '../../graphql/queries/GetProfile'
+import GetChatMessages from '../../graphql/queries/GetChatMessages'
 
 import MainDrawer from '../../navigation/MainDrawerNavigator'
 
@@ -82,10 +84,13 @@ export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
 
+    this.fetchLastReadMessages = fetchLastReadMessages.bind(this)
     this.state = {
       limit:10,
       page:1,
       searchTerms:[],
+      lastReadMessageIds: {},
+      loading: true,
     }
     //Permissions.askAsync(Permissions.LOCATION)
 
@@ -165,6 +170,10 @@ export default class HomeScreen extends React.Component {
     this.willFocusListener = this.props.navigation.addListener(
       'willFocus'
     , payload => {
+        this.fetchLastReadMessages()
+        .then( () => {
+          this.setState({loading: false})
+        })
       }
     )
     this.didFocusListener = this.props.navigation.addListener(
@@ -261,15 +270,21 @@ export default class HomeScreen extends React.Component {
       */
   render() {
     // TODO: Change to a function that accepts loginStatus
-    var leftComponent = (loginStatus) => (
+    var leftComponent = (loginStatus, newMessageCount) => (
       <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
         { loginStatus.loginStatus ?
-        <BBBIcon
-          name="Menu"
-          size={Layout.moderateScale(18)}
-          color={Colors.white}
-          style={{ color: Colors.white }}
-        />
+        <View>
+          { newMessageCount > 0
+          ? <Text style={styles.count}>{newMessageCount}</Text>
+          :
+          <BBBIcon
+            name="Menu"
+            size={Layout.moderateScale(18)}
+            color={Colors.white}
+            style={{ color: Colors.white }}
+          />
+          }
+        </View>
         :
         <Ionicons
           name="ios-log-in"
@@ -309,17 +324,46 @@ export default class HomeScreen extends React.Component {
     // Here because I don't have time to de-thread it through the different components. Just dummy
     let currentUser = {}
     //console.log("HomeScreen:Navigation: ", this.props.navigation.state.params.rootNavigation.getChildNavigation(this.props.navigation.state.params.rootNavigation.state.key))
-    return (
+    if (this.state.loading) {
+      return null
+    } else {
+      return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
             <Container>
-              <Header
-                androidStatusBarColor={Colors.mainheaderbg}
-                style={headerStyles.header}>
-                <Left style={headerStyles.left}>{leftComponent(loginStatus)}</Left>
-                <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
-                <Right style={headerStyles.right}>{rightComponent(loginStatus)}</Right>
-              </Header>
+              <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} skip={!loginStatus.loginStatus}>
+                {({ data, networkStatus, error, loading, refetch, startPolling, stopPolling }) => {
+                  //console.log("loginStatus: ", loginStatus)
+                  let newMessageCount = 0
+                  if (!loading && w(data, ['getChatMessages'])) {
+                    data.getChatMessages.map( chat => {
+                      console.log(chat.id, " : ",  w(this.state.lastReadMessageIds, [chat.id]))
+                      if (w(this.state.lastReadMessageIds, [chat.id])) {
+                        let lastMessageId = this.state.lastReadMessageIds[chat.id]
+                        chat.chatMessages.find(function(element, index, array) {
+                          if (element.id === lastMessageId) {
+                            newMessageCount += array.length - index - 1
+                            return true
+                          } else {
+                            return false
+                          }
+                        })
+                      } else newMessageCount += w(chat, ['chatMessages', 'length'])
+                    })
+                  }
+                  return (
+                    <Header
+                      androidStatusBarColor={Colors.mainheaderbg}
+                      style={headerStyles.header}
+                    >
+                      <Left style={headerStyles.left}>{leftComponent(loginStatus, newMessageCount)}</Left>
+                      <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
+                      <Right style={headerStyles.right}>{rightComponent(loginStatus)}</Right>
+                    </Header>
+                  )
+                }}
+              </GetChatMessages>
+
               <Content style={styles.container}>
                 <View>
                   <View style={styles.searchSec}>
@@ -399,6 +443,7 @@ export default class HomeScreen extends React.Component {
             </Container>
           )}</LastMessageIds>
         )}</LoginStatus>
-    );
+      )
+    }
   }
 }

@@ -1,3 +1,6 @@
+import {
+  AsyncStorage
+} from 'react-native'
 
 function updateChatMessages(oldChatList, newChatList) {
   let newChats = newChatList.filter( chat => chat.chatMessages.length > 0 )
@@ -72,7 +75,7 @@ function findByKey( o, key, path ) {
       return false
     } else {
       return true
-    } 
+    }
   })
 }
 
@@ -90,9 +93,31 @@ function getMethods(obj) {
   return result
 }
 
+async function fetchLastReadMessages() {
+  try {
+    let item = await AsyncStorage.getItem('lastReadMessages')
+    if (item !== null) {
+      let parsedItem = JSON.parse(item)
+      console.log("Item: ", item)
+      console.log("Stringify state: ", JSON.stringify(this.state.lastReadMessageIds))
+      if (JSON.stringify(this.state.lastReadMessageIds) !== item) {
+        console.log("Stored value different")
+        this.setState({
+          lastReadMessageIds: parsedItem
+        , toggle: !this.state.toggle
+        })
+        console.log("State: ", this.state.lastReadMessageIds)
+      } else console.log("Stored value NOT different")
+    }
+  } catch (error) {
+    console.log("Nothing inside lastReadMessages: ", error)
+  }
+}
+
 export {
   updateChatMessages
 , w
 , getMethods
 , getElementByKey
+, fetchLastReadMessages
 }
