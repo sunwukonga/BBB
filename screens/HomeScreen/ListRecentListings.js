@@ -67,7 +67,8 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
             }
             if (error) {
               let regex = /Invalid Token/g
-              if ( error.message.match(regex).length > 0 ) {
+              let matches = error.message.match(regex)
+              if (matches && matches.length > 0 ) {
                 // Invalid Token -- Possibly caused by credentials from secureStore.
                 this.props.unsetAuthStatus()
               }

@@ -218,8 +218,8 @@ mutation createListing(
             lineOne
             lineTwo
             postcode
-            long
-            lat
+            longitude
+            latitude
             directions
           }
         }

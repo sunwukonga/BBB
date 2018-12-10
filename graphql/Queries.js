@@ -42,8 +42,8 @@ query getMostRecentListings($countryCode:String!,$limit:Int,$page:Int){
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }
@@ -135,8 +135,8 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }
@@ -226,8 +226,8 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }
@@ -316,8 +316,8 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }
@@ -407,8 +407,8 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }
@@ -498,8 +498,8 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }
@@ -723,8 +723,8 @@ query getListing($id:Int!){
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }
@@ -838,8 +838,8 @@ query searchListings($terms:[String],$limit:Int,$page:Int,$filter:Filters!){
           lineOne
           lineTwo
           postcode
-          long
-          lat
+          longitude
+          latitude
           directions
         }
       }

@@ -52,7 +52,7 @@ class ListChats extends Component {
     this.willFocusListener = this.props.navigation.addListener(
       'willFocus'
     , payload => {
-        console.log("willFocus")
+        //console.log("willFocus")
         this.fetchLastReadMessages()
       }
     )
@@ -79,7 +79,7 @@ class ListChats extends Component {
       if (sub) {
         sub.remove();
       } else {
-        console.log("The listener at: ", i, " did not exist.")
+        //console.log("The listener at: ", i, " did not exist.")
       }
     });
   }
@@ -87,16 +87,16 @@ class ListChats extends Component {
   _fetchLastReadMessages = async () => {
     let item = await AsyncStorage.getItem('lastReadMessages')
     let parsedItem = JSON.parse(item)
-    console.log("Item: ", item)
-    console.log("Stringify state: ", JSON.stringify(this.state.lastReadMessageIds))
+    //console.log("Item: ", item)
+    //console.log("Stringify state: ", JSON.stringify(this.state.lastReadMessageIds))
     if (JSON.stringify(this.state.lastReadMessageIds) !== item) {
-      console.log("Stored value different")
+      //console.log("Stored value different")
       this.setState({
         lastReadMessageIds: parsedItem
       , toggle: !this.state.toggle
       })
-      console.log("State: ", this.state.lastReadMessageIds)
-    } else console.log("Stored value NOT different")
+      //console.log("State: ", this.state.lastReadMessageIds)
+    } //else console.log("Stored value NOT different")
   }
 
   deleteChat( chatId, mutateDeleteChat ) {
@@ -114,7 +114,7 @@ class ListChats extends Component {
 // TODO: Change target to chatScreen
 //  renderChat = ( { item }) => {
   renderChat = ( item, chatIndexes, loginStatus ) => {
-    console.log("renderChat")
+    //console.log("renderChat")
     let { item: chat } = item
     function OtherImage( props ) {
       const {chat} = props
@@ -249,7 +249,7 @@ class ListChats extends Component {
       */
   render() {
     let { chatIndexes, loginStatus } = this.props
-    console.log("Render")
+    //console.log("Render")
     return (
       <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} renderControl={this.state.toggle}>
         {({ data, fetchMore, networkStatus, error, variables}) => {
@@ -309,7 +309,7 @@ class ListChats extends Component {
           })
           */
 
-          console.log("GetChatMessages ran")
+          //console.log("GetChatMessages ran")
           return (
                 <FlatList
                   horizontal = {false}

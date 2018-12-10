@@ -38,7 +38,7 @@ import createNewItemUrl from './CreateNewItem';
 import styles from './styles';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from 'react-native-check-box';
-import { Layout, Colors, Images, Constants } from '../../constants/';
+import { Layout, Colors, Images, Constants, defaultRegions } from '../../constants/';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 import Toast, {DURATION} from 'react-native-easy-toast';
 //import Toast from 'react-native-simple-toast';
@@ -81,6 +81,104 @@ const SA_CreateToProduct = (item, loginStatus) => StackActions.reset({
   ]
 })
 
+var defaultRegions2 = {
+  AU: {
+    latitude: -28
+  , longitude: 133
+  , latitudeDelta: 50.86
+  , longitudeDelta: 41.8
+  }
+, BN: {
+    latitude: 4.638
+  , longitude: 114.736
+  , latitudeDelta: 0.40
+  , longitudeDelta: 0.20
+  }
+, CA: {
+    latitude: 57
+  , longitude: -103
+  , latitudeDelta: 50
+  , longitudeDelta: 42
+  }
+, CO: {
+    latitude: 4.588
+  , longitude: -73.421
+  , latitudeDelta: 17.52
+  , longitudeDelta: 12.87
+  }
+, GB: {
+    latitude: 54.387
+  , longitude: -2.6401
+  , latitudeDelta: 8.7517
+  , longitudeDelta: 11.013
+  }
+, HK: {
+    latitude: 22.3979
+  , longitude: 114.1232
+  , latitudeDelta: 0.7406
+  , longitudeDelta: 0.5961
+  }
+, ID: {
+    latitude: -6.8639
+  , longitude: 106.7067
+  , latitudeDelta: 6.6091
+  , longitudeDelta: 4.8574
+  }
+, KE: {
+    latitude: 0.6815
+  , longitude: 37.7088
+  , latitudeDelta: 12.0345
+  , longitudeDelta: 8.7933
+  }
+, MY: {
+    latitude: 3.6412
+  , longitude: 102.1357
+  , latitudeDelta: 7.0831
+  , longitudeDelta: 5.1832
+  }
+, NL: {
+    latitude: 52.2921
+  , longitude: 5.2091
+  , latitudeDelta: 1.6988
+  , longitudeDelta: 1.9105
+  }
+, NZ: {
+    latitude: -40.6930
+  , longitude: 172.5650
+  , latitudeDelta: 6.7351
+  , longitudeDelta: 6.5154
+  }
+, PH: {
+    latitude: 11.6910
+  , longitude: 121.7470
+  , latitudeDelta: 8.0
+  , longitudeDelta: 6.0
+  }
+, RW: {
+    latitude: -1.8065
+  , longitude: 29.7260
+  , latitudeDelta: 3.4700
+  , longitudeDelta: 2.5322
+  }
+, SG: {
+    latitude: 1.352754
+  , longitude: 103.822713
+  , latitudeDelta: 0.16
+  , longitudeDelta: 0.08
+  }
+, TZ: {
+    latitude: -5.2947
+  , longitude: 34.3738
+  , latitudeDelta: 5.3953
+  , longitudeDelta: 4.0498
+  }
+, US: {
+    latitude: 37.5319
+  , longitude: -99.3410
+  , latitudeDelta: 49.8391
+  , longitudeDelta: 49.4714
+  }
+}
 /**
 Catgeory List Details
 */
@@ -112,9 +210,7 @@ export default class CreateNewItemScreen extends React.Component {
                                 title={this.state.marker.title}
                                 description={this.state.marker.description}
                                 */
-//TODO: add toast to display errors
-    this.state = {
-      visible: false
+    /*
     , marker: {
         latlng: {
           latitude: 1.3688819
@@ -122,14 +218,13 @@ export default class CreateNewItemScreen extends React.Component {
         }
       , description: "Description"
       , title: "Title"
-    }
-    , location: null
-    , region: {
-        latitude: 37.78825
-      , longitude: -122.4324
-      , latitudeDelta: 0.0922
-      , longitudeDelta: 0.0421
       }
+      */
+//TODO: add toast to display errors
+    this.state = {
+      visible: false
+    , location: null
+    , region: null
     , errorMessage: ''
     , selectedCateName: null
     , selectedCateId:null
@@ -169,10 +264,12 @@ export default class CreateNewItemScreen extends React.Component {
     , template: null
     , barterTemplates: [] // [ [{template, qty}, {template, qty}], [{template, qty}] ]
     , address: {
-        lineOne: ''
-      , lineTwo: ''
+        name: ''
+      , street: ''
+      , city: ''
+      , region: ''
       , postcode: ''
-      , long:0.0
+      , long: 0.0
       , lat: 0.0
       , directions: ''
       }
@@ -194,17 +291,36 @@ export default class CreateNewItemScreen extends React.Component {
   }
 
   _getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      this.setState({
-        errorMessage: 'Permission to access location was denied',
-      });
-    } else {
-      let location = await Location.getCurrentPositionAsync({});
-      console.log("Location: ", location.coords)
-      this.setState({
-        region: { ...this.state.region, longitude: location.coords.longitude, latitude: location.coords.latitude }
-      })
+    try {
+      let { status } = await Permissions.askAsync(Permissions.LOCATION);
+      if (status !== 'granted') {
+        this.setState({
+          errorMessage: 'Permission to access location was denied',
+        });
+        this.toast.show("Oooops, not permission to access location", DURATION.LENGTH_LONG);
+      } else {
+        let maxDelayPromise = new Promise( (resolve, reject) => {
+          setTimeout(() => reject('Took too long'), 5000)
+        })
+        await Promise.race([Location.getCurrentPositionAsync({enableHighAccuracy: false}), maxDelayPromise])
+        .then( myLocation => {
+          return this.setState({
+            region: { ...this.state.region, longitude: myLocation.coords.longitude, latitude: myLocation.coords.latitude }
+          })
+        })
+        .catch( value => {
+          this.toast.show("GPS location fails if 'Device Only' mode is enabled on your android", 2000);
+        })
+        /*
+        let myLocation = await Location.getCurrentPositionAsync({enableHighAccuracy: false})
+        console.log("Location: ", myLocation.coords)
+        await this.setState({
+          region: { ...this.state.region, longitude: myLocation.coords.longitude, latitude: myLocation.coords.latitude }
+        })
+        */
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -243,6 +359,7 @@ export default class CreateNewItemScreen extends React.Component {
         this.toast.show("Please Select Category", DURATION.LENGTH_LONG);
         return false;
     }
+    /*
     if(this.state.address.lineOne.length>=1 || this.state.address.lineTwo.length>=1 || this.state.address.postcode.length>=1){
       if(this.state.address.lineOne.length===0){
         this.toast.show("Please Enter Address Line 1", DURATION.LENGTH_LONG);
@@ -257,6 +374,7 @@ export default class CreateNewItemScreen extends React.Component {
           return false;
       }
     }
+    */
 
 
     if(postCurrency.length == 0 || (this.state.postCost && this.state.postCost == 0.0)){
@@ -324,13 +442,19 @@ export default class CreateNewItemScreen extends React.Component {
 
     var variables = "";
     var post_=null;
-    var addr_=null;
-
+    var addr_ = {
+      lineOne: this.state.address.name.concat(" ", this.state.address.street)
+    , lineTwo: this.state.address.city.concat(" ", this.state.address.region)
+    , postcode: this.state.address.postcode
+    , long: this.state.address.long
+    , lat: this.state.address.lat
+    , directions: ''
+    }
     if(postCurrency.length!=0){
       post_={"postCurrency":postCurrency,"postCost":this.state.postCost};
     }
-    if(this.state.address.lineOne.length!=0){
-      addr_=this.state.address;
+    if(addr_.lineOne.length == 0 && this.state.address.lat == 0.0){
+      addr_ = null
     }
     variables = { variables: {
       "mode":this.state.mode,
@@ -386,6 +510,7 @@ export default class CreateNewItemScreen extends React.Component {
       this.setState({
         errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
       });
+      this.toast.show("Oooops, this will not work on Sketch", DURATION.LENGTH_LONG);
     } else {
       this._getLocationAsync();
     }
@@ -919,6 +1044,25 @@ export default class CreateNewItemScreen extends React.Component {
     this.setState({ dataSourceTags: ds.cloneWithRows(dataObjectsTags),textd:"",selectedTagId:"",selectedTagName:"" });
   };
 
+  _onSearchAddress = () => {
+    Expo.Location.geocodeAsync(
+      this.state.address.name.concat(" "
+      , this.state.address.street, " "
+      , this.state.address.city, " "
+      , this.state.address.region, " "
+      , this.state.address.postcode
+      )
+    )
+    .then( coords => {
+      let {latitude, longitude} = coords[0]
+      this.setState({
+        marker: { ...this.state.marker, latlng: {latitude: latitude, longitude: longitude}, title: 'pin', description: 'search result'}
+      , region: { latitude: latitude, longitude: longitude, latitudeDelta: 0.009, longitudeDelta: 0.009*Math.cos(Math.PI*latitude/180)}
+      , address: { ...this.state.address, lat: latitude, long: longitude}
+      })
+    })
+  }
+
   _renderDeleteTag(index) {
     let tmp = dataObjectsTags;
     let newarray = [];
@@ -1236,24 +1380,13 @@ export default class CreateNewItemScreen extends React.Component {
                     <View style={styles.faceToFace}>
                       <Text style={styles.txtfacetoFace}>Face to Face</Text>
                       <View style={styles.bottomline} />
-                      <Item style={styles.txtInput} regular>
-                        <TextInput
-                          onChangeText={(text) => {
-                            this.setState({ searchAddress: text })
-                          }}
-                          onSubmitEditing={() => {
-                            
-                          }}
-                          style={{ flex:1 }}
-                          placeholder="search"
-                          placeTextColor={Colors.lightGray}
-                        />
-                        <TouchableOpacity onPress={() => null }>
-                          <BBBIcon name="Search" style={styles.searchicon} />
-                        </TouchableOpacity>
-                      </Item>
                       <View style={styles.subFacetoFace}>
                         <View style={styles.dataFacetoFace}>
+                          { w(this.state, ['address', 'lat']) &&
+                          <Item style={styles.txtInput} regular>
+                            <Text>Latitude: {this.state.address.lat.toFixed(3)} Longitude: {this.state.address.long.toFixed(3)}</Text>
+                          </Item>
+                          }
                           <Item style={styles.txtInput} regular>
                             <TextInput
                               onChangeText={(text) => {
@@ -1294,31 +1427,44 @@ export default class CreateNewItemScreen extends React.Component {
                               placeTextColor={Colors.lightGray}
                             />
                           </Item>
-                          <Item style={styles.txtInput} regular>
-                            <TextInput
-                              onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, postcode: text} });
-                              }}
-                              style={{  flex:1 }}
-                              placeholder="138325"
-                              placeTextColor={Colors.lightGray}
-                            />
-                          </Item>
+                          <View>
+                            <Item style={styles.txtInput} regular>
+                              <TextInput
+                                onChangeText={(text) => {
+                                  this.setState({ address: { ...this.state.address, postcode: text} });
+                                }}
+                                style={{  flex:1 }}
+                                placeholder="138325"
+                                placeTextColor={Colors.lightGray}
+                              />
+                            </Item>
+                            <TouchableOpacity onPress={this._onSearchAddress}>
+                              <BBBIcon name="Search" style={styles.searchicon} />
+                            </TouchableOpacity>
+                          </View>
                         </View>
                         <View style={styles.mapFacetoFace}>
                           <MapView
+                            initialRegion={defaultRegions[country.isoCode]}
                             region={this.state.region}
                             style={{ flex: 1 }}
-                            onPress={(e) => console.log("onPressEvent: ", e.nativeEvent ? e.nativeEvent : e)}
-                            onLongPress={(e) => console.log("onLongPressEvent: ", e.nativeEvent ? e.nativeEvent : e)}
+                            onLongPress={(e) => {
+                              if (e.nativeEvent) {
+                                this.setState({
+                                  marker: { ...this.state.marker, latlng: e.nativeEvent.coordinate, title: 'title', descrpition: 'description' }
+                                , address: { ...this.state.address, lat: e.nativeEvent.coordinate.latitude, long: e.nativeEvent.coordinate.longitude }
+                                })
+                              } else { console.log("onLongPressEvente: ", e) }}}
                             showsUserLocation
                             showsMyLocationButton
                           >
+                            { this.state.marker &&
                             <MapView.Marker
                               coordinate={this.state.marker.latlng}
                               title={this.state.marker.title}
                               description={this.state.marker.description}
                             />
+                            }
                           </MapView>
                         </View>
                       </View>

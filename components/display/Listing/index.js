@@ -11,8 +11,9 @@ import {
 , Fab
 } from 'native-base';
 import { withNavigation } from 'react-navigation'
+import { MapView } from 'expo';
 import styles from './styles';
-import { Layout, Colors, Urls } from '../../../constants/';
+import { Layout, Colors, Urls, defaultRegions } from '../../../constants/';
 import Baby from '../../Baby';
 import IdentityVerification from '../../IdentityVerification';
 import BBBIcon from '../../BBBIcon';
@@ -30,6 +31,10 @@ class Listing extends Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      mapLoaded: false
+    }
   }
 
   // comparisons of important changes here
@@ -37,10 +42,18 @@ class Listing extends Component {
     if (w(this.props, ['liked']) !== w(nextProps.item, ['liked'])) {
       return true;
     }
+    if (this.state.mapLoaded == false && nextState.mapLoaded == true) {
+      return true;
+    }
     return false;
   }
     //, cache: 'reload'
   //key={ item.imageKey }
+  /*
+  componentDidMount() {
+    this.setState({ mapLoaded: true })
+  }
+  */
 
   renderItem( item ) {
     if (!w(item, ['imageKey'])) {
@@ -87,6 +100,13 @@ class Listing extends Component {
 
   render() {
     let {item, loginStatus, chatIndexes, currentUser} = this.props
+    let exchangeMode = null
+
+    if ( w(item, ['saleMode', 'exchangeModes', 'length']) > 0) {
+      exchangeMode = item.saleMode.exchangeModes.find(function(element) {
+        return element.mode == 'FACE'
+      })
+    }
 
     function OtherImage( props ) {
       const {item} = props
@@ -189,6 +209,31 @@ class Listing extends Component {
         <View>
           <Text style={styles.postDesc} >{w(item, ['description'])}</Text>
         </View>
+        { w(exchangeMode, ['location', 'latitude']) &&
+        <View style={{ paddingTop: Layout.WIDTH * 0.05, paddingBottom: Layout.WIDTH * 0.05 }}>
+          <MapView
+            initialRegion={{
+              latitude: exchangeMode.location.latitude
+            , longitude: exchangeMode.location.longitude
+            , latitudeDelta: 0.009
+            , longitudeDelta: 0.009*Math.cos(Math.PI*exchangeMode.location.latitude/180)
+            }}
+            style={{ width: Layout.WIDTH * 0.9, height: Layout.WIDTH * 0.9 }}
+            onLayout={() => { this.setState({ mapLoaded: true })}}
+            showsUserLocation
+            showsMyLocationButton
+          >
+            { this.state.mapLoaded &&
+            <MapView.Marker
+              coordinate={{latitude: exchangeMode.location.latitude, longitude: exchangeMode.location.longitude }}
+            />
+            }
+          </MapView>
+          <View>
+            <Text style={styles.postDesc} >{exchangeMode.location.lineOne}{`\n`}{exchangeMode.location.lineTwo}, {exchangeMode.location.postcode}</Text>
+          </View>
+        </View>
+        }
       </View>
     )
   }

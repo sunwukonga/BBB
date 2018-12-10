@@ -7,6 +7,12 @@ export default StyleSheet.create({
 		width: Layout.WIDTH,
 		backgroundColor: Colors.white,
 	},
+	faceToFace: {
+		backgroundColor: Colors.white,
+		borderWidth: 1,
+		borderColor: Colors.categorylistBorder,
+		margin: Layout.HEIGHT * 0.02,
+	},
 	contentStyle: {
 		flex: 1,
 		padding: Layout.WIDTH * 0.04,
