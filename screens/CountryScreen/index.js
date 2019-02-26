@@ -35,6 +35,8 @@ import {
 , GET_USER_LIKED_LIST
 , GET_USER_POSTED_LIST
 , GET_NESTED_CATEGORY_LIST
+, GET_LOCUS
+, GET_CACHED_TRANSLATIONS
 } from '../../graphql/Queries'
 import {
   SET_COUNTRY
@@ -48,81 +50,8 @@ const SA_CountryToHome = (navigation) => StackActions.reset({
   , key: null
   , actions: [ NavigationActions.navigate({ routeName: 'mainScreen' }) ]
 })
-/*
-const SA_CountryToHome = (navigation) => StackActions.reset({
-    index: 0
-  , actions: [
-      NavigationActions.navigate({
-        routeName: 'mainScreen'
-      , action: NavigationActions.navigate({
-          routeName: 'homeDrawer'
-        , action: NavigationActions.navigate({
-            routeName: 'homeScreen'
-          , params: { rootNavigation: navigation }
-          })
-        })
-      })
-    ]
-})
-*/
 
 const SA_BackToProfile = (navigate, navigation) => navigate( navigation )
-/*
-const SA_BackToProfile = StackActions.reset({
-  index: 1
-, key: 'id-1538193255286-1'
-, actions: [
-    NavigationActions.navigate({
-      routeName: 'homeDrawer'
-    , action: NavigationActions.navigate({ routeName: 'homeScreen' })
-    })
-  , NavigationActions.navigate({ routeName: 'profileScreen' })
-  ]
-})
-*/
-//    "react-navigation": "^2.13.0"
-/*
-const SA_BackToProfile = StackActions.reset({
-    index: 0
-  , actions: [NavigationActions.navigate({
-      routeName: 'homeDrawer'
-    , action: NavigationActions.navigate({
-        routeName: 'profileScreen'
-      })
-    })]
-})
-*/
-/*
-const SA_BackToProfile = StackActions.reset({
-    index: 0
-  , actions: [NavigationActions.navigate({
-      routeName: 'mainScreen'
-    , action: NavigationActions.navigate({
-        routeName: 'homeScreen'
-      , action: NavigationActions.navigate({
-          routeName: 'profileScreen'
-        })
-      })
-    })]
-})
-*/
-/*
-const SA_BackToProfile = StackActions.reset({
-  index: 0
-, actions: [
-    NavigationActions.navigate({
-      routeName: 'mainScreen'
-    , action: StackActions.reset({
-        index: 1
-      , actions: [
-          StackActions.push({ routeName: 'homeDrawer' })
-        , StackActions.push({ routeName: 'profileScreen' })
-        ]
-      })
-    })
-  ]
-})
-*/
 
 class CallSetAuthStatus extends React.Component {
   componentDidMount() {
@@ -145,14 +74,15 @@ class CallCountryHandler extends React.Component {
 const CountryScreen = compose (
   graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
 , graphql(SET_AUTH_STATUS, {name: "setAuthStatus"})
-, graphql(GET_NESTED_CATEGORY_LIST)
+, graphql(GET_NESTED_CATEGORY_LIST, {name: "getNestedCategoryList"})
+, graphql(GET_COUNTRY_LIST, {name: "getCountryList"})
 )(
   class extends React.Component {
     constructor(props) {
-      //console.log("CountryScreen Constructor")
       super(props)
       this.state = {
         countryCode: null
+      , languageCode: null
       }
       this.gettingCountryCode = true
       this.mutationInFlight = false
@@ -161,38 +91,16 @@ const CountryScreen = compose (
       const defaultGetStateForAction = RootStackNavigator.router.getStateForAction;
       RootStackNavigator.router.getStateForAction = (action, state) => {
         if (state && w(action.actions, ['length']) > 0 && action.actions[0].routeName === "countryScreen") {
-          this.countryBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode))
+          this.countryBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode, action.actions[0].params.iso639_2))
         }
         return defaultGetStateForAction(action, state);
       };
     }
 
-    onBackPress = (countryCode) => {
-      return Expo.SecureStore.setItemAsync("countryCode", countryCode)
+    onBackPress = (countryCode, iso639_2) => {
+      return Expo.SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: countryCode, iso639_2: iso639_2}))
       .then( () => {
         this.props.navigation.dispatch( SA_CountryToHome( this.props.navigation ) )
-        //console.log("routeName: ", navigation.state.routeName)
-        //navigation.navigate({routeName: navigation.state.routeName})
-        //navigation.navigate({ routeName: navigation.state.routeName })
-        /*
-        navigation.reset({
-          index: 1
-        , actions: [
-            navigation.navigate({
-              routeName: 'homeDrawer'
-            , params: {
-                rootNavigation: navigation.state.params.rootNavigation
-              }
-            , action: navigation.navigate({
-                routeName: navigation.state.routeName
-              , params: {
-                  rootNavigation: navigation.state.params.rootNavigation
-                }
-              })
-            })
-          ]
-        })
-        */
         this.removeCountryHandler()
         this.mutationInFlight = false
         this.gettingCountryCode = true
@@ -207,21 +115,25 @@ const CountryScreen = compose (
       }
     }
 
-    componentWillMount(props) {
+    componentWillMount() {
       if (! this.state.countryCode) {
-        //console.log("mainNavigation: ", this.props.navigation)
-        let countryCodePromise = Expo.SecureStore.getItemAsync("countryCode")
-        Promise.all([countryCodePromise])
-        .then( ([ countryCode ]) => {
-          if (countryCode) {
+        let countryInfoPromise = Expo.SecureStore.getItemAsync("countryInfo")
+        Promise.all([countryInfoPromise])
+        .then( ([ countryInfo ]) => {
+          console.log("countryInfo: ", countryInfo)
+          if (countryInfo) {
+            console.log("CountryCode set by SecureStore")
+            let country = JSON.parse(countryInfo)
             this.gettingCountryCode = false
             this.setState({
-              countryCode: countryCode
+              countryCode: country.countryCode
+            , languageCode: country.iso639_2
             })
           } else {
             this.gettingCountryCode = false
             this.setState({
               countryCode: null
+            , languageCode: null
             })
           }
         })
@@ -229,26 +141,24 @@ const CountryScreen = compose (
 
     }
 
-    countryHandler( countryCode, setCountry, save ) {
-      if ( countryCode ) {
+    countryHandler( country, setCountry, save ) {
+      if ( w(country, ['isoCode']) ) {
         if (!this.mutationInFlight) {
           this.mutationInFlight = true
-          setCountry({ variables: { countryCode: countryCode }})
+          let iso639_2 = w(country, ['languages', 0, iso639_2]) ? country.languages[0].iso639_2 : 'eng'
+          setCountry({ variables: { countryCode: country.isoCode, iso639_2: iso639_2 }})
           .then( () => {
-            // cache: NESTED CATEGORY LIST
             if (save) {
-              Expo.SecureStore.setItemAsync("countryCode", countryCode)
+              Expo.SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: country.isoCode, iso639_2: iso639_2}))
               .then( () => {
                 this.removeCountryHandler()
                 this.props.navigation.dispatch(SA_CountryToHome(this.props.navigation))
-                //this.props.navigation.navigate(MainStackNavigator, { params: { rootStackNavigator: RootStackNavigator, mainStackNavigator: MainStackNavigator }})
                 this.mutationInFlight = false
                 this.gettingCountryCode = true
               })
             } else {
               this.removeCountryHandler()
               this.props.navigation.dispatch(SA_CountryToHome(this.props.navigation))
-              //this.props.navigation.navigate(MainStackNavigator, { params: { rootStackNavigator: RootStackNavigator, mainStackNavigator: MainStackNavigator }})
               this.mutationInFlight = false
               this.gettingCountryCode = true
             }
@@ -260,7 +170,7 @@ const CountryScreen = compose (
     renderItem = ({ item }, setCountry) => {
       return (
         <ListItem
-          onPress={() => this.countryHandler( item.isoCode, setCountry, true ) }
+          onPress={() => this.countryHandler( item, setCountry, true ) }
           leftIcon = {<Flag code={item.isoCode} style={styles.flagStyle} />}
           title = {<Text style={styles.countryNameTxt}>{item.name}</Text>}
           containerStyle={styles.center}
@@ -270,8 +180,11 @@ const CountryScreen = compose (
     }
 
     render() {
-      //console.log("Root Navigator: ", this.props.navigation.state)
-      if ( this.gettingCountryCode ) {
+      if (
+           this.gettingCountryCode
+        || this.props.getCountryList.loading
+        || !this.props.getCountryList.allCountries
+      ) {
         return null
       }
       return (
@@ -281,42 +194,60 @@ const CountryScreen = compose (
             update = {(cache, { data: { setCountry } }) => {
               cache.writeQuery({
                 query: GET_USER_LIKED_LIST
-              , variables: {"countryCode": setCountry}
+              , variables: {"countryCode": setCountry.isoCode}
               , data: { getUserLikedListings: [] }
               })
               cache.writeQuery({
                 query: GET_USER_VISITED_LIST
-              , variables: {"countryCode": setCountry}
+              , variables: {"countryCode": setCountry.isoCode}
               , data: { getUserVisitedListings: [] }
               })
               cache.writeQuery({
                 query: GET_USER_POSTED_LIST
-              , variables: {"countryCode": setCountry}
+              , variables: {"countryCode": setCountry.isoCode}
               , data: { getUserPostedListings: [] }
               })
               cache.writeQuery({
                 query: GET_MOST_RECENT_LIST
-              , variables: {"countryCode": setCountry}
+              , variables: {"countryCode": setCountry.isoCode}
               , data: { getMostRecentListings: [] }
               })
               cache.writeQuery({
                 query: GET_MOST_VISITED_LIST
-              , variables: {"countryCode": setCountry}
+              , variables: {"countryCode": setCountry.isoCode}
               , data: { getMostVisitedListings: [] }
               })
               cache.writeQuery({
                 query: GET_MOST_LIKED_LIST
-              , variables: {"countryCode": setCountry}
+              , variables: {"countryCode": setCountry.isoCode}
               , data: { getMostLikedListings: [] }
               })
+              /*
+              cache.writeQuery({
+                query: GET_CACHED_TRANSLATIONS
+              , variables: {"locusId": 1, "countryCode": setCountry.isoCode}
+              , data: { getCachedLocus: null }
+              })
+              */
             }}
+            refetchQueries = {({ data: { setCountry } }) => [
+              {
+                query: GET_LOCUS
+              , fetchPolicy: 'network-only'
+              , variables: {
+                  "locusId": 1
+                , "countryCode": setCountry.getCachedCountry.isoCode
+                , "languageCodes": setCountry.getCachedCountry.languages.map( language => language.iso639_2 )
+                }
+              }
+            ]}
           >
             {(setCountry, { data }) => {
               return (
-                <CallCountryHandler countryHandler={() => this.countryHandler( this.state.countryCode, setCountry, false )}>
+                <CallCountryHandler countryHandler={() => this.countryHandler( {isoCode: this.state.countryCode, iso639_2: this.state.languageCode}, setCountry, false )}>
                   <Query
                     query = {GET_COUNTRY_LIST}
-                    fetchPolicy = "network-only"
+                    fetchPolicy = "cache-only"
                   >
                     {({ data, networkStatus, error }) => {
                       if (networkStatus === 1) {

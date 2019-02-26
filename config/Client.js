@@ -7,7 +7,11 @@ import { onError } from "apollo-link-error";
 import { InMemoryCache, defaultDataIdFromObject } from "apollo-cache-inmemory";
 import { Mutation } from "react-apollo";
 
-let Production = true
+import {
+  GET_CACHED_COUNTRY
+} from '../graphql/Queries'
+
+let Production = false
 let default_token
 let BBB_BASE_URL
 if (Production) {
@@ -31,9 +35,13 @@ const cache = new InMemoryCache({
   cacheRedirects: {
     Query: {
       getListing: (_, { id }, { getCacheKey }) =>
-        getCacheKey({ __typename: 'Listing', id })
-    , getCachedCountry: (_, { isoCode }, { getCacheKey }) =>
-        getCacheKey({ __typename: 'Country', isoCode })
+        getCacheKey({ __typename: 'Listing', id: id })
+    , getCachedCountry: (_, { isoCode }, { getCacheKey }) => {
+        console.log("HIT")
+        return getCacheKey({ __typename: 'Country', isoCode: isoCode })
+      }
+    , getCachedLocus: (_, { locusId, countryCode }, { getCacheKey }) =>
+        getCacheKey({ __typename: 'Locus', id: locusId, countryCode: countryCode })
     }
   },
 });
@@ -79,6 +87,7 @@ const stateLink = withClientState({
   , authorized: false
   , jwt_token: default_token
   , countryCode: 'SG'
+  , iso639_2: 'eng'
   , myProfile: {
       __typename: 'MyProfile'
     , id: -1
@@ -150,8 +159,9 @@ const stateLink = withClientState({
         return null
       },
       setCountry: (_, args, { cache }) => {
-        cache.writeData({ data: { countryCode: args.countryCode }});
-        return args.countryCode;
+        let myCountry = cache.readQuery({ query: GET_CACHED_COUNTRY, variables: {isoCode: args.countryCode} })
+        cache.writeData({ data: { countryCode: args.countryCode, iso639_2: args.iso639_2 }});
+        return myCountry
       },
     }
   },

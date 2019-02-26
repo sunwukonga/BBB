@@ -15,7 +15,8 @@ class LoginStatus extends Component {
         fetchOptions = 'cache-only'
       >
         {({ data }) => {
-            return this.props.children({loginStatus: data.authorized, countryCode: data.countryCode, myProfile: data.myProfile})
+            //return this.props.children({loginStatus: data.authorized, countryCode: data.countryCode, myProfile: data.myProfile})
+            return this.props.children(data)
         }}
       </Query>
     )

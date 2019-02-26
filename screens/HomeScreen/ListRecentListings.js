@@ -28,7 +28,7 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-      if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
+      if ( w(this.props, ['loginStatus', 'authorized']) !== w(nextProps, ['loginStatus', 'authorized']) ) {
         return true
       }
       return false;

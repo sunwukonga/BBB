@@ -1,5 +1,7 @@
 import gql from "graphql-tag";
 
+var fragments = {}
+
 const GET_MOST_RECENT_LIST = gql`
 query getMostRecentListings($countryCode:String!,$limit:Int,$page:Int){
   getMostRecentListings(countryCode:$countryCode,limit:$limit,page:$page) @connection(key: "getMostRecentListings", filter: ["countryCode"]) {
@@ -552,6 +554,7 @@ const GET_LOGIN_STATUS = gql`
 query getLoginStatus @client {
   authorized
   countryCode
+  iso639_2
   myProfile {
     id
     profileName
@@ -579,7 +582,7 @@ query {
 
 const GET_CACHED_COUNTRY = gql`
 query getCachedCountry($isoCode: Int!) {
-  getCachedCountry(isoCode: $isoCode) @client {
+  getCachedCountry(isoCode: $isoCode) {
     isoCode
     name
     currencies {
@@ -782,7 +785,54 @@ query {
       name
     }
   }
-}`;
+}`
+
+fragments.locusDetails = gql`
+fragment LocusDetails on Locus {
+  id
+  name
+  parentName
+  content {
+    id
+    meaning
+    countryCode
+    translations {
+      id
+      iso639_2
+      text
+    }
+  }
+}
+`
+const GET_LOCUS = gql`
+query getLocus($locusId:Int!, $countryCode:String!, $languageCodes:[String]!) {
+  getLocus(locusId:$locusId, countryCode: $countryCode, languageCodes: $languageCodes) @connection(key: "getCachedLocus", filter: ["locusId", "countryCode"]) {
+    ...LocusDetails
+    children {
+      ...LocusDetails
+      children {
+        ...LocusDetails
+      }
+    }
+  }
+}
+${fragments.locusDetails}
+`
+
+const GET_CACHED_TRANSLATIONS = gql`
+query getCachedLocus($locusId:Int!, $countryCode:String!) {
+  getCachedLocus(locusId:$locusId, countryCode: $countryCode) {
+    ...LocusDetails
+    children {
+      ...LocusDetails
+      children {
+        ...LocusDetails
+      }
+    }
+  }
+}
+${fragments.locusDetails}
+`
 
 const GET_CATEGORY_LIST = gql`
 query {
@@ -900,6 +950,8 @@ export {
 , GET_PROFILE
 , GET_LISTING
 , GET_NESTED_CATEGORY_LIST
+, GET_LOCUS
+, GET_CACHED_TRANSLATIONS
 , GET_CATEGORY_LIST
 , SEARCH_LISTINGS
 }

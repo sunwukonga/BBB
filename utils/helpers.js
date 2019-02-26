@@ -2,6 +2,61 @@ import {
   AsyncStorage
 } from 'react-native'
 
+function i18n(translations, parentName, name, iso639_2) {
+  let locus = null
+  let content = null
+  let translation = null
+  if (findLocus(translations.children) !== undefined) {
+    let loci = locus.content.filter( content => {
+      if (content.translations.find( tranlationObject => translationObject.iso639_2 == iso639_2) !== undefined) {
+        return true
+      } else return false
+    })
+    if (loci.length > 1) {
+      // Multiple appropriate translations found, with one specific to selected country
+      content = loci.find( content => content.countryCode != null )
+    } else {
+      // Possible single generic translation (non-country specific)
+      content = loci.find( content => content.countryCode == null )
+    }
+    if (content) {
+      // Got a translation
+      translation = content.translations.find( tranlationObject => translationObject.iso639_2 == iso639_2).text
+    } else {
+      // No appropriate translation.
+      if (locus.content.length > 1) {
+        // Country specific generic content
+        content = locus.content.find( content => content.countryCode != null )
+      } else {
+        // Non-country specific generic content
+        content = locus.content.find( content => content.countryCode == null )
+      }
+      if (content) {
+        translation = content.meaning
+      } else {
+        translation = "No content defined for locus!"
+      }
+    }
+  } else translation = "Locus not found!"
+
+  return translation
+
+  function findLocus(children) {
+    return children.find( placeholder => {
+      if (placeholder.name == name && placeholder.parentName == parentName) {
+        locus = placeholder
+        return true
+      } else if (placeholder.children !== undefined) {
+        if (findLocus(placeholder.children) === undefined) {
+          return false
+        } else return true
+      }
+      return false
+      //} else console.log("Test: ", placeholder.parentName, ":", placeholder.name)
+    })
+  }
+}
+
 function updateChatMessages(oldChatList, newChatList) {
   let newChats = newChatList.filter( chat => chat.chatMessages.length > 0 )
                   .map( chat => {
@@ -117,6 +172,7 @@ async function fetchLastReadMessages() {
 export {
   updateChatMessages
 , w
+, i18n
 , getMethods
 , getElementByKey
 , fetchLastReadMessages

@@ -33,7 +33,7 @@ class ChatButton extends Component {
   }
 
   navOrCreate( mutateCreateChat, item, loginStatus, chatIndexes ) {
-    if ( loginStatus.loginStatus ) {
+    if ( loginStatus.authorized ) {
       if ( item.chatId != -1 ) {
         // chat already exists
         this.props.navigation.navigate('chatDetailScreen', {

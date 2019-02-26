@@ -26,7 +26,7 @@ import IdentityVerification5 from '../../components/IdentityVerification5';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from '../../components/CheckBox';
-import Dropdown from '../../components/Dropdown/dropdown';
+//import Dropdown from '../../components/Dropdown/dropdown';
 import Slider from '../../components/Slider';
 import { Ionicons } from '@expo/vector-icons';
 

@@ -42,7 +42,7 @@ class LikeButton extends Component {
 
   navOrToggle( mutateToggleLike, item, loginStatus ) {
     console.log("navOrToggle called")
-    if ( loginStatus.loginStatus ) {
+    if ( loginStatus.authorized ) {
       // Toggle the like
       console.log("LikeButton Pressed.")
       mutateToggleLike({ listingId: item.id, like: !item.liked })

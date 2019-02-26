@@ -20,6 +20,24 @@ export default StyleSheet.create({
   bodys: {
     borderBottomWidth: 0
   },
+  dataFacetoFace: {
+    flex: 1,
+    margin: Layout.HEIGHT * 0.02,
+  },
+  txtTitle: {
+    marginBottom: Layout.HEIGHT * 0.01,
+    fontSize: Layout.moderateScale(17),
+    fontFamily: 'roboto-reguler',
+  },
+  dateDropDown: {
+    borderWidth: 0.8,
+    borderColor: '#c8d5d5',
+    paddingLeft: Layout.moderateScale(10),
+    paddingRight: Layout.moderateScale(10),
+    paddingTop: Layout.moderateScale(10),
+    borderRadius: Layout.moderateScale(3),
+    backgroundColor: Colors.white,
+  },
   bebyview: {
     margin: Layout.HEIGHT * 0.01,
     borderRadius: Layout.HEIGHT * 0.035,

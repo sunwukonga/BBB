@@ -31,7 +31,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
-import Dropdown from '../../components/Dropdown/dropdown';
+//import Dropdown from '../../components/Dropdown/dropdown';
 import { create } from 'apisauce';
 import getSignedUrl from './SignedUrl';
 import createNewItemUrl from './CreateNewItem';

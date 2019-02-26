@@ -19,18 +19,59 @@ import styles from './styles';
 import { Layout, Images, Colors, Urls } from '../../constants/';
 
 //apollo client
-import { graphql } from "react-apollo";
+import { graphql, compose } from "react-apollo";
 import {
   UNSET_AUTH_STATUS
 } from '../../graphql/Mutations'
+import {
+  GET_CACHED_TRANSLATIONS
+, GET_LOGIN_STATUS
+} from '../../graphql/Queries'
 import LoginStatus from '../HomeScreen/LoginStatus'
-import { w, getElementByKey, fetchLastReadMessages } from '../../utils/helpers.js'
+import { w, i18n, getElementByKey, fetchLastReadMessages } from '../../utils/helpers.js'
 import GetChatMessages from '../../graphql/queries/GetChatMessages'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
 //import MainDrawer from '../../navigation/MainDrawerNavigator'
 
 //reset the appolo cache
-export const DrawerContainer = graphql(UNSET_AUTH_STATUS)(
+export const DrawerContainer = compose(
+  graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
+, graphql(GET_LOGIN_STATUS, {name: "loginStatus"})
+  /*
+  , graphql(GET_CACHED_COUNTRY, {
+      name: "cachedCountry"
+    , skip: ({ loginStatus }) => !loginStatus
+    , options: ({loginStatus}) => ({
+        variables: { countryCode: loginStatus.countryCode }
+      })
+    })
+  , graphql(GET_LOCUS, {
+      name: "i18n"
+    , skip: ({ cachedCountry }) => !cachedCountry || !cachedCountry.getCachedCountry
+    , options: ({loginStatus, cachedCountry}) => {
+        console.log("If this is EMPTY, it should have been skipped: ", cachedCountry)
+        return ({
+          variables: {
+            locusId: 1
+          , countryCode: loginStatus.countryCode
+          , languageCodes: cachedCountry.getCachedCountry.languages.map( language => language.iso639_2 )
+          }
+        })
+      }
+    })
+    */
+, graphql(GET_CACHED_TRANSLATIONS, {
+    name: "i18n"
+  , skip: ({ loginStatus }) => !loginStatus
+  , options: ({loginStatus}) => ({
+      variables: {
+        locusId: 1
+      , countryCode: loginStatus.countryCode
+      }
+    , fetchPolicy: 'cache-only'
+    })
+  })
+)(
   class extends Component {
     constructor(props) {
       super(props)
@@ -70,16 +111,24 @@ export const DrawerContainer = graphql(UNSET_AUTH_STATUS)(
     */
 
     render() {
-      const { navigation } = this.props;
+      //const { navigation } = this.props;
+      /*
+                  <Text style={styles.uglyDrawerItem}>{i18n(translations, "DrawerContainer", "Home", "eng")}</Text>
+      if (!this.props.i18n.loading && translations) {
+        //console.log("Translations: ", translations)
+      }
+      */
       //console.log("Navigation: ", navigation)
       //console.log("navStateParams: ", getElementByKey(navigation, 'rootNavigation'))
-      if (this.state.loading) {
+      if (this.state.loading || !w(this.props, ['i18n', 'getCachedLocus'])) {
+      //if (this.state.loading) {
         return null
       } else {
+        const { navigation, i18n: {getCachedLocus: translations} } = this.props;
         return (
           <LoginStatus>{ loginStatus => (
             <Container style={styles.container} >
-              {loginStatus.loginStatus ?
+              {loginStatus.authorized ?
                 <TouchableOpacity
                   onPress={() => {
                     this.props.navigation.navigate({
@@ -117,7 +166,7 @@ export const DrawerContainer = graphql(UNSET_AUTH_STATUS)(
                     color={Colors.secondaryColor}
                     style={styles.menuIcon}
                   />
-                  <Text style={styles.uglyDrawerItem}>Home</Text>
+                  <Text style={styles.uglyDrawerItem}>{i18n(translations, "DrawerContainer", "Home", loginStatus.iso639_2)}</Text>
                 </Item>
                 <Item
                   style={[styles.borderView, {}]}
@@ -133,7 +182,7 @@ export const DrawerContainer = graphql(UNSET_AUTH_STATUS)(
                   <Text style={styles.uglyDrawerItem}>Chat</Text>
                   <View style={{flexGrow: 1}}>
                   <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
-                    <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} skip={!loginStatus.loginStatus}>
+                    <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} skip={!loginStatus.authorized}>
                       {({ data, networkStatus, error, loading, refetch, startPolling, stopPolling }) => {
                         let newMessageCount = 0
                         if (!loading && w(data, ['getChatMessages'])) {
@@ -231,7 +280,7 @@ export const DrawerContainer = graphql(UNSET_AUTH_STATUS)(
                     },
                   ]}
                   onPress={() => {
-                    this.props.mutate({ variables: { id: loginStatus.myProfile.id }})
+                    this.props.unsetAuthStatus({ variables: { id: loginStatus.myProfile.id }})
                     .then( () => {
                       this.props.navigation.closeDrawer()
                     })

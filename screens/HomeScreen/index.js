@@ -24,6 +24,7 @@ import {
 , Content
 , Fab
 } from 'native-base'
+import { graphql, compose } from "react-apollo";
 //custom components
 import BBBHeader from '../../components/BBBHeader'
 import BBBIcon from '../../components/BBBIcon'
@@ -32,7 +33,7 @@ import { Ionicons } from '@expo/vector-icons'
 import styles from './styles'
 import headerStyles from '../../components/BBBHeader/styles'
 import { Layout, Colors, Images, IconNames } from '../../constants/'
-import { fetchLastReadMessages, w} from '../../utils/helpers.js'
+import { w, i18n, fetchLastReadMessages } from '../../utils/helpers.js'
 //import Toast from 'react-native-simple-toast'
 //import Toast, {DURATION} from 'react-native-easy-toast';
 //import { Permissions } from 'expo'
@@ -48,9 +49,14 @@ import LoginStatus from './LoginStatus'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import GetProfile from '../../graphql/queries/GetProfile'
 import GetChatMessages from '../../graphql/queries/GetChatMessages'
+import GetCachedTranslations from '../../graphql/queries/GetCachedTranslations'
 
 import MainDrawer from '../../navigation/MainDrawerNavigator'
 
+import {
+  GET_CACHED_TRANSLATIONS
+, GET_LOGIN_STATUS
+} from '../../graphql/Queries'
 //Navigation Actions
 const NA_HomeToLoginToDrawer = NavigationActions.navigate({
   routeName: 'loginScreen'
@@ -65,6 +71,23 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
 
 const showIcons = false
 
+/*
+export default HomeScreen = compose(
+  graphql(GET_LOGIN_STATUS, {name: "loginStatus"})
+, graphql(GET_CACHED_TRANSLATIONS, {
+    name: "i18n"
+  , skip: ({ loginStatus }) => !loginStatus
+  , options: ({loginStatus}) => ({
+      variables: {
+        locusId: 1
+      , countryCode: loginStatus.countryCode
+      }
+    , fetchOptions: 'cache-only'
+    })
+  })
+)(
+class extends React.Component {
+*/
 export default class HomeScreen extends React.Component {
 
   static navigationOptions = () => ({
@@ -230,7 +253,8 @@ export default class HomeScreen extends React.Component {
   // Auth checking functions
   //-----------------------------------
   checkAuthForCreate = (loginStatus) => {
-    if( loginStatus.loginStatus ) {
+    console.log(loginStatus)
+    if( loginStatus.authorized ) {
       this.props.navigation.navigate('createNewItemScreen')
     } else{
       this.props.navigation.dispatch(NA_HomeToLoginToCreate);
@@ -238,7 +262,7 @@ export default class HomeScreen extends React.Component {
   }
  
   checkAuthForChat = (item, loginStatus) => {
-    if( loginStatus.loginStatus ) {
+    if( loginStatus.authorized ) {
       var recUserId_ = item.user.id;
       var listingId_ = item.id;
       var chatId_ = item.chatId;
@@ -255,7 +279,7 @@ export default class HomeScreen extends React.Component {
   }
 
   checkAuthForDrawer = (loginStatus) => {
-    if ( loginStatus.loginStatus ) {
+    if ( loginStatus.authorized ) {
       //this.drawerBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this))
       this.props.navigation.openDrawer()
     }
@@ -272,7 +296,7 @@ export default class HomeScreen extends React.Component {
     // TODO: Change to a function that accepts loginStatus
     var leftComponent = (loginStatus, newMessageCount) => (
       <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
-        { loginStatus.loginStatus ?
+        { loginStatus.authorized ?
         <View>
           { newMessageCount > 0
           ? <Text style={styles.count}>{newMessageCount}</Text>
@@ -330,120 +354,123 @@ export default class HomeScreen extends React.Component {
       return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
-            <Container>
-              <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} skip={!loginStatus.loginStatus}>
-                {({ data, networkStatus, error, loading, refetch, startPolling, stopPolling }) => {
-                  //console.log("loginStatus: ", loginStatus)
-                  let newMessageCount = 0
-                  if (!loading && w(data, ['getChatMessages'])) {
-                    data.getChatMessages.map( chat => {
-                      console.log(chat.id, " : ",  w(this.state.lastReadMessageIds, [chat.id]))
-                      if (w(this.state.lastReadMessageIds, [chat.id])) {
-                        let lastMessageId = this.state.lastReadMessageIds[chat.id]
-                        chat.chatMessages.find(function(element, index, array) {
-                          if (element.id === lastMessageId) {
-                            newMessageCount += array.length - index - 1
-                            return true
-                          } else {
-                            return false
-                          }
-                        })
-                      } else newMessageCount += w(chat, ['chatMessages', 'length'])
-                    })
-                  }
-                  return (
-                    <Header
-                      androidStatusBarColor={Colors.mainheaderbg}
-                      style={headerStyles.header}
-                    >
-                      <Left style={headerStyles.left}>{leftComponent(loginStatus, newMessageCount)}</Left>
-                      <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
-                      <Right style={headerStyles.right}>{rightComponent(loginStatus)}</Right>
-                    </Header>
-                  )
-                }}
-              </GetChatMessages>
+            <GetCachedTranslations loginStatus={loginStatus}>{ translations => (
+              <Container>
+                <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} skip={!loginStatus.authorized}>
+                  {({ data, networkStatus, error, loading, refetch, startPolling, stopPolling }) => {
+                    //console.log("translations: ", translations)
+                    let newMessageCount = 0
+                    if (!loading && w(data, ['getChatMessages'])) {
+                      data.getChatMessages.map( chat => {
+                        //console.log(chat.id, " : ",  w(this.state.lastReadMessageIds, [chat.id]))
+                        if (w(this.state.lastReadMessageIds, [chat.id])) {
+                          let lastMessageId = this.state.lastReadMessageIds[chat.id]
+                          chat.chatMessages.find(function(element, index, array) {
+                            if (element.id === lastMessageId) {
+                              newMessageCount += array.length - index - 1
+                              return true
+                            } else {
+                              return false
+                            }
+                          })
+                        } else newMessageCount += w(chat, ['chatMessages', 'length'])
+                      })
+                    }
+                    return (
+                      <Header
+                        androidStatusBarColor={Colors.mainheaderbg}
+                        style={headerStyles.header}
+                      >
+                        <Left style={headerStyles.left}>{leftComponent(loginStatus, newMessageCount)}</Left>
+                        <Body style={headerStyles.body}><Title style={headerStyles.headerTitle}>Bebe Bargains</Title></Body>
+                        <Right style={headerStyles.right}>{rightComponent(loginStatus)}</Right>
+                      </Header>
+                    )
+                  }}
+                </GetChatMessages>
 
-              <Content style={styles.container}>
-                <View>
-                  <View style={styles.searchSec}>
-                    <Item regular style={styles.searchItem}>
-              {/*TODO: Change searchTerms from String to Array of Strings */
-              }
-                      <Input
-                        placeholder="What are you looking for?"
-                        style={styles.mainSearch}
-                        keyboardType="default"
-                        returnKeyType="search"
-                        onChangeText={(text) => {
-                            this.setState({ searchTerms: text.split(/\s+/g)});
-                        }}
-                        onSubmitEditing={ () =>
-                          this.props.navigation.navigate('searchResultScreen', { terms: this.state.searchTerms, loginStatus: loginStatus})
-                        }
-                      />
-                      <TouchableOpacity onPress={() =>
-                        this.props.navigation.navigate('searchResultScreen', { terms: this.state.searchTerms, loginStatus: loginStatus})
-                      }>
-                        <BBBIcon name="Search" style={styles.searchicon} />
-                      </TouchableOpacity>
-                    </Item>
-                  </View>
-              { showIcons ?
-              <FlatList
-                horizontal = {true}
-                contentContainerStyle={styles.listContent}
-                keyExtractor={(item, index) => index.toString()}
-                data = { IconNames || ["md-create"]}
-                renderItem={({ item }) => {
-                  return (
-                    <TouchableOpacity onPress={() => Alert.alert("IconName: " + item)}>
-                      <Ionicons
-                        name={item}
-                        size={Layout.moderateScale(24)}
-                        color={Colors.primaryColor}
-                        style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}
-                      />
-                    </TouchableOpacity>
-                  )
-                }}
-              />
-              : null }
-
-                  <ListRecentListings
-                    loginStatus={loginStatus}
-                    variables={{"limit":this.state.limit,"page":this.state.page}}
-                    chatIndexes={chatIndexes}
-                    currentUser={currentUser}
-                    createNew={() => this.checkAuthForCreate(loginStatus) } />
-                  <View style={styles.adSec}>
-                    <Text style={styles.mainadText}>
-                      Do you have something to sell or give away?
-                    </Text>
-                    <Text style={styles.subtitle}>
-                      Post it with us and we'll give you an audience.
-                    </Text>
-                  </View>
+                <Content style={styles.container}>
                   <View>
-                    <ListVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
-                    <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
-                    <View style={styles.hr} />
-                    <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                    <View style={styles.searchSec}>
+                      <Item regular style={styles.searchItem}>
+                {/*TODO: Change searchTerms from String to Array of Strings */
+                }
+                        <Input
+                          placeholder={i18n(translations, "HomeScreen", "LookingFor", "eng")}
+                          style={styles.mainSearch}
+                          keyboardType="default"
+                          returnKeyType="search"
+                          onChangeText={(text) => {
+                              this.setState({ searchTerms: text.split(/\s+/g)});
+                          }}
+                          onSubmitEditing={ () =>
+                            this.props.navigation.navigate('searchResultScreen', { terms: this.state.searchTerms, loginStatus: loginStatus})
+                          }
+                        />
+                        <TouchableOpacity onPress={() =>
+                          this.props.navigation.navigate('searchResultScreen', { terms: this.state.searchTerms, loginStatus: loginStatus})
+                        }>
+                          <BBBIcon name="Search" style={styles.searchicon} />
+                        </TouchableOpacity>
+                      </Item>
+                    </View>
+                { showIcons ?
+                <FlatList
+                  horizontal = {true}
+                  contentContainerStyle={styles.listContent}
+                  keyExtractor={(item, index) => index.toString()}
+                  data = { IconNames || ["md-create"]}
+                  renderItem={({ item }) => {
+                    return (
+                      <TouchableOpacity onPress={() => Alert.alert("IconName: " + item)}>
+                        <Ionicons
+                          name={item}
+                          size={Layout.moderateScale(24)}
+                          color={Colors.primaryColor}
+                          style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent' }}
+                        />
+                      </TouchableOpacity>
+                    )
+                  }}
+                />
+                : null }
+
+                    <ListRecentListings
+                      loginStatus={loginStatus}
+                      variables={{"limit":this.state.limit,"page":this.state.page}}
+                      chatIndexes={chatIndexes}
+                      currentUser={currentUser}
+                      createNew={() => this.checkAuthForCreate(loginStatus) } />
+                    <View style={styles.adSec}>
+                      <Text style={styles.mainadText}>
+                        Do you have something to sell or give away?
+                      </Text>
+                      <Text style={styles.subtitle}>
+                        Post it with us and we'll give you an audience.
+                      </Text>
+                    </View>
+                    <View>
+                      <ListVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                      <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                      <View style={styles.hr} />
+                      <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                    </View>
                   </View>
-                </View>
-              </Content>
-              <Fab
-                direction="up"
-                style={styles.fabStyle}
-                position="bottomRight"
-                onPress={() => this.checkAuthForCreate(loginStatus)}
-              >
-                <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
-              </Fab>
-            </Container>
+                </Content>
+                <Fab
+                  direction="up"
+                  style={styles.fabStyle}
+                  position="bottomRight"
+                  onPress={() => this.checkAuthForCreate(loginStatus)}
+                >
+                  <Icon name="ios-add" style={{ fontSize: Layout.moderateScale(20) }} />
+                </Fab>
+              </Container>
+            )}</GetCachedTranslations>
           )}</LastMessageIds>
         )}</LoginStatus>
       )
     }
   }
 }
+//)

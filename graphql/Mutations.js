@@ -23,8 +23,8 @@ mutation unsetAuthStatus( $id: Int! ) {
 }`
 
 const SET_COUNTRY = gql`
-mutation setCountry ( $countryCode: String! ) {
-  setCountry( countryCode: $countryCode) @client
+mutation setCountry ( $countryCode: String!, $iso639_2: String! ) {
+  setCountry( countryCode: $countryCode, iso639_2: $iso639_2) @client
 }`
 
 const FACEBOOK_LOGIN = gql`

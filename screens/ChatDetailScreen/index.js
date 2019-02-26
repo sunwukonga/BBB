@@ -28,9 +28,6 @@ import {
 , Input
 } from 'native-base'
 import { graphql, Query } from "react-apollo";
-import {
-  GET_CHAT_MESSAGES
-} from '../../graphql/Queries'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
 //import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Ionicons } from '@expo/vector-icons';

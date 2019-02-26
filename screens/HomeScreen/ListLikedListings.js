@@ -30,7 +30,7 @@ class ListLikedListings extends Component {
     if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
       return true
     }
-    if ( w(this.props, ['loginStatus', 'loginStatus']) !== w(nextProps, ['loginStatus', 'loginStatus']) ) {
+    if ( w(this.props, ['loginStatus', 'authorized']) !== w(nextProps, ['loginStatus', 'authorized']) ) {
       return true
     }
     return false;

@@ -10,7 +10,7 @@ class LastMessageIds extends Component {
   }
   render() {
     let { loginStatus } = this.props
-    if (!loginStatus.loginStatus) {
+    if (!loginStatus.authorized) {
       return this.props.children()
     }
     return (
