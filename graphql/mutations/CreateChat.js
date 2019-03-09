@@ -29,7 +29,7 @@ export const CreateChat = graphql(CREATE_CHAT) (
     }
 
     render() {
-      let {item, loginStatus, currentUser } = this.props
+      let {item, loginStatus } = this.props
 
 //      let optimisticResponse = optimisticCreateChat( item, currentUser )
 // , optimisticResponse: optimisticResponse

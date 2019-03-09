@@ -49,30 +49,35 @@ const ratingItems = [
 const idVerifications = [
   {
     id: 1
+  , locus: "AuthorVerifiedAccount"
   , description: "Author has logged in with a social media account"
   , ratingvalue: 1
   , checked: false
   },
   {
     id: 2
+  , locus: "AuthorVerifiedEmail"
   , description: "Author has verified an email address with us"
   , ratingvalue: 2
   , checked: false
   },
   {
     id: 3
+  , locus: "AuthorVerifiedNumber"
   , description: "Author has verified a phone number with us"
   , ratingvalue: 3
   , checked: false
   },
   {
     id: 4
+  , locus: "AuthorVerifiedID"
   , description: "Author has submitted a photo ID"
   , ratingvalue: 4
   , checked: false
   },
   {
     id: 5
+  , locus: "AuthorVerifiedDemonstratedID"
   , description: "Author has submitted a photo ID and demonstrated good conduct for 3 months or more"
   , ratingvalue: 5
   , checked: false

@@ -1,20 +1,14 @@
 import React, { Component } from 'react';
 import {
-  Image
-, TouchableOpacity
-, View
+  View
 } from 'react-native';
-import {
-  Text
-, Item
-} from 'native-base';
-import { withNavigation } from 'react-navigation'
+//import { withNavigation } from 'react-navigation'
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
-import Baby from '../../components/Baby';
-import IdentityVerification from '../../components/IdentityVerification';
-import BBBIcon from '../../components/BBBIcon';
-import Stars from '../../components/Stars';
+//import Baby from '../../components/Baby';
+//import IdentityVerification from '../../components/IdentityVerification';
+//import BBBIcon from '../../components/BBBIcon';
+//import Stars from '../../components/Stars';
 import CheckBox from '../../components/CheckBox';
 import CheckboxBlank from '../../components/CheckboxBlank';
 import CheckboxChecked from '../../components/CheckboxChecked';
@@ -35,7 +29,7 @@ class CategoryListItem extends Component {
           isChecked={categoryIds.includes(item.id)}
           onClick={() => this.props.onClickCategory({id: item.id, selected: !categoryIds.includes(item.id)})}
           checkBoxColor={'#fff'}
-          rightText={item.name}
+          rightText={item.childName}
           rightTextStyle={{
             color: Colors.secondaryColor,
             fontSize: Layout.moderateScale(18),
@@ -60,4 +54,4 @@ class CategoryListItem extends Component {
   }
 }
 
-export default withNavigation(CategoryListItem)
+export default CategoryListItem

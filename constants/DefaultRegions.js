@@ -48,6 +48,12 @@ const defaultRegions = {
   , latitudeDelta: 12.0345
   , longitudeDelta: 8.7933
   }
+, KW: {
+    latitude: 29.378586
+  , longitude: 47.990341
+  , latitudeDelta: 6.7351
+  , longitudeDelta: 6.5154
+  }
 , MY: {
     latitude: 3.6412
   , longitude: 102.1357

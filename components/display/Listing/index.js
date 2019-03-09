@@ -10,6 +10,7 @@ import {
 , Item
 , Fab
 } from 'native-base';
+import { graphql, compose } from "react-apollo";
 import { withNavigation } from 'react-navigation'
 import { MapView } from 'expo';
 import styles from './styles';
@@ -25,9 +26,27 @@ import CreateChat from '../../../graphql/mutations/CreateChat'
 import LastMessageIds from '../../../screens/ChatListScreen/LastMessageIds'
 import { optimisticCreateChat } from '../../../graphql/mutations/Optimistic.js'
 import GetProfile from '../../../graphql/queries/GetProfile'
-import { w } from '../../../utils/helpers.js'
+import { w, i18n } from '../../../utils/helpers.js'
+import {
+  GET_CACHED_TRANSLATIONS
+, GET_LOGIN_STATUS
+} from '../../../graphql/Queries'
 
-class Listing extends Component {
+const Listing = compose(
+  graphql(GET_LOGIN_STATUS, {name: "loginStatus"})
+, graphql(GET_CACHED_TRANSLATIONS, {
+    name: "i18n"
+  , skip: ({ loginStatus }) => !loginStatus
+  , options: ({loginStatus}) => ({
+      variables: {
+        locusId: 1
+      , countryCode: loginStatus.countryCode
+      }
+    , fetchPolicy: 'cache-only'
+    })
+  })
+)(
+class extends Component {
 
   constructor(props) {
     super(props);
@@ -99,7 +118,12 @@ class Listing extends Component {
   }
 
   render() {
-    let {item, loginStatus, chatIndexes, currentUser} = this.props
+    if ( !w(this.props, ['i18n', 'getCachedLocus']) ) {
+      return null
+    }
+    let {item, loginStatus, chatIndexes, i18n: {getCachedLocus: translations}} = this.props
+    const parentName = "ProductDetailsScreen"
+
     let exchangeMode = null
 
     if ( w(item, ['saleMode', 'exchangeModes', 'length']) > 0) {
@@ -146,7 +170,7 @@ class Listing extends Component {
           }}
         >
           <LikeButton item={item} loginStatus={loginStatus} />
-          <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+          <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} />
         </View>
         <Item style={styles.userItemDetailsSec}>
           <View style={{ flexDirection: 'row' }}>
@@ -186,21 +210,21 @@ class Listing extends Component {
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{alignSelf: 'flex-start'}}>
-            <Text style={styles.regularLarge}>Category</Text>
+            <Text style={styles.regularLarge}>{i18n(translations, parentName, "Category", loginStatus.iso639_2, "Category")}</Text>
             <Text style={[styles.regularSmall, styles.tagContainer]}>
-              {w(item, ['category', 'name'])}
+              {i18n(translations, parentName, w(item, ['category', 'locus']), loginStatus.iso639_2, w(item, ['category', 'name']))}
             </Text>
           </View>
           <View>
             <View style={styles.alignmentButton}>
               <View style={styles.saleButton}>
-                <Text style={styles.regularSmall}>{w(item, ['saleMode', 'mode']) ? item.saleMode.mode.toUpperCase() : ""}</Text>
+                <Text style={styles.regularSmall}>{i18n(translations, parentName, w(item, ['saleMode', 'mode']), loginStatus.iso639_2, w(item, ['saleMode', 'mode']))}</Text>
               </View>
             </View>
             { w(item, ['saleMode', 'counterOffer']) ?
             <View style={styles.alignmentButton}>
               <View style={styles.offerButton}>
-                <Text style={styles.regularSmall}>Counter Offers Welcome</Text>
+                <Text style={styles.regularSmall}>{i18n(translations, parentName, "OfferWelcome", loginStatus.iso639_2, "Counter Offers Welcome")}</Text>
               </View>
             </View>
             : null }
@@ -238,6 +262,7 @@ class Listing extends Component {
     )
   }
 }
+)
 
 export default withNavigation(Listing)
 

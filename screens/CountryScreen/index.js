@@ -120,9 +120,9 @@ const CountryScreen = compose (
         let countryInfoPromise = Expo.SecureStore.getItemAsync("countryInfo")
         Promise.all([countryInfoPromise])
         .then( ([ countryInfo ]) => {
-          console.log("countryInfo: ", countryInfo)
+          //console.log("countryInfo: ", countryInfo)
           if (countryInfo) {
-            console.log("CountryCode set by SecureStore")
+            //console.log("CountryCode set by SecureStore")
             let country = JSON.parse(countryInfo)
             this.gettingCountryCode = false
             this.setState({
@@ -146,6 +146,11 @@ const CountryScreen = compose (
         if (!this.mutationInFlight) {
           this.mutationInFlight = true
           let iso639_2 = w(country, ['languages', 0, iso639_2]) ? country.languages[0].iso639_2 : 'eng'
+          //console.log("Test: ", iso639_2)
+          //console.log("Country: ", country)
+          if ( w(country, ['iso639_2']) ) {
+            iso639_2 = country.iso639_2
+          }
           setCountry({ variables: { countryCode: country.isoCode, iso639_2: iso639_2 }})
           .then( () => {
             if (save) {

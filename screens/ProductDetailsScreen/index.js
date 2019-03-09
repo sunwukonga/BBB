@@ -18,8 +18,8 @@ import { ProgressDialog } from 'react-native-simple-dialogs';
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import Baby from '../../components/Baby';
-import IdentityVerification2 from '../../components/IdentityVerification2';
-import IdentityVerification from '../../components/IdentityVerification';
+//import IdentityVerification2 from '../../components/IdentityVerification2';
+//import IdentityVerification from '../../components/IdentityVerification';
 import BBBIcon from '../../components/BBBIcon';
 import Stars from '../../components/Stars';
 // style
@@ -50,21 +50,16 @@ class ProductDetailsScreen extends React.Component {
   render() {
     let {item, loginStatus} = this.props.navigation.state.params
 
-		var leftComponent = (
-			<Button transparent onPress={() => this.props.navigation.goBack()}>
-				<BBBIcon
-					name="BackArrow"
-					size={Layout.moderateScale(18)}
-					style={styles.backarrow}
-				/>
-			</Button>
-		);
+    var leftComponent = (
+      <Button transparent onPress={() => this.props.navigation.goBack()}>
+        <BBBIcon
+          name="BackArrow"
+          size={Layout.moderateScale(18)}
+          style={styles.backarrow}
+        />
+      </Button>
+    )
 
-    /*
-            <GetProfile loginStatus={loginStatus}>{ currentUser => (
-            )}</GetProfile>
-            */
-    let currentUser = {}
     return (
       <GetCachedListing listingId={item.id}>{ listing => (
         <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
@@ -74,7 +69,7 @@ class ProductDetailsScreen extends React.Component {
                 leftComponent={leftComponent}
               />
               <Content style={styles.contentStyle}>
-                <Listing item={listing} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+                <Listing item={listing} loginStatus={loginStatus} chatIndexes={chatIndexes} />
               </Content>
             </Container>
         )}</LastMessageIds>

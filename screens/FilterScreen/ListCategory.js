@@ -7,13 +7,14 @@ import {
 , ActivityIndicator
 } from 'react-native';
 import styles from './styles';
-import { withNavigation } from 'react-navigation'
+//import { withNavigation } from 'react-navigation'
 
 import {
   GET_NESTED_CATEGORY_LIST
 } from '../../graphql/Queries'
 import CategoryListItem from './CategoryListItem'
 import ExpandableList from 'react-native-expandable-section-flatlist';
+import { i18nTransformCategories } from '../../utils/helpers.js'
 
 
 class ListCategory extends Component {
@@ -22,11 +23,11 @@ class ListCategory extends Component {
   }
 
   render() {
-    const {categoryIds} = this.props
+        //fetchPolicy="cache-only"
+    const { categoryIds, loginStatus, translations } = this.props
     return (
       <Query
         query = {GET_NESTED_CATEGORY_LIST}
-        fetchPolicy="cache-only"
       >
         {({ data, fetchMore, networkStatus, refetch, error, variables}) => {
 
@@ -39,6 +40,7 @@ class ListCategory extends Component {
           if (!data.allCategoriesNested || data.allCategoriesNested.length == 0) {
             return null
           }
+          /*
           let inputData = []
           Object.keys(data.allCategoriesNested).forEach((key,index)=>{
             inputData.push({
@@ -47,18 +49,28 @@ class ListCategory extends Component {
             , data: data.allCategoriesNested[key].children
             })
           });
+          */
+
+          _renderRow = (rowItem, rowId, sectionId) => (
+            <CategoryListItem
+              item={rowItem}
+              categoryIds={categoryIds}
+              onClickCategory={(input) => this.props.onClickCategory(input)}
+            />
+          )
+
           return (
             <View>
               <ExpandableList
-                dataSource={inputData}
+                dataSource={i18nTransformCategories(data.allCategoriesNested, loginStatus, translations)}
                 headerKey="name"
                 memberKey="data"
-                renderRow={( item ) => <CategoryListItem item={item} categoryIds={categoryIds}  onClickCategory={(input) => this.props.onClickCategory(input)} /> }
-                renderSectionHeaderX={(section, sectionId)  =>(
-                      <View style={styles.mainlist}>
-                      <Text style={styles.SectionHeaderStyle}>{section}</Text>
-                      </View>
-                    )}
+                renderRow={ this._renderRow }
+                renderSectionHeaderX= { (section, sectionId) => (
+                  <View style={styles.mainlist}>
+                    <Text style={styles.SectionHeaderStyle}>{section}</Text>
+                  </View>
+                )}
               />
             </View>
           )
@@ -68,7 +80,7 @@ class ListCategory extends Component {
   }
 }
 
-export default withNavigation(ListCategory)
+export default ListCategory
 /*
               <FlatList
                 contentContainerStyle={styles.listContent}

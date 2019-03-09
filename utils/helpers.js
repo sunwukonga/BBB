@@ -2,13 +2,28 @@ import {
   AsyncStorage
 } from 'react-native'
 
-function i18n(translations, parentName, name, iso639_2) {
+function i18nTransformCategories(rawData, loginStatus, translations) {
+  let data = []
+  Object.keys(rawData).forEach( (key, index) => {
+    data.push({
+      id: rawData[key].id
+    , name: i18n(translations, rawData[key].locus.parentName, rawData[key].locus.name, loginStatus.iso639_2, rawData[key].name)
+    , data: rawData[key].children.map( child => ({
+        id: child.id
+      , childName: i18n(translations, child.locus.parentName, child.locus.name, loginStatus.iso639_2, child.name)
+      }))
+    })
+  })
+  return data
+}
+
+function i18n(translations, parentName, name, iso639_2, inSituDefault = "No default content defined") {
   let locus = null
   let content = null
-  let translation = null
+  let translation = inSituDefault
   if (findLocus(translations.children) !== undefined) {
     let loci = locus.content.filter( content => {
-      if (content.translations.find( tranlationObject => translationObject.iso639_2 == iso639_2) !== undefined) {
+      if (content.translations.find( translationObject => translationObject.iso639_2 == iso639_2) !== undefined) {
         return true
       } else return false
     })
@@ -21,7 +36,7 @@ function i18n(translations, parentName, name, iso639_2) {
     }
     if (content) {
       // Got a translation
-      translation = content.translations.find( tranlationObject => translationObject.iso639_2 == iso639_2).text
+      translation = content.translations.find( translationObject => translationObject.iso639_2 == iso639_2).text
     } else {
       // No appropriate translation.
       if (locus.content.length > 1) {
@@ -34,10 +49,10 @@ function i18n(translations, parentName, name, iso639_2) {
       if (content) {
         translation = content.meaning
       } else {
-        translation = "No content defined for locus!"
+        console.log("i18n: [", parentName, "][", name, "] content not defined")
       }
     }
-  } else translation = "Locus not found!"
+  } else console.log("i18n: [", parentName, "][", name, "] locus not found")
 
   return translation
 
@@ -52,7 +67,6 @@ function i18n(translations, parentName, name, iso639_2) {
         } else return true
       }
       return false
-      //} else console.log("Test: ", placeholder.parentName, ":", placeholder.name)
     })
   }
 }
@@ -173,6 +187,7 @@ export {
   updateChatMessages
 , w
 , i18n
+, i18nTransformCategories
 , getMethods
 , getElementByKey
 , fetchLastReadMessages

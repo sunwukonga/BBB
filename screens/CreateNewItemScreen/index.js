@@ -3,7 +3,6 @@ import {
   Image
 , Platform
 , ScrollView
-, StyleSheet
 , TouchableOpacity
 , View
 , ListView
@@ -26,38 +25,47 @@ import Baby from '../../components/Baby';
 import RedioSelected from '../../components/RedioSelected';
 import RedioUnselect from '../../components/RedioUnselect';
 import Add from '../../components/Add';
-import SearchBtn from '../../components/SearchBtn';
+//import SearchBtn from '../../components/SearchBtn';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+//import FontAwesome from 'react-native-vector-icons/FontAwesome';
+//import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 //import Dropdown from '../../components/Dropdown/dropdown';
 import { create } from 'apisauce';
 import getSignedUrl from './SignedUrl';
-import createNewItemUrl from './CreateNewItem';
+//import createNewItemUrl from './CreateNewItem';
 import styles from './styles';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from 'react-native-check-box';
 import { Layout, Colors, Images, Constants, defaultRegions } from '../../constants/';
 import { ProgressDialog,Dialog } from 'react-native-simple-dialogs';
 import Toast, {DURATION} from 'react-native-easy-toast';
+import Collapsible from 'react-native-collapsible';
+import ModalFilterPicker from 'react-native-modal-filter-picker';
+import { StackActions, NavigationActions } from 'react-navigation';
+import { graphql, compose } from "react-apollo";
 //import Toast from 'react-native-simple-toast';
+//-----------------
 import getCategoryList from './AllCategoryApi';
 import getTemplateList from './SearchTemplateApi';
-import ModalFilterPicker from 'react-native-modal-filter-picker';
+
 import LoginStatus from '../HomeScreen/LoginStatus'
-import { w, getMethods } from '../../utils/helpers.js'
-import { StackActions, NavigationActions } from 'react-navigation';
+import { w, i18n, getMethods } from '../../utils/helpers.js'
 
 import { CreateListing } from '../../graphql/mutations/CreateListing'
 import GetCachedCountry from '../../graphql/queries/GetCachedCountry'
+import {
+  GET_CACHED_TRANSLATIONS
+, GET_LOGIN_STATUS
+} from '../../graphql/Queries'
 
-import Collapsible from 'react-native-collapsible';
+
 var dataObjectsCates = [];
 var dataObjectsTags = [];
 var tagsList = [];
 var imageList=[];
 var imageUploadList=[];
+
 // Navigation Actions
 const resetAction = StackActions.reset({
   index: 1,
@@ -81,117 +89,27 @@ const SA_CreateToProduct = (item, loginStatus) => StackActions.reset({
   ]
 })
 
-var defaultRegions2 = {
-  AU: {
-    latitude: -28
-  , longitude: 133
-  , latitudeDelta: 50.86
-  , longitudeDelta: 41.8
-  }
-, BN: {
-    latitude: 4.638
-  , longitude: 114.736
-  , latitudeDelta: 0.40
-  , longitudeDelta: 0.20
-  }
-, CA: {
-    latitude: 57
-  , longitude: -103
-  , latitudeDelta: 50
-  , longitudeDelta: 42
-  }
-, CO: {
-    latitude: 4.588
-  , longitude: -73.421
-  , latitudeDelta: 17.52
-  , longitudeDelta: 12.87
-  }
-, GB: {
-    latitude: 54.387
-  , longitude: -2.6401
-  , latitudeDelta: 8.7517
-  , longitudeDelta: 11.013
-  }
-, HK: {
-    latitude: 22.3979
-  , longitude: 114.1232
-  , latitudeDelta: 0.7406
-  , longitudeDelta: 0.5961
-  }
-, ID: {
-    latitude: -6.8639
-  , longitude: 106.7067
-  , latitudeDelta: 6.6091
-  , longitudeDelta: 4.8574
-  }
-, KE: {
-    latitude: 0.6815
-  , longitude: 37.7088
-  , latitudeDelta: 12.0345
-  , longitudeDelta: 8.7933
-  }
-, MY: {
-    latitude: 3.6412
-  , longitude: 102.1357
-  , latitudeDelta: 7.0831
-  , longitudeDelta: 5.1832
-  }
-, NL: {
-    latitude: 52.2921
-  , longitude: 5.2091
-  , latitudeDelta: 1.6988
-  , longitudeDelta: 1.9105
-  }
-, NZ: {
-    latitude: -40.6930
-  , longitude: 172.5650
-  , latitudeDelta: 6.7351
-  , longitudeDelta: 6.5154
-  }
-, PH: {
-    latitude: 11.6910
-  , longitude: 121.7470
-  , latitudeDelta: 8.0
-  , longitudeDelta: 6.0
-  }
-, RW: {
-    latitude: -1.8065
-  , longitude: 29.7260
-  , latitudeDelta: 3.4700
-  , longitudeDelta: 2.5322
-  }
-, SG: {
-    latitude: 1.352754
-  , longitude: 103.822713
-  , latitudeDelta: 0.16
-  , longitudeDelta: 0.08
-  }
-, TZ: {
-    latitude: -5.2947
-  , longitude: 34.3738
-  , latitudeDelta: 5.3953
-  , longitudeDelta: 4.0498
-  }
-, US: {
-    latitude: 37.5319
-  , longitude: -99.3410
-  , latitudeDelta: 49.8391
-  , longitudeDelta: 49.4714
-  }
-}
-/**
-Catgeory List Details
-*/
-var allCategoryList = [];
-var allCategoryValueList = [];
 var currency = ''
 var postCurrency = ''
-export default class CreateNewItemScreen extends React.Component {
+
+
+export default CreateNewItemScreen = compose(
+  graphql(GET_LOGIN_STATUS, {name: "loginStatus"})
+, graphql(GET_CACHED_TRANSLATIONS, {
+    name: "i18n"
+  , skip: ({ loginStatus }) => !loginStatus
+  , options: ({loginStatus}) => ({
+      variables: {
+        locusId: 1
+      , countryCode: loginStatus.countryCode
+      }
+    , fetchPolicy: 'cache-only'
+    })
+  })
+)(
+class extends React.Component {
   constructor(props) {
     super(props);
-    //let location = await Location.getCurrentPositionAsync({})
-    //location.coords.latitude; location.coords.longitude
-    // defaultLocation
 
     const rowHasChanged = (r1, r2) => r1 !== r2;
 
@@ -203,24 +121,7 @@ export default class CreateNewItemScreen extends React.Component {
     if (imageList.length == 0) {
       imageList.push({ id:'addImageButton', imageId:0,url: Images.trollie,inputFlag:true });
     }
-/*
-      coordinates: {
-        latitudenull
-                                coordinate={this.state.marker.latlng}
-                                title={this.state.marker.title}
-                                description={this.state.marker.description}
-                                */
-    /*
-    , marker: {
-        latlng: {
-          latitude: 1.3688819
-        , longitude: 103.8969434
-        }
-      , description: "Description"
-      , title: "Title"
-      }
-      */
-//TODO: add toast to display errors
+    //TODO: add toast to display errors
     this.state = {
       visible: false
     , location: null
@@ -234,7 +135,6 @@ export default class CreateNewItemScreen extends React.Component {
     , selectedTagName: null
     , selectedTagId:null
     , tagVisible:false
-    , allCategoryList:[]
     , allCategoryValueList:[]
     , searchTemplateList:[]
     , searchTemplateValueList:[]
@@ -253,10 +153,6 @@ export default class CreateNewItemScreen extends React.Component {
     , showDialog:false
     , errorMsg:''
     , dialogTitle:''
-
-  //    _pickImage = this._pickImage
-
-      // Data for mutation i.e. create item
     , mode: Constants.SALE
     , images: imageList
     , cost: 0.0
@@ -297,7 +193,7 @@ export default class CreateNewItemScreen extends React.Component {
         this.setState({
           errorMessage: 'Permission to access location was denied',
         });
-        this.toast.show("Oooops, not permission to access location", DURATION.LENGTH_LONG);
+        this.toast.show("Oooops, no permission to access location", DURATION.LENGTH_LONG);
       } else {
         let maxDelayPromise = new Promise( (resolve, reject) => {
           setTimeout(() => reject('Took too long'), 5000)
@@ -305,19 +201,12 @@ export default class CreateNewItemScreen extends React.Component {
         await Promise.race([Location.getCurrentPositionAsync({enableHighAccuracy: false}), maxDelayPromise])
         .then( myLocation => {
           return this.setState({
-            region: { ...this.state.region, longitude: myLocation.coords.longitude, latitude: myLocation.coords.latitude }
+            region: { ...this.state.region, longitude: myLocation.coords.longitude, latitude: myLocation.coords.latitude, latitudeDelta: 0.009, longitudeDelta: 0.009*Math.cos(Math.PI*latitude/180)}
           })
         })
         .catch( value => {
           this.toast.show("GPS location fails if 'Device Only' mode is enabled on your android", 2000);
         })
-        /*
-        let myLocation = await Location.getCurrentPositionAsync({enableHighAccuracy: false})
-        console.log("Location: ", myLocation.coords)
-        await this.setState({
-          region: { ...this.state.region, longitude: myLocation.coords.longitude, latitude: myLocation.coords.latitude }
-        })
-        */
       }
     } catch (error) {
       console.log(error);
@@ -359,23 +248,6 @@ export default class CreateNewItemScreen extends React.Component {
         this.toast.show("Please Select Category", DURATION.LENGTH_LONG);
         return false;
     }
-    /*
-    if(this.state.address.lineOne.length>=1 || this.state.address.lineTwo.length>=1 || this.state.address.postcode.length>=1){
-      if(this.state.address.lineOne.length===0){
-        this.toast.show("Please Enter Address Line 1", DURATION.LENGTH_LONG);
-        return false;
-      }
-      if(this.state.address.lineTwo.length===0){
-        this.toast.show("Please Enter Address Line 2", DURATION.LENGTH_LONG);
-          return false;
-      }
-      if(this.state.address.postcode.length===0){
-        this.toast.show("Please Enter Postcode", DURATION.LENGTH_LONG);
-          return false;
-      }
-    }
-    */
-
 
     if(postCurrency.length == 0 || (this.state.postCost && this.state.postCost == 0.0)){
       if (postCurrency.length===0){
@@ -518,13 +390,12 @@ export default class CreateNewItemScreen extends React.Component {
       progressVisible: true,
     });
     getCategoryList().then((res)=>{
+        let allCategoryValueList = []
         Object.keys(res.data.allCategoriesFlat).forEach((key,index)=>{
-              allCategoryList.push(res.data.allCategoriesFlat[key]);
               allCategoryValueList.push({label:res.data.allCategoriesFlat[key].name,key:res.data.allCategoriesFlat[key].id});
         });
 
         this.setState({
-          allCategoryList:allCategoryList,
           allCategoryValueList:allCategoryValueList,
           progressVisible: false,
         })
@@ -575,7 +446,7 @@ export default class CreateNewItemScreen extends React.Component {
             <TouchableOpacity onPress={() => this._pickImage()}>
               <View style={styles.addIcon}>
                 <Add width={Layout.HEIGHT * 0.03} height={Layout.HEIGHT * 0.03} />
-                <Text style={styles.addimage}>Add Image</Text>
+                <Text style={styles.addimage}>{item.addImageTranslation}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -618,7 +489,6 @@ export default class CreateNewItemScreen extends React.Component {
       //console.log("EXIF: ", pickerResult.exif)
       this.setState({
         progressVisible: true,
-        progressMsg:"Validating Image..."
       });
       // https://docs.expo.io/versions/latest/sdk/filesystem#expofilesystemgetinfoasyncfileuri-options
       /*let hashPromise = new Promise(function(resolve, reject) {
@@ -766,36 +636,9 @@ export default class CreateNewItemScreen extends React.Component {
 
   // Copied from: https://github.com/expo/image-upload-example/blob/master/frontend/App.js
   _uploadImageAsync = async (uri,base64) => {
-    /*
-    let apiUrl = 'https://s3-ap-southeast-1.amazonaws.com/bbb-app-images';
 
-    let uriParts = uri.split('.');
-    let fileType = uriParts[uriParts.length - 1];
-
-    let formData = new FormData();
-    formData.append('photo', {
-      uri,
-      name: `photo.${fileType}`,
-      type: `image/${fileType}`,
-    });
-
-    let options = {
-      method: 'POST',
-      body: formData,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'multipart/form-data',
-      },
-    };
-
-    return fetch(apiUrl, options);
-    */
     this.setState({
       progressVisible: true,
-      progressMsg:"Image Uploading..."
-    });
-    const api = create({
-      baseURL: 'https://bbb-app-images.s3.amazonaws.com',
     })
 
     // create formdata
@@ -834,13 +677,16 @@ export default class CreateNewItemScreen extends React.Component {
     .then( (data) => {
       // post your data.
       if (data) {
+        const api = create({
+          baseURL: 'https://bbb-app-images.s3.amazonaws.com',
+        })
         return api.post('', data, {
           onUploadProgress: (e) => {
             const progress = e.loaded / e.total;
-
           }
         })
-      } return null
+      }
+      return null
     })
     .then( (response) =>{
       if ( w(response, ['ok']) ) {
@@ -857,7 +703,6 @@ export default class CreateNewItemScreen extends React.Component {
       
       this.setState({
         progressVisible: false,
-        progressMsg:"Please Wait..."
       })
     })
   }
@@ -891,7 +736,6 @@ export default class CreateNewItemScreen extends React.Component {
 
     this.setState({
       images:imageList
-
     })
   }
 
@@ -924,7 +768,6 @@ export default class CreateNewItemScreen extends React.Component {
 
 
   onPressAdd = () => {
-    // console.log(this.state.texts);
     var idss = dataObjectsCates.length + 1;
     dataObjectsCates.push({ id: idss.toString(), text: this.state.text });
     const ds = new ListView.DataSource({
@@ -1133,6 +976,11 @@ export default class CreateNewItemScreen extends React.Component {
                             }
                             */
   render() {
+    if (this.state.loading || !w(this.props, ['i18n', 'getCachedLocus'])) {
+      return null
+    }
+    const { navigation, loginStatus, i18n: {getCachedLocus: translations} } = this.props;
+    const parentName = "CreateNewItemScreen"
 
     var leftComponent = (
       <Button transparent onPress={() => this.props.navigation.goBack()}>
@@ -1167,377 +1015,376 @@ export default class CreateNewItemScreen extends React.Component {
     var _this = this;
 
     return (
-      <LoginStatus>{ loginStatus => (
-        <GetCachedCountry loginStatus={loginStatus}>{ country => {
-          if (currency === '') {
-            currency = country.currencies[0].iso4217
-          }
-          if (postCurrency === '') {
-            postCurrency = country.currencies[0].iso4217
-          }
-          return (
-          <View style={styles.container}>
-            <BBBHeader
-            title="Create A New Item"
-            leftComponent={leftComponent}
-            rightComponent={rightComponent(loginStatus)}
-            />
-            <Toast ref={component => this.toast = component}/>
-            <ScrollView
-              style={styles.container}
-              contentContainerStyle={styles.contentContainer}
-            >
-              <View style={styles.imagesMainView}>
-                <FlatList
-                  horizontal={true}
-                  data={this.state.images}
-                  extraData={this.state}
-                  keyExtractor={(item, index) => item.id }
-                  renderItem={this._renderRow.bind(this)}
-                  contentContainerStyle={styles.listContents}
+      <GetCachedCountry loginStatus={loginStatus}>{ country => {
+        if (currency === '') {
+          currency = country.currencies[0].iso4217
+        }
+        if (postCurrency === '') {
+          postCurrency = country.currencies[0].iso4217
+        }
+        return (
+        <View style={styles.container}>
+          <BBBHeader
+          title={i18n(translations, parentName, "CreateItem", loginStatus.iso639_2, "Create A New Item")}
+          leftComponent={leftComponent}
+          rightComponent={rightComponent(loginStatus)}
+          />
+          <Toast ref={component => this.toast = component}/>
+          <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.contentContainer}
+          >
+            <View style={styles.imagesMainView}>
+              <FlatList
+                horizontal={true}
+                data={this.state.images.map( image => Object.assign({}, image, {addImageTranslation: i18n(translations, parentName, "AddImage", loginStatus.iso639_2, "Add Image") }))}
+                extraData={this.state}
+                keyExtractor={(item, index) => item.id }
+                renderItem={this._renderRow.bind(this)}
+                contentContainerStyle={styles.listContents}
+              />
+            </View>
+            <View style={styles.Descrip}>
+              <Text style={styles.txtTitle}>{i18n(translations, parentName, "Title", loginStatus.iso639_2, "Title")}</Text>
+              <Item style={styles.txtInput} regular>
+                <Input
+                  blurOnSubmit={ false }
+                  onSubmitEditing={() => { this.focusNextField("two") }}
+                  returnKeyType={ "next" }
+                  ref={ (el) => this.inputs['one'] = el }
+                  onChangeText={(text) => {
+                    this.setState({ title:text});
+                  }}
+                  maxLength={50}
                 />
-              </View>
-              <View style={styles.Descrip}>
-                <Text style={styles.txtTitle}>Title</Text>
-                <Item style={styles.txtInput} regular>
-                  <Input
-                    blurOnSubmit={ false }
-                    onSubmitEditing={() => { this.focusNextField("two") }}
-                    returnKeyType={ "next" }
-                    ref={ (el) => this.inputs['one'] = el }
-                    onChangeText={(text) => {
-                      this.setState({ title:text});
-                    }}
-                    maxLength={50}
-                  />
-                  <Text style={styles.txtcount}>{this.state.title.length}/50</Text>
-                </Item>
-              </View>
+                <Text style={styles.txtcount}>{this.state.title.length}/50</Text>
+              </Item>
+            </View>
 
-              <View style={styles.Descrip}>
-                <Text style={styles.txtTitle}>Description</Text>
-                <Item style={styles.txtInput} regular>
-                  <Input
-                    blurOnSubmit={ false }
-                    multiline={true}
-                    style={{
-                      height: Layout.HEIGHT * 0.1,
-                      marginBottom: Layout.HEIGHT * 0.015,
-                    }}
-                    returnKeyType={ "done" }
-                    ref={ (el) => this.inputs['two'] = el }
-                    onChangeText={text => { this.setState({ longDesc:text }); }}
-                    maxLength={191}
-                  />
-                  <Text style={styles.txtcount}>{this.state.longDesc.length}/191</Text>
-                </Item>
-              </View>
+            <View style={styles.Descrip}>
+              <Text style={styles.txtTitle}>{i18n(translations, parentName, "Description", loginStatus.iso639_2, "Description")}</Text>
+              <Item style={styles.txtInput} regular>
+                <Input
+                  blurOnSubmit={ false }
+                  multiline={true}
+                  style={{
+                    height: Layout.HEIGHT * 0.1,
+                    marginBottom: Layout.HEIGHT * 0.015,
+                  }}
+                  returnKeyType={ "done" }
+                  ref={ (el) => this.inputs['two'] = el }
+                  onChangeText={text => { this.setState({ longDesc:text }); }}
+                  maxLength={191}
+                />
+                <Text style={styles.txtcount}>{this.state.longDesc.length}/191</Text>
+              </Item>
+            </View>
 
-                <View style={styles.dataFacetoFace}>
-                  <Text style={styles.txtTitle}>Category</Text>
-                  <View>
-                    <View style={styles.categoryTxtView}>
-                      <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
-                      {this.state.selectedCateName === null
-                      ? <Text regular>Select Category</Text>
-                      : (
-                        <Text regular>{this.state.selectedCateName}</Text>
-                      )}
-                      </TouchableOpacity>
-                    </View>
-                    <ModalFilterPicker
-                      key={1}
-                      visible={this.state.visible}
-                      onSelect={this.onSelect}
-                      onCancel={this.onCancel}
-                      selectedOption={w(this, ['state', 'selectedCateId']) ? this.state.selectedCateId.toString() : ''}
-                      options={this.state.allCategoryValueList}
-                    />
+              <View style={styles.dataFacetoFace}>
+                <Text style={styles.txtTitle}>{i18n(translations, parentName, "Category", loginStatus.iso639_2, "Category")}</Text>
+                <View>
+                  <View style={styles.categoryTxtView}>
+                    <TouchableOpacity  onPress={this.onShow}  style={styles.txtCategoryInput}>
+                    {this.state.selectedCateName === null
+                    ? <Text regular>{i18n(translations, parentName, "SelectCategory", loginStatus.iso639_2, "Select Category")}</Text>
+                    : (
+                      <Text regular>{this.state.selectedCateName}</Text>
+                    )}
+                    </TouchableOpacity>
                   </View>
+                  <ModalFilterPicker
+                    key={1}
+                    visible={this.state.visible}
+                    onSelect={this.onSelect}
+                    onCancel={this.onCancel}
+                    selectedOption={w(this, ['state', 'selectedCateId']) ? this.state.selectedCateId.toString() : ''}
+                    options={this.state.allCategoryValueList}
+                  />
                 </View>
+              </View>
 
-                  <View style={styles.exchangeMode}>
-                    <Text style={styles.txtExch}>Exchange Mode</Text>
-                    <View style={styles.saleview}>
-                      <TouchableOpacity onPress={this.onPressHeadSale}>
-                        <View style={styles.saleHeader}>
-                          {this.state.isCollapsedSale
-                          ? (
+                <View style={styles.exchangeMode}>
+                  <Text style={styles.txtExch}>{i18n(translations, parentName, "ExchangeMode", loginStatus.iso639_2, "Exchange Mode")}</Text>
+                  <View style={styles.saleview}>
+                    <TouchableOpacity onPress={this.onPressHeadSale}>
+                      <View style={styles.saleHeader}>
+                        {this.state.isCollapsedSale
+                        ? (
+                        <Feather
+                          name="circle"
+                          style={{
+                            width: Layout.moderateScale(30),
+                            height: Layout.moderateScale(30),
+                            fontSize: Layout.moderateScale(30),
+                            color: '#c8c8c8',
+                          }}
+                        />
+                        ) : (
+                        <RedioSelected width={Layout.moderateScale(30)} height={Layout.moderateScale(30)} />
+                        )}
+                        <Text style={styles.txtfacetoFace}>{i18n(translations, parentName, "Sale", loginStatus.iso639_2, "Sale")}</Text>
+                      </View>
+                    </TouchableOpacity>
+                    {this.state.isCollapsedSale ? null : (
+                    <View style={styles.bottomline} />
+                    )}
+                    <Collapsible collapsed={this.state.isCollapsedSale}>
+                      <View style={styles.saleChild}>
+                        <View style={styles.subFacetoFace}>
+                          <View style={styles.dataFacetoFace}>
+                            <Text style={styles.txtTitle}>{i18n(translations, parentName, "Currency", loginStatus.iso639_2, "Currency")}</Text>
+                            <Picker
+                              style={styles.dateDropDown}
+                              onValueChange={(value, index, data) => { currency = value }}
+                            >
+                              {country.currencies.map((c, i) => {
+                                return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
+                              })}
+                            </Picker>
+                          </View>
+                          <View style={styles.dataFacetoFace}>
+                            <Text style={styles.txtTitle}>{i18n(translations, parentName, "Price", loginStatus.iso639_2, "Price")}</Text>
+                            <Item style={styles.txtInput} regular>
+                              <Input keyboardType="numeric"  onChangeText={(text) => this.setState({cost: text})} />
+                            </Item>
+                          </View>
+                        </View>
+                        <CheckBox
+                          style={styles.chboxRemember}
+                          onClick={() => this.setState({ counterOffer: !this.state.counterOffer })}
+                          isChecked={this.state.counterOffer}
+                          checkBoxColor={'#fff'}
+                          rightText={i18n(translations, parentName, "AllowCounter", loginStatus.iso639_2, "Allow counter offer")}
+                          rightTextStyle={{
+                            color: 'black',
+                              fontSize: 20,
+                              marginLeft: 20,
+                              fontFamily: 'roboto-reguler',
+                          }}
+                          unCheckedImage={
+                            <Ionicons
+                            name="ios-square-outline"
+                            size={Layout.moderateScale(20)}
+                            color="black"
+                            style={styles.cancle}
+                            />
+                          }
+                          checkedImage={
+                            <Ionicons
+                            name="ios-checkbox-outline"
+                            size={Layout.moderateScale(20)}
+                            color="black"
+                            style={styles.cancle}
+                            />
+                          }
+                        />
+                      </View>
+                    </Collapsible>
+                  </View>
+
+                  <View style={styles.saleview}>
+                    <TouchableOpacity onPress={this.onPressHeadDonate}>
+                      <View style={styles.saleHeader}>
+                        {this.state.isCollapsedDonate ? (
                           <Feather
-                            name="circle"
-                            style={{
-                              width: Layout.moderateScale(30),
+                          name="circle"
+                          style={{
+                            width: Layout.moderateScale(30),
                               height: Layout.moderateScale(30),
                               fontSize: Layout.moderateScale(30),
                               color: '#c8c8c8',
-                            }}
+                          }}
                           />
-                          ) : (
-                          <RedioSelected width={Layout.moderateScale(30)} height={Layout.moderateScale(30)} />
-                          )}
-                          <Text style={styles.txtfacetoFace}>Sale</Text>
-                        </View>
-                      </TouchableOpacity>
-                      {this.state.isCollapsedSale ? null : (
-                      <View style={styles.bottomline} />
-                      )}
-                      <Collapsible collapsed={this.state.isCollapsedSale}>
-                        <View style={styles.saleChild}>
-                          <View style={styles.subFacetoFace}>
-                            <View style={styles.dataFacetoFace}>
-                              <Text style={styles.txtTitle}>Currency</Text>
-                              <Picker
-                                style={styles.dateDropDown}
-                                onValueChange={(value, index, data) => { currency = value }}
-                              >
-                                {country.currencies.map((c, i) => {
-                                  return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
-                                })}
-                              </Picker>
-                            </View>
-                            <View style={styles.dataFacetoFace}>
-                              <Text style={styles.txtTitle}>Price</Text>
-                              <Item style={styles.txtInput} regular>
-                                <Input keyboardType="numeric"  onChangeText={(text) => this.setState({cost: text})} />
-                              </Item>
-                            </View>
-                          </View>
-                          <CheckBox
-                            style={styles.chboxRemember}
-                            onClick={() => this.setState({ counterOffer: !this.state.counterOffer })}
-                            isChecked={this.state.counterOffer}
-                            checkBoxColor={'#fff'}
-                            rightText={'Allow counter offer'}
-                            rightTextStyle={{
-                              color: 'black',
-                                fontSize: 20,
-                                marginLeft: 20,
-                                fontFamily: 'roboto-reguler',
-                            }}
-                            unCheckedImage={
-                              <Ionicons
-                              name="ios-square-outline"
-                              size={Layout.moderateScale(20)}
-                              color="black"
-                              style={styles.cancle}
-                              />
-                            }
-                            checkedImage={
-                              <Ionicons
-                              name="ios-checkbox-outline"
-                              size={Layout.moderateScale(20)}
-                              color="black"
-                              style={styles.cancle}
-                              />
-                            }
+                        ) : (
+                          <RedioSelected
+                          width={Layout.moderateScale(30)}
+                          height={Layout.moderateScale(30)}
                           />
-                        </View>
-                      </Collapsible>
-                    </View>
-
-                    <View style={styles.saleview}>
-                      <TouchableOpacity onPress={this.onPressHeadDonate}>
-                        <View style={styles.saleHeader}>
-                          {this.state.isCollapsedDonate ? (
-                            <Feather
-                            name="circle"
-                            style={{
-                              width: Layout.moderateScale(30),
-                                height: Layout.moderateScale(30),
-                                fontSize: Layout.moderateScale(30),
-                                color: '#c8c8c8',
-                            }}
-                            />
-                          ) : (
-                            <RedioSelected
-                            width={Layout.moderateScale(30)}
-                            height={Layout.moderateScale(30)}
-                            />
-                          )}
-                          <Text style={styles.txtfacetoFace}>Donate</Text>
-                        </View>
-                      </TouchableOpacity>
-                      {this.state.isCollapsedDonate ? null : (
-                      <View style={styles.bottomline} />
-                      )}
-                      <Collapsible collapsed={this.state.isCollapsedDonate}>
-                        <View style={styles.saleChild}>
-                          <View style={styles.subFacetoFace}>
-                            <View style={styles.dataFacetoFace}>
-                              <Text style={styles.txtTitle}>Address</Text>
-                              <Item style={styles.txtInput} regular>
-                                <Input />
-                              </Item>
-                            </View>
-                          </View>
-                        </View>
-                      </Collapsible>
-                    </View>
-                  </View>
-
-                  <View style={styles.deliveryOption}>
-                    <Text style={styles.txtDelOpt}>Delivery Options</Text>
-                    <View style={styles.faceToFace}>
-                      <Text style={styles.txtfacetoFace}>Face to Face</Text>
-                      <View style={styles.bottomline} />
-                      <View style={styles.subFacetoFace}>
-                        <View style={styles.dataFacetoFace}>
-                          { w(this.state, ['address', 'lat']) &&
-                          <Item style={styles.txtInput} regular>
-                            <Text>Latitude: {this.state.address.lat.toFixed(3)} Longitude: {this.state.address.long.toFixed(3)}</Text>
-                          </Item>
-                          }
-                          <Item style={styles.txtInput} regular>
-                            <TextInput
-                              onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, name: text} });
-                              }}
-                              style={{  flex:1 }}
-                              placeholder="24"
-                              placeTextColor={Colors.lightGray}
-                            />
-                          </Item>
-                          <Item style={styles.txtInput} regular>
-                            <TextInput
-                              onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, street: text} });
-                              }}
-                              style={{  flex:1 }}
-                              placeholder="Smith St"
-                              placeTextColor={Colors.lightGray}
-                            />
-                          </Item>
-                          <Item style={styles.txtInput} regular>
-                            <TextInput
-                              onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, city: text} });
-                              }}
-                              style={{  flex:1 }}
-                              placeholder={country.name}
-                              placeTextColor={Colors.lightGray}
-                            />
-                          </Item>
-                          <Item style={styles.txtInput} regular>
-                            <TextInput
-                              onChangeText={(text) => {
-                                this.setState({ address: { ...this.state.address, region: text} });
-                              }}
-                              style={{  flex:1 }}
-                              placeholder="Hougang"
-                              placeTextColor={Colors.lightGray}
-                            />
-                          </Item>
-                          <View>
+                        )}
+                        <Text style={styles.txtfacetoFace}>{i18n(translations, parentName, "Donate", loginStatus.iso639_2, "Donate")}</Text>
+                      </View>
+                    </TouchableOpacity>
+                    {this.state.isCollapsedDonate ? null : (
+                    <View style={styles.bottomline} />
+                    )}
+                    <Collapsible collapsed={this.state.isCollapsedDonate}>
+                      <View style={styles.saleChild}>
+                        <View style={styles.subFacetoFace}>
+                          <View style={styles.dataFacetoFace}>
+                            <Text style={styles.txtTitle}>Address</Text>
                             <Item style={styles.txtInput} regular>
-                              <TextInput
-                                onChangeText={(text) => {
-                                  this.setState({ address: { ...this.state.address, postcode: text} });
-                                }}
-                                style={{  flex:1 }}
-                                placeholder="138325"
-                                placeTextColor={Colors.lightGray}
-                              />
+                              <Input />
                             </Item>
-                            <TouchableOpacity onPress={this._onSearchAddress}>
-                              <BBBIcon name="Search" style={styles.searchicon} />
-                            </TouchableOpacity>
                           </View>
                         </View>
-                        <View style={styles.mapFacetoFace}>
-                          <MapView
-                            initialRegion={defaultRegions[country.isoCode]}
-                            region={this.state.region}
-                            style={{ flex: 1 }}
-                            onLongPress={(e) => {
-                              if (e.nativeEvent) {
-                                this.setState({
-                                  marker: { ...this.state.marker, latlng: e.nativeEvent.coordinate, title: 'title', descrpition: 'description' }
-                                , address: { ...this.state.address, lat: e.nativeEvent.coordinate.latitude, long: e.nativeEvent.coordinate.longitude }
-                                })
-                              } else { console.log("onLongPressEvente: ", e) }}}
-                            showsUserLocation
-                            showsMyLocationButton
-                          >
-                            { this.state.marker &&
-                            <MapView.Marker
-                              coordinate={this.state.marker.latlng}
-                              title={this.state.marker.title}
-                              description={this.state.marker.description}
+                      </View>
+                    </Collapsible>
+                  </View>
+                </View>
+
+                <View style={styles.deliveryOption}>
+                  <Text style={styles.txtDelOpt}>{i18n(translations, parentName, "DeliveryOptions", loginStatus.iso639_2, "Delivery Options")}</Text>
+                  <View style={styles.faceToFace}>
+                    <Text style={styles.txtfacetoFace}>{i18n(translations, parentName, "Face to Face", loginStatus.iso639_2, "Face to Face")}</Text>
+                    <View style={styles.bottomline} />
+                    <View style={styles.subFacetoFace}>
+                      <View style={styles.dataFacetoFace}>
+                        { w(this.state, ['address', 'lat']) &&
+                        <Item style={styles.txtInput} regular>
+                          <Text>{i18n(translations, parentName, "Latitude", loginStatus.iso639_2, "Latitude")}: {this.state.address.lat.toFixed(3)} {i18n(translations, parentName, "Longitude", loginStatus.iso639_2, "Longitude")}: {this.state.address.long.toFixed(3)}</Text>
+                        </Item>
+                        }
+                        <Item style={styles.txtInput} regular>
+                          <TextInput
+                            onChangeText={(text) => {
+                              this.setState({ address: { ...this.state.address, name: text} });
+                            }}
+                            style={{  flex:1 }}
+                            placeholder="24"
+                            placeTextColor={Colors.lightGray}
+                          />
+                        </Item>
+                        <Item style={styles.txtInput} regular>
+                          <TextInput
+                            onChangeText={(text) => {
+                              this.setState({ address: { ...this.state.address, street: text} });
+                            }}
+                            style={{  flex:1 }}
+                            placeholder="Smith St"
+                            placeTextColor={Colors.lightGray}
+                          />
+                        </Item>
+                        <Item style={styles.txtInput} regular>
+                          <TextInput
+                            onChangeText={(text) => {
+                              this.setState({ address: { ...this.state.address, city: text} });
+                            }}
+                            style={{  flex:1 }}
+                            placeholder={country.name}
+                            placeTextColor={Colors.lightGray}
+                          />
+                        </Item>
+                        <Item style={styles.txtInput} regular>
+                          <TextInput
+                            onChangeText={(text) => {
+                              this.setState({ address: { ...this.state.address, region: text} });
+                            }}
+                            style={{  flex:1 }}
+                            placeholder="Hougang"
+                            placeTextColor={Colors.lightGray}
+                          />
+                        </Item>
+                        <View>
+                          <Item style={styles.txtInput} regular>
+                            <TextInput
+                              onChangeText={(text) => {
+                                this.setState({ address: { ...this.state.address, postcode: text} });
+                              }}
+                              style={{  flex:1 }}
+                              placeholder="138325"
+                              placeTextColor={Colors.lightGray}
                             />
-                            }
-                          </MapView>
+                          </Item>
+                          <TouchableOpacity onPress={this._onSearchAddress}>
+                            <BBBIcon name="Search" style={styles.searchicon} />
+                          </TouchableOpacity>
                         </View>
                       </View>
-                    </View>
-
-                    <View style={styles.regPost}>
-                      <Text style={styles.txtfacetoFace}>Registered Post</Text>
-                      <View style={styles.bottomline} />
-                      <View style={styles.subFacetoFace}>
-                        <View style={styles.dataFacetoFace}>
-                        <Text style={styles.txtTitle}>Currency</Text>
-                        <Picker
-                          style={styles.dateDropDown}
-                          onValueChange={(value, index, data) => { postCurrency = value }}
+                      <View style={styles.mapFacetoFace}>
+                        {console.log(w(this.state, ['region', 'latitudeDelta']) ? this.state.region : Object.assign({}, defaultRegions[country.isoCode], this.state.region))}
+                        <MapView
+                          initialRegion={defaultRegions[country.isoCode]}
+                          region={w(this.state, ['region', 'latitudeDelta']) ? this.state.region : Object.assign({}, defaultRegions[country.isoCode], this.state.region)}
+                          style={{ flex: 1 }}
+                          onLongPress={(e) => {
+                            if (e.nativeEvent) {
+                              this.setState({
+                                marker: { ...this.state.marker, latlng: e.nativeEvent.coordinate, title: 'title', descrpition: 'description' }
+                              , address: { ...this.state.address, lat: e.nativeEvent.coordinate.latitude, long: e.nativeEvent.coordinate.longitude }
+                              })
+                            } else { console.log("onLongPressEvente: ", e) }}}
+                          showsUserLocation
+                          showsMyLocationButton
                         >
-                          {country.currencies.map((c, i) => {
-                            return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
-                          })}
-                        </Picker>
-                        </View>
-                        <View style={styles.dataFacetoFace}>
-                          <Text style={styles.txtTitle}>Postal Cost</Text>
-                          <Item style={styles.txtInput} regular>
-                            <Input keyboardType="numeric" onChangeText={(text) =>{ this.setState({postCost:text}) } }/>
-                          </Item>
-                        </View>
+                          { this.state.marker &&
+                          <MapView.Marker
+                            coordinate={this.state.marker.latlng}
+                            title={this.state.marker.title}
+                            description={this.state.marker.description}
+                          />
+                          }
+                        </MapView>
                       </View>
                     </View>
                   </View>
 
-                  <View style={{ padding: Layout.HEIGHT * 0.1}} />
-            </ScrollView>
+                  <View style={styles.regPost}>
+                    <Text style={styles.txtfacetoFace}>{i18n(translations, parentName, "RegisteredPost", loginStatus.iso639_2, "Registered Post")}</Text>
+                    <View style={styles.bottomline} />
+                    <View style={styles.subFacetoFace}>
+                      <View style={styles.dataFacetoFace}>
+                      <Text style={styles.txtTitle}>{i18n(translations, parentName, "Currency", loginStatus.iso639_2, "Currency")}</Text>
+                      <Picker
+                        style={styles.dateDropDown}
+                        onValueChange={(value, index, data) => { postCurrency = value }}
+                      >
+                        {country.currencies.map((c, i) => {
+                          return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
+                        })}
+                      </Picker>
+                      </View>
+                      <View style={styles.dataFacetoFace}>
+                        <Text style={styles.txtTitle}>{i18n(translations, parentName, "PostalCost", loginStatus.iso639_2, "Postal Cost")}</Text>
+                        <Item style={styles.txtInput} regular>
+                          <Input keyboardType="numeric" onChangeText={(text) =>{ this.setState({postCost:text}) } }/>
+                        </Item>
+                      </View>
+                    </View>
+                  </View>
+                </View>
 
-            <ProgressDialog
-              visible={this.state.progressVisible}
-              message={this.state.progressMsg}
-              activityIndicatorColor='blue'
-            />
+                <View style={{ padding: Layout.HEIGHT * 0.1}} />
+          </ScrollView>
 
-           <Dialog
-             visible={this.state.showDialog}
-             title={this.state.dialogTitle}
-             onTouchOutside={() => this.setState({showDialog:false})}
-             contentStyle={{ justifyContent: 'center', alignItems: 'center' }}
-             animationType="fade"
+          <ProgressDialog
+            visible={this.state.progressVisible}
+            message={this.state.progressMsg}
+            activityIndicatorColor='blue'
+          />
+
+         <Dialog
+           visible={this.state.showDialog}
+           title={this.state.dialogTitle}
+           onTouchOutside={() => this.setState({showDialog:false})}
+           contentStyle={{ justifyContent: 'center', alignItems: 'center' }}
+           animationType="fade"
+         >
+           <Text style={{ marginBottom: 10,	color: 'black' }}>{this.state.errorMsg}</Text>
+           <TouchableOpacity
+             style={{
+               marginRight:40,
+               marginLeft:40,
+               marginTop:10,
+               paddingTop:10,
+               paddingBottom:10,
+               backgroundColor:'#00A6A4',
+               borderRadius:10,
+               borderWidth: 1,
+               borderColor: '#fff'
+             }}
+             onPress={() => this.setState({showDialog:false})}
+             underlayColor='#fff'
            >
-             <Text style={{ marginBottom: 10,	color: 'black' }}>{this.state.errorMsg}</Text>
-             <TouchableOpacity
-               style={{
-                 marginRight:40,
-                 marginLeft:40,
-                 marginTop:10,
-                 paddingTop:10,
-                 paddingBottom:10,
-                 backgroundColor:'#00A6A4',
-                 borderRadius:10,
-                 borderWidth: 1,
-                 borderColor: '#fff'
-               }}
-               onPress={() => this.setState({showDialog:false})}
-               underlayColor='#fff'
-             >
-               <Text style={{
-                 color:'#fff',
-                 textAlign:'center',
-                 paddingLeft : 10,
-                 paddingRight : 10
-               }}>Ok</Text>
-             </TouchableOpacity>
-           </Dialog>
-          </View>
-        )}}</GetCachedCountry>
-      )}</LoginStatus>
+             <Text style={{
+               color:'#fff',
+               textAlign:'center',
+               paddingLeft : 10,
+               paddingRight : 10
+             }}>Ok</Text>
+           </TouchableOpacity>
+         </Dialog>
+        </View>
+      )}}</GetCachedCountry>
     )
   }
   onShow = () => {
@@ -1623,70 +1470,4 @@ export default class CreateNewItemScreen extends React.Component {
     });
   }
 }
-
-/*
-              <View style={styles.categoty}>
-                <View style={styles.dataFacetoFace}>
-                  <Text style={styles.txtTitles}>Templates</Text>
-                  <View>
-                    <View style={styles.categoryTxtView}>
-                      <TouchableOpacity  onPress={this.onShowTemplate}   style={styles.selectionInput}>
-                      {this.state.selectedTemplateName === null ?   <Text regular>Select Template</Text> : (
-                        <Text regular>{this.state.selectedTemplateName}</Text>
-                      )}
-                      </TouchableOpacity>
-                    </View>
-                    {this.state.searchTemplateValueList.length === 0 ? null : (
-                    <ModalFilterPicker
-                      key={2}
-                      visible={this.state.templateVisible}
-                      onSelect={this.onSelectTemplate}
-                      onCancel={this.onCancel}
-                      selectedOption={this.state.selectedTemplateName}
-                      options={this.state.searchTemplateValueList}
-                    />
-                    )}
-                  </View>
-                <View>
-              </View>
-
-              <Text style={styles.txtTitles}>Tags</Text>
-              <View style={styles.categoryTxtView}>
-                <TouchableOpacity  onPress={this.onShowTags}  style={styles.selectionInput}>
-                  <Text regular>Select Tag</Text>
-                </TouchableOpacity>
-              </View>
-
-              {this.state.allTagList.length === 0 ? null : (
-              <ModalFilterPicker
-                key={3}
-                visible={this.state.tagVisible}
-                onSelect={this.onSelectTag}
-                onCancel={this.onCancel}
-                options={this.state.allTagList}
-              />
-              )}
-              <View>
-                <ListView
-                  horizontal={true}
-                  contentContainerStyle={styles.listContent}
-                  dataSource={this.state.dataSourceTags}
-                  renderRow={this._renderRowTags.bind(this)}
-                  enableEmptySections
-                  pageSize={parseInt(this.state.pageSize)}
-                />
-              </View>
-            </View>
-          </View>
-*/
-
-/*
-                        <Dropdown
-                          data={country.currencies.map( currency => { value: currency.iso4217 } )}
-                          labelHeight={0}
-                          dropdownPosition={0}
-                          baseColor="rgba(0, 0, 0, .00)"
-                          containerStyle={styles.dateDropDown}
-                          onChangeText={(value, index, data) =>{ this.setState({postCurrency:value}) } }
-                        />
-*/
+)

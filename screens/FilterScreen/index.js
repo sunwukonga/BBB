@@ -12,17 +12,14 @@ import {
 	Button,
 	Icon,
 } from 'native-base';
+import { graphql, compose } from "react-apollo";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { NavigationActions } from 'react-navigation';
 // custom components
 import Baby from '../../components/Baby';
 import CheckboxBlank from '../../components/CheckboxBlank';
 import CheckboxChecked from '../../components/CheckboxChecked';
-import IdentityVerification1 from '../../components/IdentityVerification1';
-import IdentityVerification2 from '../../components/IdentityVerification2';
-import IdentityVerification3 from '../../components/IdentityVerification3';
-import IdentityVerification4 from '../../components/IdentityVerification4';
-import IdentityVerification5 from '../../components/IdentityVerification5';
+import IdentityVerification from '../../components/IdentityVerification';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from '../../components/CheckBox';
@@ -38,10 +35,30 @@ import { Layout, Colors, Images } from '../../constants/';
 import FilterConstants from './FilterConstants'
 import getTemplateList from './SearchTemplateApi';
 import ListCategory from './ListCategory';
+import { w, i18n } from '../../utils/helpers.js'
+import ListSearchResults from '../../components/lists/ListSearchResults'
+import {
+  GET_CACHED_TRANSLATIONS
+, GET_LOGIN_STATUS
+} from '../../graphql/Queries'
 
 var internalUpdate = false
 
-export default class FilterScreen extends React.Component {
+export default FilterScreen = compose(
+  graphql(GET_LOGIN_STATUS, {name: "loginStatus"})
+, graphql(GET_CACHED_TRANSLATIONS, {
+    name: "i18n"
+  , skip: ({ loginStatus }) => !loginStatus
+  , options: ({loginStatus}) => ({
+      variables: {
+        locusId: 1
+      , countryCode: loginStatus.countryCode
+      }
+    , fetchPolicy: 'cache-only'
+    })
+  })
+)(
+class extends React.Component {
 	constructor(props) {
 		super(props);
     this.onClickCategory = this.onClickCategory.bind(this)
@@ -52,10 +69,10 @@ export default class FilterScreen extends React.Component {
 			typography: 'Please select',
 			SliderValue: 0,
 
-      filter: this.props.navigation.state.params.filter,
+      filter: this.props.navigation.state.params.filter ? this.props.navigation.state.params.filter : { minPrice: 0, maxPrice: 1000 },
 
 			modeItemList: FilterConstants.modeItems.map( modeItem => {
-        if (modeItem.title.toUpperCase() === this.props.navigation.state.params.filter.mode) {
+        if (modeItem.title.toUpperCase() === w(this.props.navigation.state.params.filter, ['mode'])) {
           modeItem.checked = true
         }
         return modeItem
@@ -263,59 +280,19 @@ export default class FilterScreen extends React.Component {
 		});
 	}
 
-	identifyFn(data) {
-		var temp = [];
-		if (data == 1) {
-			temp = (
-				<View style={{ marginLeft: Layout.moderateScale(10) }}>
-					<IdentityVerification1
-						width={Layout.moderateScale(30)}
-						height={Layout.moderateScale(30)}
-					/>
-				</View>
-			);
-		} else if (data == 2) {
-			temp = (
-				<View style={{ marginLeft: Layout.moderateScale(10) }}>
-					<IdentityVerification2
-						width={Layout.moderateScale(30)}
-						height={Layout.moderateScale(30)}
-					/>
-				</View>
-			);
-		} else if (data == 3) {
-			temp = (
-				<View style={{ marginLeft: Layout.moderateScale(10) }}>
-					<IdentityVerification3
-						width={Layout.moderateScale(30)}
-						height={Layout.moderateScale(30)}
-					/>
-				</View>
-			);
-		} else if (data == 4) {
-			temp = (
-				<View style={{ marginLeft: Layout.moderateScale(10) }}>
-					<IdentityVerification4
-						width={Layout.moderateScale(30)}
-						height={Layout.moderateScale(30)}
-					/>
-				</View>
-			);
-		} else {
-			temp = (
-				<View style={{ marginLeft: Layout.moderateScale(10) }}>
-					<IdentityVerification5
-						width={Layout.moderateScale(30)}
-						height={Layout.moderateScale(30)}
-					/>
-				</View>
-			);
-		}
-		return temp;
+	identifyBars(numericRating) {
+    return (
+      <View style={{ marginLeft: Layout.moderateScale(10) }}>
+        <IdentityVerification
+          width={Layout.moderateScale(30)}
+          height={Layout.moderateScale(30)}
+          level={numericRating}
+        />
+      </View>
+    )
 	}
 
-	_renderActiveComponent = () => {
-    console.log("Filter_: ", this.state.filter.categories)
+	_renderActiveComponent = (translations, parentName, loginStatus) => {
 		const { segment } = this.state;
 
 		if (segment === 1) {
@@ -323,10 +300,11 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'Mode_list'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Mode</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "Mode", loginStatus.iso639_2, "Mode")}</Text>
 					</View>
 					<View>
 						{this.state.modeItemList.map((item, index) => {
+              console.log("Mode: ", item.title)
 							return (
 								<View style={styles.offersListItem} key={'mode_' + index}>
 									<CheckBox
@@ -334,7 +312,7 @@ export default class FilterScreen extends React.Component {
 										isChecked={item.checked}
 										onClick={() => this.onClickMode(item)}
 										checkBoxColor={'#fff'}
-										rightText={item.title}
+										rightText={i18n(translations, parentName, item.title, loginStatus.iso639_2, item.title)}
 										rightTextStyle={{
 											color: Colors.secondaryColor,
 											fontSize: Layout.moderateScale(18),
@@ -365,13 +343,13 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'dateandtime'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Listing newer than</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "NewerThan", loginStatus.iso639_2, "Listing newer than")}</Text>
 					</View>
 					<View style={styles.dateTimeSec}>
 
 					<View style={{ flex: 1 }}>
 			 			<TouchableOpacity onPress={this._showDateTimePicker}>
-				 			<Text>Select Date & Time</Text>
+				 			<Text>{i18n(translations, parentName, "SelectDate", loginStatus.iso639_2, "Select Date & Time")}</Text>
 							{this.state.dateTime!=null ? <Text>{this.state.selectedDate}</Text> :
 										null
 							}
@@ -392,8 +370,8 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'ratings'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Listing Author Ratings</Text>
-						<Text>This feature is experimental. It may not work as expected.</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "AuthorRatings", loginStatus.iso639_2, "Listing Author Ratings")}</Text>
+						<Text>{i18n(translations, parentName, "Experimental", loginStatus.iso639_2, "This feature is experimental. It may not work as expected.")}</Text>
 					</View>
 					<View>
 						{this.state.ratingItemList.map((item, index) => {
@@ -410,7 +388,7 @@ export default class FilterScreen extends React.Component {
 											isChecked={item.checked}
 											onClick={() => this.onClickRating(item)}
 											checkBoxColor={'#fff'}
-											rightText={item.ratingvalue + ' Star'}
+											rightText={item.ratingvalue + ' ' + i18n(translations, parentName, "Star", loginStatus.iso639_2, "Star")}
 											rightTextStyle={{
 												color: Colors.secondaryColor,
 												fontSize: Layout.moderateScale(18),
@@ -445,8 +423,8 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'identify'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Listing Author Identify Verification</Text>
-						<Text>This feature is experimental. It may not work as expected.</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "IdentityVerification", loginStatus.iso639_2, "Listing Author Identify Verification")}</Text>
+						<Text>{i18n(translations, parentName, "Experimental", loginStatus.iso639_2, "This feature is experimental. It may not work as expected.")}</Text>
 					</View>
 					<View>
 						{this.state.idVerificationList.map((item, index) => {
@@ -458,7 +436,7 @@ export default class FilterScreen extends React.Component {
                       isChecked={item.checked}
                       onClick={() => this.onClickIdentify(item)}
                       checkBoxColor={'#fff'}
-                      rightTextView={this.identifyFn(item.ratingvalue)}
+                      rightTextView={this.identifyBars(item.ratingvalue)}
                       rightTextStyle={{
                         color: Colors.secondaryColor,
                         fontSize: Layout.moderateScale(18),
@@ -479,7 +457,7 @@ export default class FilterScreen extends React.Component {
                       }
                     />
                     <View style={styles.bulletText}>
-                      <Text style={styles.identityDescText}>{item.description}</Text>
+                      <Text style={styles.identityDescText}>{i18n(translations, parentName, item.locus, loginStatus.iso639_2, item.description)}</Text>
                     </View>
                   </View>
 								</View>
@@ -489,44 +467,49 @@ export default class FilterScreen extends React.Component {
 				</View>
 			);
 		} else if (segment === 5) {
-			return (
-				<View key={'price'}>
-					<View style={styles.minMaxPrice}>
-							<Text style={{ flex: 1 }}>Price Range</Text>
-				<MultiSlider
-           values={[this.state.filter.minPrice, this.state.filter.maxPrice]}
-           onValuesChange={this.minMaxPriceValuesChange}
-           min={0}
-           max={25000}
-           step={500}
-           allowOverlap
-           snapped
-         />
+      let { minPrice, maxPrice } = this.state.filter
+      let priceRangeBuffer = (maxPrice - minPrice) / 10
+      console.log(maxPrice > 25000 || 12 * priceRangeBuffer > 25000 ? 25000 : maxPrice + priceRangeBuffer)
+      return (
+        <View key={'price'}>
+          <View style={styles.minMaxPrice}>
+            <Text style={{ flex: 1 }}>{i18n(translations, parentName, "PriceRange", loginStatus.iso639_2, "Price Range")}</Text>
+            <MultiSlider
+               values={[minPrice, maxPrice]}
+               onValuesChange={this.minMaxPriceValuesChange}
+               min={minPrice == 0 || minPrice < priceRangeBuffer ? 0 : priceRangeBuffer}
+               max={maxPrice > 25000 || 12 * priceRangeBuffer > 25000 ? 25000 : maxPrice + priceRangeBuffer}
+               step={priceRangeBuffer}
+               allowOverlap
+               snapped
+            />
 
-			 <View style={{
-        flex: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
-    }}>
-
-						<Text style={{ flex: 1 }}>Min: {this.state.filter.minPrice}</Text>
-						<Text style={{ flex: 0 }}>Max: {this.state.filter.maxPrice}</Text>
-				</View>
-
-			 </View>
-
-				</View>
-			);
+            <View style={{
+              flex: 0,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+              <Text style={{ flex: 1 }}>{i18n(translations, parentName, "Min", loginStatus.iso639_2, "Min")}: {this.state.filter.minPrice}</Text>
+              <Text style={{ flex: 0 }}>{i18n(translations, parentName, "Max", loginStatus.iso639_2, "Max")}: {this.state.filter.maxPrice}</Text>
+            </View>
+          </View>
+        </View>
+      );
 		} else if (segment === 6) {
 
 			return (
 				<View key={'categories'}>
 					<View style={[styles.fltrTitleText, styles.fltrbtwn]}>
-						<Text style={styles.filterDetailsTitle}>Categories</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "Categories", loginStatus.iso639_2, "Categories")}</Text>
 						<BBBIcon name="Search" style={styles.filterDetailsTitle} />
 					</View>
 					<View>
-            <ListCategory categoryIds={this.state.filter.categories} onClickCategory={(item) => this.onClickCategory(item)} />
+            <ListCategory
+              categoryIds={this.state.filter.categories}
+              loginStatus={loginStatus}
+              translations={translations}
+              onClickCategory={(item) => this.onClickCategory(item)}
+            />
 					</View>
 				</View>
 			);
@@ -535,7 +518,7 @@ export default class FilterScreen extends React.Component {
 
 				<View key={'templates_list'}>
 					<View style={[styles.fltrTitleText, styles.fltrbtwn]}>
-						<Text style={styles.filterDetailsTitle}>Templates</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "Templates", loginStatus.iso639_2, "Templates")}</Text>
 						<BBBIcon name="Search" style={styles.filterDetailsTitle} />
 					</View>
 					<View>
@@ -578,7 +561,7 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'tags_list'}>
 					<View style={[styles.fltrTitleText, styles.fltrbtwn]}>
-						<Text style={styles.filterDetailsTitle}>Tags</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "Tags", loginStatus.iso639_2, "Tags")}</Text>
 						<BBBIcon name="Search" style={styles.filterDetailsTitle} />
 					</View>
 					<View>
@@ -621,7 +604,7 @@ export default class FilterScreen extends React.Component {
 			return (
 				<View key={'offers'}>
 					<View style={styles.fltrTitleText}>
-						<Text style={styles.filterDetailsTitle}>Counter Offers</Text>
+						<Text style={styles.filterDetailsTitle}>{i18n(translations, parentName, "Counter", loginStatus.iso639_2, "Counter Offers")}</Text>
 					</View>
 					<View style={styles.offersListItem}>
 						<CheckBox
@@ -629,7 +612,7 @@ export default class FilterScreen extends React.Component {
 							isChecked={this.state.filter.counterOffer}
 							onClick={() => this.onClickOffers()}
 							checkBoxColor={'#fff'}
-							rightText={'Allow counter offer'}
+							rightText={i18n(translations, parentName, "AllowCounter", loginStatus.iso639_2, "Allow counter offer")}
 							rightTextStyle={{
 								color: Colors.secondaryColor,
 								fontSize: Layout.moderateScale(18),
@@ -683,6 +666,12 @@ export default class FilterScreen extends React.Component {
 	}
 
 	render() {
+    if ( !w(this.props, ['i18n', 'getCachedLocus']) ) {
+      return null
+    }
+    const { loginStatus, i18n: {getCachedLocus: translations} } = this.props;
+    const parentName = "FilterScreen"
+
 		var leftComponent = (
 			<Button transparent onPress={() => this.props.navigation.goBack()}>
 				<BBBIcon
@@ -696,12 +685,12 @@ export default class FilterScreen extends React.Component {
 		var rightComponent = (
 			<View style={styles.rightComponentStyle}>
 				<TouchableOpacity onPress={() => this.resetAllValues()}>
-					<Text style={styles.headerText}>RESET</Text>
+					<Text style={styles.headerText}>{i18n(translations, parentName, "Reset", loginStatus.iso639_2, "RESET")}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity
 					style={{ marginLeft: Layout.moderateScale(8) }}
 					onPress={() => this.returnToSearchList()}>
-					<Text style={styles.headerText}>APPLY</Text>
+					<Text style={styles.headerText}>{i18n(translations, parentName, "Apply", loginStatus.iso639_2, "APPLY")}</Text>
 				</TouchableOpacity>
 			</View>
 		);
@@ -711,7 +700,7 @@ export default class FilterScreen extends React.Component {
 		return (
 			<Container style={styles.container}>
 				<BBBHeader
-					title="Filter"
+					title={i18n(translations, parentName, "Filter", loginStatus.iso639_2, "Filter")}
 					leftComponent={leftComponent}
 					rightComponent={rightComponent}
 				/>
@@ -766,7 +755,7 @@ export default class FilterScreen extends React.Component {
 					</Content>
 
 					<View style={styles.fileterSec}>
-						<Content>{this._renderActiveComponent()}</Content>
+						<Content>{this._renderActiveComponent(translations, parentName, loginStatus)}</Content>
 					</View>
 				</View>
 			</Container>
@@ -841,8 +830,6 @@ export default class FilterScreen extends React.Component {
 			searchTemplateValueList:[],
 			tagList:[],
 		});
-
 	}
-
-
 }
+)

@@ -143,7 +143,10 @@ class extends React.Component {
               onValueChange={(value, index, data) => {
                 // The setTimeout fixes a problem with every second change not propagating
                 // https://github.com/facebook/react-native/pull/22821
-                setTimeout(() => setCountry({ variables: { countryCode: cachedCountry.getCachedCountry.isoCode, iso639_2: value }}), 0)
+                setTimeout(() => {
+                  setCountry({ variables: { countryCode: cachedCountry.getCachedCountry.isoCode, iso639_2: value }})
+                  Expo.SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: cachedCountry.getCachedCountry.isoCode, iso639_2: value}))
+                }, 0)
               }}
             >
               {cachedCountry.getCachedCountry.languages.map((l, i) => {

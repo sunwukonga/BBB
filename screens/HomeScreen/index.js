@@ -3,8 +3,6 @@ import {
   View
 , Text
 , TouchableOpacity
-, AsyncStorage
-, BackHandler
 , FlatList
 , Alert
 } from 'react-native';
@@ -26,7 +24,7 @@ import {
 } from 'native-base'
 import { graphql, compose } from "react-apollo";
 //custom components
-import BBBHeader from '../../components/BBBHeader'
+//import BBBHeader from '../../components/BBBHeader'
 import BBBIcon from '../../components/BBBIcon'
 import { Ionicons } from '@expo/vector-icons'
 // style
@@ -44,10 +42,8 @@ import ListVisitedListings from './ListVisitedListings'
 import ListLikedListings from './ListLikedListings'
 import ListUserVisitedListings from './ListUserVisitedListings'
 
-import likeProductApi from './LikeProductApi';
 import LoginStatus from './LoginStatus'
 import LastMessageIds from '../ChatListScreen/LastMessageIds'
-import GetProfile from '../../graphql/queries/GetProfile'
 import GetChatMessages from '../../graphql/queries/GetChatMessages'
 import GetCachedTranslations from '../../graphql/queries/GetCachedTranslations'
 
@@ -57,6 +53,7 @@ import {
   GET_CACHED_TRANSLATIONS
 , GET_LOGIN_STATUS
 } from '../../graphql/Queries'
+
 //Navigation Actions
 const NA_HomeToLoginToDrawer = NavigationActions.navigate({
   routeName: 'loginScreen'
@@ -71,23 +68,6 @@ const NA_HomeToLoginToCreate = NavigationActions.navigate({
 
 const showIcons = false
 
-/*
-export default HomeScreen = compose(
-  graphql(GET_LOGIN_STATUS, {name: "loginStatus"})
-, graphql(GET_CACHED_TRANSLATIONS, {
-    name: "i18n"
-  , skip: ({ loginStatus }) => !loginStatus
-  , options: ({loginStatus}) => ({
-      variables: {
-        locusId: 1
-      , countryCode: loginStatus.countryCode
-      }
-    , fetchOptions: 'cache-only'
-    })
-  })
-)(
-class extends React.Component {
-*/
 export default class HomeScreen extends React.Component {
 
   static navigationOptions = () => ({
@@ -100,7 +80,6 @@ export default class HomeScreen extends React.Component {
   }
 
   openDrawerAndSetState = () => {
-    //this.drawerOpen = true
     this.props.navigation.openDrawer()
   }
 
@@ -116,9 +95,6 @@ export default class HomeScreen extends React.Component {
       loading: true,
     }
     //Permissions.askAsync(Permissions.LOCATION)
-
-    //this.drawerOpen = false
-
   }
 
   // REDUNDANT; NOT USED
@@ -133,61 +109,6 @@ export default class HomeScreen extends React.Component {
     }
   }
 
-  sendLikeRequest(item){
-
-    var _like=!item.liked;
-		var variables={"listingId": item.id,"like": _like}
-		likeProductApi(variables).then((res)=>{
-
-        if(res.data.likeListing){
-          var mostVisitedList=this.state.mostVisitedList;
-          for(var i=0;i<mostVisitedList.length;i++){
-            if(mostVisitedList[i].id==item.id){
-              mostVisitedList[i].liked=_like;
-            }
-          }
-
-          var _count=this.state.count+1;
-
-            this.setState({
-              mostVisitedList:mostVisitedList,
-              progressVisible:false,
-              count:_count,
-            })
-
-
-        }
-
-		})
-		.catch(error => {
-      this.setState({
-				progressVisible: false,
-			});
-			console.log("Error:" + error.message);
-			//Toast.show(error.message,Toast.SHORT);
-
-		});
-	}
-
-  /*
-  componentWillReceiveProps(nextProps) {
-    console.log("WillReceiveProps")
-  }
-  */
-/*
-  _retrieveCountry = async () => {
-      try {
-          const value = await AsyncStorage.getItem('countryCode');
-          if (value) {
-            this.setState({
-              countryCode: value
-            });
-          }
-       } catch (error) {
-         console.log(error);
-       }
-    }
- */ 
   componentDidMount() {
 
     this.willFocusListener = this.props.navigation.addListener(
@@ -287,13 +208,9 @@ export default class HomeScreen extends React.Component {
       this.props.navigation.dispatch(NA_HomeToLoginToDrawer)
     }
   }
-/*
-      <LoginStatus>{ loginStatus => (
-      )}</LoginStatus>
-      ^^^ There can be no gap between  `>` and `{`  OR  `}` and `<`
-      */
+      //^^^ There can be no gap between  `>` and `{`  OR  `}` and `<`
+      // when using components accessing children
   render() {
-    // TODO: Change to a function that accepts loginStatus
     var leftComponent = (loginStatus, newMessageCount) => (
       <Button transparent onPress={ () => this.checkAuthForDrawer(loginStatus)}>
         { loginStatus.authorized ?
@@ -330,27 +247,12 @@ export default class HomeScreen extends React.Component {
       </Button>
     );
 
-      /*
-        <LoginStatus>{ loginStatus => {
-          this.loginStatus = loginStatus
-          return null
-        }}</LoginStatus>
-        */
-    /*
-        <BBBHeader
-          title="Bebe Bargains"
-          leftComponent={leftComponent}
-          rightComponent={rightComponent}
-        />
-        */
             //<GetProfile loginStatus={loginStatus}>{ currentUser => (
             //)}</GetProfile>
-    // Here because I don't have time to de-thread it through the different components. Just dummy
-    let currentUser = {}
-    //console.log("HomeScreen:Navigation: ", this.props.navigation.state.params.rootNavigation.getChildNavigation(this.props.navigation.state.params.rootNavigation.state.key))
     if (this.state.loading) {
       return null
     } else {
+      let parentName = "HomeScreen"
       return (
         <LoginStatus>{ loginStatus => (
           <LastMessageIds loginStatus={loginStatus}>{ chatIndexes => (
@@ -358,11 +260,9 @@ export default class HomeScreen extends React.Component {
               <Container>
                 <GetChatMessages chatIndexes={chatIndexes} pollInterval={10000} skip={!loginStatus.authorized}>
                   {({ data, networkStatus, error, loading, refetch, startPolling, stopPolling }) => {
-                    //console.log("translations: ", translations)
                     let newMessageCount = 0
                     if (!loading && w(data, ['getChatMessages'])) {
                       data.getChatMessages.map( chat => {
-                        //console.log(chat.id, " : ",  w(this.state.lastReadMessageIds, [chat.id]))
                         if (w(this.state.lastReadMessageIds, [chat.id])) {
                           let lastMessageId = this.state.lastReadMessageIds[chat.id]
                           chat.chatMessages.find(function(element, index, array) {
@@ -396,7 +296,7 @@ export default class HomeScreen extends React.Component {
                 {/*TODO: Change searchTerms from String to Array of Strings */
                 }
                         <Input
-                          placeholder={i18n(translations, "HomeScreen", "LookingFor", "eng")}
+                          placeholder={i18n(translations, parentName, "LookingFor", loginStatus.iso639_2, "What are you looking for?")}
                           style={styles.mainSearch}
                           keyboardType="default"
                           returnKeyType="search"
@@ -439,21 +339,21 @@ export default class HomeScreen extends React.Component {
                       loginStatus={loginStatus}
                       variables={{"limit":this.state.limit,"page":this.state.page}}
                       chatIndexes={chatIndexes}
-                      currentUser={currentUser}
-                      createNew={() => this.checkAuthForCreate(loginStatus) } />
+                      createNew={() => this.checkAuthForCreate(loginStatus) }
+                      translations={translations} />
                     <View style={styles.adSec}>
                       <Text style={styles.mainadText}>
-                        Do you have something to sell or give away?
+                        {i18n(translations, parentName, "QuestionSell", loginStatus.iso639_2, "Do you have something to sell or give away?")}
                       </Text>
                       <Text style={styles.subtitle}>
-                        Post it with us and we'll give you an audience.
+                        {i18n(translations, parentName, "SuggestionPost", loginStatus.iso639_2, "Post it with us and we'll give you an audience.")}
                       </Text>
                     </View>
                     <View>
-                      <ListVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
-                      <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                      <ListVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} translations={translations} />
+                      <ListLikedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} translations={translations} />
                       <View style={styles.hr} />
-                      <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} currentUser={currentUser} />
+                      <ListUserVisitedListings loginStatus={loginStatus} variables={{"limit":this.state.limit,"page":this.state.page}} chatIndexes={chatIndexes} translations={translations} />
                     </View>
                   </View>
                 </Content>
@@ -473,4 +373,3 @@ export default class HomeScreen extends React.Component {
     }
   }
 }
-//)

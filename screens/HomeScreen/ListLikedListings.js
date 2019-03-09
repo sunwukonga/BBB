@@ -13,7 +13,7 @@ import {
   GET_MOST_LIKED_LIST
 } from '../../graphql/Queries'
 import PureListItem from './PureListItem'
-import { w } from '../../utils/helpers.js'
+import { w, i18n } from '../../utils/helpers.js'
 import { Locations } from "../../constants/"
 
 class ListLikedListings extends Component {
@@ -38,7 +38,8 @@ class ListLikedListings extends Component {
 
 
   render() {
-    let { variables, loginStatus, chatIndexes, currentUser } = this.props
+    let { variables, loginStatus, chatIndexes, translations } = this.props
+    const parentName = "HomeScreen"
     return (
       <Query
         query = {GET_MOST_LIKED_LIST}
@@ -60,7 +61,7 @@ class ListLikedListings extends Component {
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
                 <Text style={styles.populerText}>
-                  Most Liked Items
+                  {i18n(translations, parentName, "MostLiked", loginStatus.iso639_2, "Most Liked Items")}
                 </Text>
               </View>
               <FlatList
@@ -69,7 +70,7 @@ class ListLikedListings extends Component {
                 keyExtractor={(item, index) => item.id.toString()}
                 data = {data.getMostLikedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} resetTo={Locations.Home} />
+                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Home} translations={translations} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}

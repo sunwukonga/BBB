@@ -11,6 +11,11 @@ query getMostRecentListings($countryCode:String!,$limit:Int,$page:Int){
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id
@@ -104,6 +109,11 @@ query getMostVisitedListings($countryCode:String!,$limit:Int,$page:Int) {
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id
@@ -195,6 +205,11 @@ query getMostLikedListings($countryCode:String!,$limit:Int,$page:Int) {
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id
@@ -285,6 +300,11 @@ query getUserVisitedListings($countryCode:String!,$limit:Int,$page:Int){
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id
@@ -376,6 +396,11 @@ query getUserPostedListings($countryCode:String!,$limit:Int,$page:Int) {
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id
@@ -467,6 +492,11 @@ query getUserLikedListings($countryCode:String!,$limit:Int,$page:Int) {
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id
@@ -609,6 +639,11 @@ query getChatMessages($chatIndexes:[ChatIndex]) {
       category {
         id
         name
+        locus {
+          id
+          name
+          parentName
+        }
       }
       user {
         id
@@ -693,6 +728,11 @@ query getListing($id:Int!){
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id
@@ -780,9 +820,19 @@ query {
   allCategoriesNested {
     id
     name
+    locus {
+      id
+      name
+      parentName
+    }
     children {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
   }
 }`
@@ -812,6 +862,9 @@ query getLocus($locusId:Int!, $countryCode:String!, $languageCodes:[String]!) {
       ...LocusDetails
       children {
         ...LocusDetails
+        children {
+          ...LocusDetails
+        }
       }
     }
   }
@@ -827,6 +880,9 @@ query getCachedLocus($locusId:Int!, $countryCode:String!) {
       ...LocusDetails
       children {
         ...LocusDetails
+        children {
+          ...LocusDetails
+        }
       }
     }
   }
@@ -839,9 +895,19 @@ query {
   allCategoriesFlat {
     id
     name
+    locus {
+      id
+      name
+      parentName
+    }
     children {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
   }
 }`;
@@ -855,6 +921,11 @@ query searchListings($terms:[String],$limit:Int,$page:Int,$filter:Filters!){
     category {
       id
       name
+      locus {
+        id
+        name
+        parentName
+      }
     }
     primaryImage {
       id

@@ -13,7 +13,7 @@ import {
   GET_USER_VISITED_LIST
 } from '../../graphql/Queries'
 import PureListItem from './PureListItem'
-import { w } from '../../utils/helpers.js'
+import { w, i18n } from '../../utils/helpers.js'
 import { Locations } from "../../constants/"
 
 
@@ -38,7 +38,8 @@ class ListUserVisitedListings extends Component {
   }
 
   render() {
-    let { variables, loginStatus, chatIndexes, currentUser } = this.props
+    let { variables, loginStatus, chatIndexes, translations } = this.props
+    const parentName = "HomeScreen"
     if (!loginStatus.authorized) {
       return null
     }
@@ -63,7 +64,7 @@ class ListUserVisitedListings extends Component {
             <View style={styles.imagesMainView}>
               <View style={styles.populerSec}>
                 <Text style={styles.populerText}>
-                  Your Visited Items
+                  {i18n(translations, parentName, "YourVisited", loginStatus.iso639_2, "Your Visited Items")}
                 </Text>
               </View>
               <FlatList
@@ -72,7 +73,7 @@ class ListUserVisitedListings extends Component {
                 keyExtractor={(item, index) => index.toString()}
                 data = {data.getUserVisitedListings || []}
                 renderItem={({ item }) =>
-                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} resetTo={Locations.Home} />
+                   <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Home} translations={translations} />
                 }
                 onEndReachedThreshold={0.5}
                 refreshing={networkStatus === 4 || networkStatus === 3}

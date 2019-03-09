@@ -23,7 +23,7 @@ import DeleteButton from '../../components/buttons/DeleteButton'
 import CreateChat from '../../graphql/mutations/CreateChat'
 import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 import GetProfile from '../../graphql/queries/GetProfile'
-import { w } from '../../utils/helpers.js'
+import { w, i18n } from '../../utils/helpers.js'
 
 class PureListItem extends Component {
 
@@ -43,14 +43,15 @@ class PureListItem extends Component {
   }
 
   render() {
-    let {item, loginStatus, chatIndexes, currentUser, createNew, resetTo } = this.props
+    let {item, loginStatus, chatIndexes, createNew, resetTo, translations } = this.props
+    const parentName = "HomeScreen"
     if ( item.emptyList ) {
       return (
         <TouchableOpacity onPress={ createNew } >
           <View style={styles.imagesSubView}>
-            <Text style={{ textAlign: 'center' }}>No recent listings</Text>
+            <Text style={{ textAlign: 'center' }}>{i18n(translations, parentName, "NoRecent", loginStatus.iso639_2, "No recent listings")}</Text>
             <Baby style={styles.rowImage} />
-            <Text style={{ textAlign: 'center' }}>Click on me to create a new Listing</Text>
+            <Text style={{ textAlign: 'center' }}>{i18n(translations, parentName, "ClickToCreate", loginStatus.iso639_2, "Click on me to create a new listing")}</Text>
           </View>
         </TouchableOpacity>
       )
@@ -73,16 +74,16 @@ class PureListItem extends Component {
     }
 
     return (
-        <TouchableOpacity
-          onPress={ () => this.props.navigation.navigate({
-            routeName: 'productDetailsScreen'
-          , params: {
-              previous_screen: 'homeScreen'
-            , item: item
-            , loginStatus: loginStatus
-            }
-          })}
-        >
+      <TouchableOpacity
+        onPress={ () => this.props.navigation.navigate({
+          routeName: 'productDetailsScreen'
+        , params: {
+            previous_screen: 'homeScreen'
+          , item: item
+          , loginStatus: loginStatus
+          }
+        })}
+      >
         <View style={styles.imagesSubView}>
           <View>
             { w(item, ['primaryImage', 'imageKey']) === null
@@ -90,7 +91,7 @@ class PureListItem extends Component {
               : <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
             }
             <LikeButton item={item} loginStatus={loginStatus} />
-            <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} />
+            <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} />
             <DeleteButton item={item} loginStatus={loginStatus} resetTo={resetTo} />
           </View>
 
@@ -134,8 +135,8 @@ class PureListItem extends Component {
           </View>
 
         </View>
-                </TouchableOpacity>
-      )
+      </TouchableOpacity>
+    )
   }
 }
 

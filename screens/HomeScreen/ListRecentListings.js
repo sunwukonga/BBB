@@ -16,7 +16,7 @@ import {
   UNSET_AUTH_STATUS
 } from '../../graphql/Mutations'
 import PureListItem from './PureListItem'
-import { w } from '../../utils/helpers.js'
+import { w, i18n } from '../../utils/helpers.js'
 import { Locations } from "../../constants/"
 
 const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"}) (
@@ -49,7 +49,8 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
   }
 
     render() {
-      let { variables, loginStatus, chatIndexes, currentUser, createNew } = this.props
+      let { variables, loginStatus, chatIndexes, createNew, translations } = this.props
+      const parentName = "HomeScreen"
       return (
         <Query
           query = {GET_MOST_RECENT_LIST}
@@ -90,7 +91,7 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
             return (
               <View style={styles.imagesMainView}>
                 <View style={styles.populerSec}>
-                  <Text style={styles.populerText}>Most Recent Items</Text>
+                  <Text style={styles.populerText}>{i18n(translations, parentName, "MostRecent", loginStatus.iso639_2, "Most Recent Items")}</Text>
                 </View>
                 <FlatList
                   horizontal = {true}
@@ -98,7 +99,7 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
                   keyExtractor={(item, index) => index.toString()}
                   data = {dataPointer}
                   renderItem={({ item }) => {
-                    return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} currentUser={currentUser} createNew={createNew} resetTo={Locations.Home} />
+                    return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Home} createNew={createNew} translations={translations} />
                   }}
                   onEndReachedThreshold={0.5}
                   refreshing={networkStatus === 4 || networkStatus === 3}

@@ -22,7 +22,7 @@ import { Colors, Layout, Urls, Constants } from '../../../constants/';
 import IdentityVerification from '../../../components/IdentityVerification';
 import Stars from '../../../components/Stars';
 import Baby from '../../../components/Baby';
-import { w } from '../../../utils/helpers.js'
+import { w, i18n } from '../../../utils/helpers.js'
 import { Locations } from "../../../constants/"
 
 var filterDefaults = {
@@ -64,7 +64,7 @@ class ListSearchResults extends Component {
     return false;
   }
 
-  _renderItem = ({ item }, loginStatus) => {
+  _renderItem = ({ item }, loginStatus, translations) => {
 
     function OtherImage( props ) {
       const {item} = props
@@ -79,6 +79,7 @@ class ListSearchResults extends Component {
       }
     }
 
+    const parentName = "SearchResultScreen"
     return (
       <TouchableOpacity
         style={styles.imagesSubView}
@@ -139,22 +140,22 @@ class ListSearchResults extends Component {
           <View style={styles.offerTypeSec}>
           {item.saleMode.mode==Constants.BARTER ? (
             <View style={styles.bartedSec}>
-              <Text style={styles.bartedTxt}>BARTER</Text>
+              <Text style={styles.bartedTxt}>{i18n(translations, parentName, "Barter", loginStatus.iso639_2, "Barter")}</Text>
             </View>
           ) : null}
           {item.saleMode.mode==Constants.DONATE ? (
             <View style={styles.bartedSec}>
-              <Text style={styles.bartedTxt}>DONATE</Text>
+              <Text style={styles.bartedTxt}>{i18n(translations, parentName, "Donate", loginStatus.iso639_2, "Donate")}</Text>
             </View>
           ) : null}
           {item.counterOffer ? (
             <View style={styles.counterSec}>
-              <Text style={styles.counterTxt}>COUNTER OFFER</Text>
+              <Text style={styles.bartedTxt}>{i18n(translations, parentName, "CounterOffer", loginStatus.iso639_2, "Counter Offer")}</Text>
             </View>
           ) : null}
           {item.saleMode.mode==Constants.SALE ? (
             <View style={styles.saleSec}>
-              <Text style={styles.saleTxt}>SALE</Text>
+              <Text style={styles.bartedTxt}>{i18n(translations, parentName, "Sale", loginStatus.iso639_2, "Sale")}</Text>
             </View>
           ) : null}
           </View>
@@ -164,7 +165,7 @@ class ListSearchResults extends Component {
   }
 
   render() {
-    let { loginStatus, terms, filter } = this.props
+    let { loginStatus, translations, terms, filter } = this.props
     let variables = {
       limit: this.state.limit
     , page: this.state.page
@@ -175,7 +176,7 @@ class ListSearchResults extends Component {
       , filter
       )
     }
-    if (terms.length > 0) {
+    if (terms && terms.length > 0) {
       variables.terms = terms
     }
     return (
@@ -200,7 +201,7 @@ class ListSearchResults extends Component {
               <FlatList
                 data={data.searchListings || []}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={(item) => this._renderItem(item, loginStatus)}
+                renderItem={(item) => this._renderItem(item, loginStatus, translations)}
                 contentContainerStyle={styles.listContent}
                 onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
                 onEndReachedThreshold={0.5}

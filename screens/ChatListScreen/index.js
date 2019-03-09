@@ -11,12 +11,32 @@ import BBBIcon from '../../components/BBBIcon';
 import ListChats from './ListChats'
 import LoginStatus from '../HomeScreen/LoginStatus'
 import LastMessageIds from './LastMessageIds'
+import { graphql, compose } from "react-apollo";
+import {
+  GET_CACHED_TRANSLATIONS
+, GET_LOGIN_STATUS
+} from '../../graphql/Queries'
+import { w, i18n } from '../../utils/helpers.js'
 
 //style
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
 
-class ChatListScreen extends Component {
+export default ChatListScreen = compose(
+  graphql(GET_LOGIN_STATUS, {name: "loginStatus"})
+, graphql(GET_CACHED_TRANSLATIONS, {
+    name: "i18n"
+  , skip: ({ loginStatus }) => !loginStatus
+  , options: ({loginStatus}) => ({
+      variables: {
+        locusId: 1
+      , countryCode: loginStatus.countryCode
+      }
+    , fetchPolicy: 'cache-only'
+    })
+  })
+)(
+class extends Component {
 
   constructor(props) {
     super(props)
@@ -35,19 +55,21 @@ class ChatListScreen extends Component {
         />
       </Button>
     );
+    if ( !w(this.props, ['i18n', 'getCachedLocus']) ) {
+      return null
+    }
+    let { loginStatus, i18n: {getCachedLocus: translations} } = this.props;
+    const parentName = "ChatListScreen"
     return (
       <Container style={styles.container}>
-        <BBBHeader title="Chats" leftComponent={leftComponent} />
+        <BBBHeader title={i18n(translations, parentName, "Chats", loginStatus.iso639_2, "Chats")} leftComponent={leftComponent} />
         <Content>
-          <LoginStatus>{ loginStatus => (
-            <LastMessageIds loginStatus={loginStatus}>{ chatIndexes  => (
-              <ListChats chatIndexes={chatIndexes} loginStatus={loginStatus} />
-            )}</LastMessageIds>
-          )}</LoginStatus>
+          <LastMessageIds loginStatus={loginStatus}>{ chatIndexes  => (
+            <ListChats chatIndexes={chatIndexes} loginStatus={loginStatus} />
+          )}</LastMessageIds>
         </Content>
       </Container>
-    );
+    )
   }
 }
-
-export default ChatListScreen
+)

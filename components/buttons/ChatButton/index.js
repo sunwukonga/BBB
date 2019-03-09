@@ -56,14 +56,14 @@ class ChatButton extends Component {
   }
 
   render() {
-    const {item, loginStatus, chatIndexes, currentUser} = this.props
+    const {item, loginStatus, chatIndexes} = this.props
 
     if (loginStatus.myProfile.id == w(item, ['user', 'id'])) {
       // Cannot chat with yourself. Button should not exist.
       return null
     } else {
       return (
-        <CreateChat item={item} loginStatus={loginStatus} currentUser={currentUser}>{ mutateCreateChat  => (
+        <CreateChat item={item} loginStatus={loginStatus}>{ mutateCreateChat  => (
           <TouchableOpacity
             style={styles.chatIconSec}
             onPress={ () => this.navOrCreate( mutateCreateChat, item, loginStatus, chatIndexes ) }
