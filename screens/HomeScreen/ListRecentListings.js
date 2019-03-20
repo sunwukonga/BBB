@@ -34,20 +34,6 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
       return false;
     }
 
-  getMethods(obj) {
-    var result = []; 
-    for (var id in obj) {
-      try {
-        if (typeof(obj[id]) == "function") {
-        result.push(id);
-        }
-      } catch (err) {
-        result.push(id + ": inaccessible");
-      }
-    }
-    return result;
-  }
-
     render() {
       let { variables, loginStatus, chatIndexes, createNew, translations } = this.props
       const parentName = "HomeScreen"

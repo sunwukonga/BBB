@@ -55,7 +55,7 @@ class extends React.Component {
 
         //key = {rowItem.key}
   _renderRow = (rowItem, rowId, sectionId) => (
-    <View style={styles.mainlist} key={'categories_' + rowItem.id}>
+    <View style={styles.mainlist} >
       <TouchableOpacity
         style={{
           flex: 1,
@@ -114,6 +114,7 @@ class extends React.Component {
           </Text>
           ):(
           <ExpandableList
+            key={"avoidWarning"}
             dataSource={i18nTransformCategories(allCategoriesNested, loginStatus, translations)}
             headerKey="name"
             memberKey="data"

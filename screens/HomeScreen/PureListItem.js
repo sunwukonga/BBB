@@ -39,6 +39,9 @@ class PureListItem extends Component {
     if ( w(this.props, ['item', 'chatId']) !== w(nextProps, ['item', 'chatId']) ) {
       return true
     }
+    if (w(this.props, ['loginStatus', 'myProfile', 'id']) != w(nextProps, ['loginStatus', 'myProfile', 'id'])) {
+      return true
+    }
     return false;
   }
 
@@ -56,6 +59,9 @@ class PureListItem extends Component {
         </TouchableOpacity>
       )
     }
+    if (item.deleted) {
+      return null
+    }
 
     function OtherImage( props ) {
       const {item} = props
@@ -68,9 +74,6 @@ class PureListItem extends Component {
       } else {
         return <BBBIcon name="IdentitySvg" size={Layout.moderateScale(18)} />
       }
-    }
-    if (item.deleted) {
-      return null
     }
 
     return (

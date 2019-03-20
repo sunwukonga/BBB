@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Mutation } from "react-apollo";
 import {
   View
 , TouchableOpacity
@@ -9,12 +8,6 @@ import { Layout, Colors } from '../../../constants/';
 import BBBIcon from '../../BBBIcon';
 import { withNavigation, NavigationActions } from 'react-navigation'
 
-import {
-  LIKE_LISTING
-} from '../../../graphql/Mutations'
-import {
-  GET_USER_LIKED_LIST
-} from '../../../graphql/Queries'
 import { w } from '../../../utils/helpers.js'
 import { ToggleLike } from '../../../graphql/mutations/ToggleLike'
 
@@ -38,7 +31,6 @@ class LikeButton extends Component {
     }
     return false;
   }
-
 
   navOrToggle( mutateToggleLike, item, loginStatus ) {
     console.log("navOrToggle called")

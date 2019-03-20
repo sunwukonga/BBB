@@ -20,10 +20,10 @@ class CategoryListItem extends Component {
   }
 
   render() {
-    const {item, categoryIds} = this.props
+    const {item, categoryIds = []} = this.props
 
     return (
-      <View style={styles.offersListItem} key={'categories_' + item.id}>
+      <View style={styles.offersListItem} >
         <CheckBox
           style={styles.chboxRemember}
           isChecked={categoryIds.includes(item.id)}

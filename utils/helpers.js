@@ -7,9 +7,11 @@ function i18nTransformCategories(rawData, loginStatus, translations) {
   Object.keys(rawData).forEach( (key, index) => {
     data.push({
       id: rawData[key].id
+    , key: rawData[key].id.toString()
     , name: i18n(translations, rawData[key].locus.parentName, rawData[key].locus.name, loginStatus.iso639_2, rawData[key].name)
     , data: rawData[key].children.map( child => ({
         id: child.id
+      , key: child.id.toString()
       , childName: i18n(translations, child.locus.parentName, child.locus.name, loginStatus.iso639_2, child.name)
       }))
     })

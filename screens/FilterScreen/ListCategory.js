@@ -22,9 +22,17 @@ class ListCategory extends Component {
     super(props);
   }
 
+  _renderRow = (rowItem, rowId, sectionId) => (
+    <CategoryListItem
+      item={rowItem}
+      categoryIds={this.props.categoryIds}
+      onClickCategory={(input) => this.props.onClickCategory(input)}
+    />
+  )
+
   render() {
         //fetchPolicy="cache-only"
-    const { categoryIds, loginStatus, translations } = this.props
+    const { loginStatus, translations } = this.props
     return (
       <Query
         query = {GET_NESTED_CATEGORY_LIST}
@@ -51,28 +59,18 @@ class ListCategory extends Component {
           });
           */
 
-          _renderRow = (rowItem, rowId, sectionId) => (
-            <CategoryListItem
-              item={rowItem}
-              categoryIds={categoryIds}
-              onClickCategory={(input) => this.props.onClickCategory(input)}
-            />
-          )
-
           return (
-            <View>
               <ExpandableList
                 dataSource={i18nTransformCategories(data.allCategoriesNested, loginStatus, translations)}
                 headerKey="name"
                 memberKey="data"
-                renderRow={ this._renderRow }
+                renderRow={this._renderRow}
                 renderSectionHeaderX= { (section, sectionId) => (
                   <View style={styles.mainlist}>
                     <Text style={styles.SectionHeaderStyle}>{section}</Text>
                   </View>
                 )}
               />
-            </View>
           )
         }}
       </Query>

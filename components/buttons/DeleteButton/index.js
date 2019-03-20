@@ -19,7 +19,7 @@ class DeleteButton extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (w(this.props, ['loginStatus', 'authorized']) != w(nextProps, ['loginStatus', 'authorized'])) {
+    if (w(this.props, ['loginStatus', 'myProfile', 'id']) != w(nextProps, ['loginStatus', 'myProfile', 'id'])) {
       return true
     }
     return false;

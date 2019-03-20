@@ -225,20 +225,19 @@ class extends React.Component {
 
 	onClickCategory({id, selected}) {
     if (!selected) {
-      console.log("Undo click")
       internalUpdate = true
       this.setState({
         filter: Object.assign( this.state.filter, { categories: this.state.filter.categories.filter( categoryId => categoryId != id)})
       })
     } else {
-      console.log("Do click: ", this.state.filter.categories)
-      this.state.filter.categories.push( id )
+      let selectedCategories = this.state.filter.categories || []
+      selectedCategories.push( id )
       internalUpdate = true
       this.setState({
-        filter: Object.assign( this.state.filter, { categories: this.state.filter.categories})
+        filter: Object.assign( this.state.filter, { categories: selectedCategories})
       })
     }
-    this._getTemplates();
+    //this._getTemplates();
 	}
 
 
