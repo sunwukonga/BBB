@@ -47,8 +47,6 @@ import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import GetChatMessages from '../../graphql/queries/GetChatMessages'
 import GetCachedTranslations from '../../graphql/queries/GetCachedTranslations'
 
-import MainDrawer from '../../navigation/MainDrawerNavigator'
-
 import {
   GET_CACHED_TRANSLATIONS
 , GET_LOGIN_STATUS

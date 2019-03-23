@@ -53,7 +53,7 @@ class PureListItem extends Component {
         <TouchableOpacity onPress={ createNew } >
           <View style={styles.imagesSubView}>
             <Text style={{ textAlign: 'center' }}>{i18n(translations, parentName, "NoRecent", loginStatus.iso639_2, "No recent listings")}</Text>
-            <Baby style={styles.rowImage} />
+            <Baby style={styles.babyIcon} />
             <Text style={{ textAlign: 'center' }}>{i18n(translations, parentName, "ClickToCreate", loginStatus.iso639_2, "Click on me to create a new listing")}</Text>
           </View>
         </TouchableOpacity>

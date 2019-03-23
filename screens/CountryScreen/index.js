@@ -14,8 +14,7 @@ import {
 , Text
 } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
-import { RootStackNavigator } from '../../navigation/RootNavigation'
-import MainStackNavigator from '../../navigation/MainDrawerNavigator'
+//import { RootStackNavigator } from '../../navigation/RootNavigation'
 
 // custom components
 import BBBHeader from '../../components/BBBHeader/';
@@ -88,8 +87,10 @@ const CountryScreen = compose (
       this.mutationInFlight = false
       this.countryBackHandler = null
 
-      const defaultGetStateForAction = RootStackNavigator.router.getStateForAction;
-      RootStackNavigator.router.getStateForAction = (action, state) => {
+      let parentRouter = props.navigation.dangerouslyGetParent().router
+      //const defaultGetStateForAction = RootStackNavigator.router.getStateForAction;
+      const defaultGetStateForAction = parentRouter.getStateForAction;
+      parentRouter.getStateForAction = (action, state) => {
         if (state && w(action.actions, ['length']) > 0 && action.actions[0].routeName === "countryScreen") {
           this.countryBackHandler = BackHandler.addEventListener("hardwareBackPress", this.onBackPress.bind(this, action.actions[0].params.countryCode, action.actions[0].params.iso639_2))
         }

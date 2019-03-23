@@ -78,7 +78,7 @@ class extends Component {
     if (!w(item, ['imageKey'])) {
       return (
         <View key={item.id} style={styles.swiperSec}>
-          <Baby style={styles.rowImage} />
+          <Baby style={styles.babyIcon} />
         </View>
       )
     } else {

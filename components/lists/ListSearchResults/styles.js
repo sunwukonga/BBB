@@ -1,6 +1,15 @@
 import { Platform, StyleSheet } from 'react-native';
 import { Layout, Colors } from '../../../constants/';
 
+let babyIcon = {
+  height: Layout.WIDTH * 0.30,
+  width: Layout.WIDTH * 0.30,
+  borderWidth: 0.5,
+  backgroundColor: Colors.white,
+  borderColor: Colors.categorylistBorder,
+  marginRight: Layout.WIDTH * 0.01,
+}
+
 export default StyleSheet.create({
   container: {
     backgroundColor: Colors.menuHeader,
@@ -65,15 +74,8 @@ export default StyleSheet.create({
 		marginRight: Layout.WIDTH * 0.03,
 		marginLeft: Layout.WIDTH * 0.03,
 	},
-	rowImage: {
-		height: Layout.WIDTH * 0.30,
-		width: Layout.WIDTH * 0.30,
-		resizeMode: 'contain',
-		borderWidth: 0.5,
-		backgroundColor: Colors.white,
-		borderColor: Colors.categorylistBorder,
-		marginRight: Layout.WIDTH * 0.01,
-	},
+  rowImage: Object.assign({resizeMode: 'contain'}, babyIcon),
+  babyIcon: babyIcon,
   favoriteIconSec: {
     position: 'absolute',
     top: Layout.moderateScale(10),

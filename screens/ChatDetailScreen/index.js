@@ -383,7 +383,7 @@ export default class ChatScreen extends Component {
                 <View style={styles.notifyContainer}>
                   { (w(chat, ['listing', 'primaryImage', 'imageKey']))
                   ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.primaryImage.imageKey }} style={styles.notifyImage} />
-                  : <Baby style={styles.profileImage} />
+                  : <Baby style={styles.babyIcon} />
                   }
                   <Text style={styles.regularSmall}>
                     { ! w(chat, ['listing'])

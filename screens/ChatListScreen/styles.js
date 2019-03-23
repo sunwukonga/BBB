@@ -1,6 +1,17 @@
 import { Platform, StyleSheet } from 'react-native';
 import { Layout, Colors } from '../../constants/';
 
+let babyIcon = {
+  height: Layout.HEIGHT * 0.10,
+  width: Layout.HEIGHT * 0.10,
+  borderRadius: Layout.HEIGHT * 0.02,
+  marginTop: Layout.WIDTH * 0.02,
+  marginRight: Layout.WIDTH * 0.02,
+  marginLeft: Layout.WIDTH * 0.05,
+  paddingLeft: Layout.WIDTH * 0.05,
+  alignSelf: 'center',
+}
+
 export default StyleSheet.create({
   mainlist: {
     backgroundColor: Colors.white,
@@ -91,17 +102,8 @@ export default StyleSheet.create({
     fontSize: Layout.moderateScale(16),
     letterSpacing: 0.7,
   },
-  profileImage: {
-    height: Layout.HEIGHT * 0.10,
-    width: Layout.HEIGHT * 0.10,
-    borderRadius: Layout.HEIGHT * 0.02,
-    marginTop: Layout.WIDTH * 0.02,
-    marginRight: Layout.WIDTH * 0.02,
-    marginLeft: Layout.WIDTH * 0.05,
-    paddingLeft: Layout.WIDTH * 0.05,
-    resizeMode: 'cover',
-    alignSelf: 'center',
-  },
+  profileImage: Object.assign({resizeMode: 'cover'}, babyIcon),
+  babyIcon: babyIcon,
   userImage: {
     height: Layout.HEIGHT * 0.07,
     width: Layout.HEIGHT * 0.07,

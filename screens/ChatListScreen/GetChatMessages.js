@@ -31,13 +31,13 @@ class ListChatMessages extends Component {
       return (
        ( chat.listing.user.profileImage && chat.listing.user.profileImage.imageKey )
        ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.user.profileImage.imageKey }} style={styles.profileImage} />
-       : <Baby style={styles.rowImage} />
+       : <Baby style={styles.babyIcon} />
       )
     } else if ( chat && chat.initUser ) {
       return (
        ( chat.initUser.profileImage && chat.initUser.profileImage.imageKey )
        ? <Image source={{ uri: Urls.s3ImagesURL + chat.initUser.profileImage.imageKey }} style={styles.profileImage} />
-       : <Baby style={styles.rowImage} />
+       : <Baby style={styles.babyIcon} />
       )
     }
   }
@@ -76,7 +76,7 @@ class ListChatMessages extends Component {
         <Body style={styles.bodys}>
           <View style={styles.titleview}>
           { item.listing.primaryImage===null ||  item.listing.primaryImage.imageKey===null
-            ? <Baby style={styles.rowImage} />
+            ? <Baby style={styles.babyIcon} />
             : <Image source={{ uri: Urls.s3ImagesURL + item.listing.primaryImage.imageKey }} style={styles.rowImage} />
           }
             <Text style={styles.title}>{item.listing.title}</Text>

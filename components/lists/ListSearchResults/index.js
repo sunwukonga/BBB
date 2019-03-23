@@ -95,7 +95,7 @@ class ListSearchResults extends Component {
         <View>
         { w(item, ['primaryImage', 'imageKey'])
           ? <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
-          : <Baby style={styles.rowImage} />
+          : <Baby style={styles.babyIcon} />
         }
         </View>
         <View style={styles.userdetailSec}>

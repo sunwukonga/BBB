@@ -317,8 +317,9 @@ export default class Slider extends PureComponent {
     );
   };
 
+
   _getPropsForComponentUpdate(props) {
-    var {
+    let [
       value,
       onValueChange,
       onSlidingStart,
@@ -326,8 +327,8 @@ export default class Slider extends PureComponent {
       style,
       trackStyle,
       thumbStyle,
-      ...otherProps,
-    } = props;
+      ...otherProps
+    ] = props;
 
     return otherProps;
   };

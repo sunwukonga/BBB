@@ -91,7 +91,7 @@ class extends React.Component {
       if (!imageURL) {
         return (
           <View style={styles.swiperSec}>
-            <Baby style={styles.rowImage} />
+            <Baby style={styles.babyIcon} />
           </View>
         )
       } else {

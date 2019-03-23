@@ -1,6 +1,15 @@
 import { Platform, StyleSheet } from 'react-native';
 import { Layout, Colors } from '../../constants/';
 
+let babyIcon = {
+  height: Layout.HEIGHT * 0.05,
+  width: Layout.HEIGHT * 0.05,
+  borderRadius: Layout.HEIGHT * 0.025,
+  marginTop: Layout.WIDTH * 0.02,
+  marginRight: Layout.WIDTH * 0.02,
+  alignSelf: 'center',
+}
+
 export default StyleSheet.create({
   container: {
     height: Layout.HEIGHT,
@@ -49,15 +58,8 @@ export default StyleSheet.create({
     fontSize: Layout.moderateScale(16),
     letterSpacing: 0.7,
   },
-  profileImage: {
-    height: Layout.HEIGHT * 0.05,
-    width: Layout.HEIGHT * 0.05,
-    borderRadius: Layout.HEIGHT * 0.025,
-    marginTop: Layout.WIDTH * 0.02,
-    marginRight: Layout.WIDTH * 0.02,
-    resizeMode: 'cover',
-    alignSelf: 'center',
-  },
+  profileImage: Object.assign({resizeMode: 'cover'}, babyIcon),
+  babyIcon: babyIcon,
   notifyContainer: {
     paddingVertical: Layout.HEIGHT * 0.01,
     paddingHorizontal: Layout.WIDTH * 0.05,

@@ -201,7 +201,7 @@ class ListChats extends Component {
             <View style={styles.titleview}>
             { w(chat, ['listing', 'primaryImage', 'imageKey'])
               ? <Image source={{ uri: Urls.s3ImagesURL + chat.listing.primaryImage.imageKey }} style={styles.rowImage} />
-              : <Baby style={styles.rowImage} />
+              : <Baby style={styles.babyIcon} />
             }
               <Text style={styles.title}>{w(chat, ['listing', 'title'])}</Text>
             </View>

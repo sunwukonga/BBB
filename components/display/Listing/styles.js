@@ -1,6 +1,11 @@
 import { Platform, StyleSheet } from 'react-native';
 import { Layout, Colors } from '../../../constants/';
 
+let babyIcon = {
+  height: Layout.WIDTH * 0.7,
+  width: Layout.WIDTH * 0.7
+}
+
 export default StyleSheet.create({
 	container: {
 		height: Layout.HEIGHT,
@@ -52,10 +57,8 @@ export default StyleSheet.create({
 		borderRadius: Layout.moderateScale(3),
 		marginHorizontal: Layout.moderateScale(3),
 	},
-	rowImage: {
-		height: Layout.WIDTH * 0.7,
-		width: Layout.WIDTH * 0.7,
-	},
+  rowImage: babyIcon,
+  babyIcon: babyIcon,
 	favoriteIconSec: {
 		position: 'absolute',
 		top: Layout.moderateScale(10),

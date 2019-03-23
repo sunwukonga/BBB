@@ -1,6 +1,13 @@
 import { Platform, StyleSheet } from 'react-native';
 import { Layout, Colors } from '../../constants/';
 
+let rowImage = {
+  height: Layout.WIDTH * 0.48,
+  width: Layout.WIDTH * 0.54,
+  borderRadius: Layout.HEIGHT * 0.015,
+  resizeMode: 'contain',
+  alignSelf: 'center'
+}
 export default StyleSheet.create({
   container: {
     backgroundColor: Colors.menuHeader,
@@ -81,12 +88,12 @@ export default StyleSheet.create({
     borderWidth: 0.5,
     overflow: 'hidden',
   },
-  rowImage: {
-    height: Layout.WIDTH * 0.48,
-    width: Layout.WIDTH * 0.54,
-    borderRadius: Layout.HEIGHT * 0.015,
-    resizeMode: 'contain',
-    alignSelf: 'center',
+  rowImage: rowImage,
+  babyIcon: {
+    height: rowImage.height,
+    width: rowImage.width,
+    borderRadius: rowImage.borderRadius,
+    alignSelf: rowImage.alignSelf
   },
   favoriteIconSec: {
     position: 'absolute',

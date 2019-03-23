@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, ViewPropTypes } from 'react-native'
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -9,7 +9,7 @@ import {
 
 export default class Baby extends Component {
   static propTypes = {
-    style: PropTypes.number.isRequired
+    style: ViewPropTypes.style
   }
 
   render = () => {
