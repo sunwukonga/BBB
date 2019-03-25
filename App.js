@@ -2,11 +2,13 @@ import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font } from 'expo';
 import { Ionicons } from '@expo/vector-icons';
-import RootNavigation from './navigation/RootNavigation';
+import RootNavigation, { RootStackNavigator } from './navigation/RootNavigation';
 import { ApolloProvider } from 'react-apollo';
+import { createAppContainer } from 'react-navigation'
 import client from './config/Client';
 
 console.disableYellowBox = true;
+
 
 export default class App extends React.Component {
   state = {
@@ -23,6 +25,7 @@ export default class App extends React.Component {
         />
       );
     } else {
+      let RootContainer = createAppContainer( RootStackNavigator )
       return (
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
@@ -30,7 +33,7 @@ export default class App extends React.Component {
             <View style={styles.statusBarUnderlay} />
           )}
           <ApolloProvider client={client}>
-            <RootNavigation />
+            <RootContainer />
           </ApolloProvider>
         </View>
       );

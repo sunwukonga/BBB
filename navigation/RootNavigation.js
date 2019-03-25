@@ -27,7 +27,7 @@ const RootStackNavigator = createStackNavigator(
 export default class RootNavigator extends React.Component {
 
   constructor() {
-    super()
+    super(props)
     //console.log("RootNav:constructor")
     this.homeBackExitHandler = null
 //    this.dummyHandler = null
