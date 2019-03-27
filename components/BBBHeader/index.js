@@ -9,7 +9,7 @@ import {
   Icon,
 } from 'native-base';
 import { Text } from 'react-native';
-import EvilIcons from 'react-native-vector-icons/EvilIcons';
+import { EvilIcons } from '@expo/vector-icons';
 
 // Styles and Theme
 import { Layout, Colors } from '../../constants/';

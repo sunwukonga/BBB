@@ -67,7 +67,7 @@ class ListVisitedListings extends Component {
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => "MostVisited-" + item.id}
                 data = {data.getMostVisitedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Home} translations={translations} />

@@ -7,7 +7,6 @@ import {
 , Picker
 } from 'react-native'
 import { Container, Content, List, ListItem, Body, Left, Right, Text, Button, Icon } from 'native-base'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 // custom components
 import Baby from '../../components/Baby'
@@ -37,7 +36,6 @@ import {
   SET_COUNTRY
 } from '../../graphql/Mutations'
 
-//const SA_changeCountry = (isoCode, navigation, key) => StackActions.reset({
 const SA_changeCountry = (isoCode, iso639_2) => StackActions.reset({
   index: 0
 , key: null
@@ -48,15 +46,6 @@ const SA_changeCountry = (isoCode, iso639_2) => StackActions.reset({
     })
   ]
 })
-/*
-const SA_changeCountry = StackActions.reset({
-  index: 0
-, key: 'root'
-, actions: [
-    StackActions.push({ routeName: 'loginScreen' })
-  ]
-})
-*/
 
 export default ProfileScreen = compose(
   graphql(GET_LOGIN_STATUS, {name: "loginStatus"})

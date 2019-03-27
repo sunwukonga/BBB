@@ -19,11 +19,11 @@ import {
   Icon,
   Input,
 } from 'native-base';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 //custom components
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
+import { Ionicons } from '@expo/vector-icons';
 
 // screen style
 import styles from './styles';

@@ -13,7 +13,7 @@ import {
 */
 import styles from './styles';
 import { Layout, Colors } from '../../constants/';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 import { w } from '../../utils/helpers.js'
 
 import {

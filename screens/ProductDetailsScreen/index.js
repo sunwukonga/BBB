@@ -9,8 +9,6 @@ import {
 	Button,
 	Item,
 } from 'native-base';
-import Swiper from 'react-native-swiper';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationActions } from 'react-navigation';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 //import Toast from 'react-native-simple-toast';
@@ -31,7 +29,7 @@ import LastMessageIds from '../ChatListScreen/LastMessageIds'
 import GetProfile from '../../graphql/queries/GetProfile'
 import GetCachedListing from '../../graphql/queries/GetCachedListing'
 import Listing from '../../components/display/Listing'
-import { w } from '../../utils/helpers.js'
+import { w, getMethods } from '../../utils/helpers.js'
 
 
 class ProductDetailsScreen extends React.Component {
@@ -49,9 +47,10 @@ class ProductDetailsScreen extends React.Component {
 
   render() {
     let {item, loginStatus} = this.props.navigation.state.params
+    //console.log(JSON.stringify(getMethods(this.props.navigation)))
 
     var leftComponent = (
-      <Button transparent onPress={() => this.props.navigation.goBack()}>
+      <Button transparent onPress={() => this.props.navigation.pop()}>
         <BBBIcon
           name="BackArrow"
           size={Layout.moderateScale(18)}
@@ -69,7 +68,10 @@ class ProductDetailsScreen extends React.Component {
                 leftComponent={leftComponent}
               />
               <Content style={styles.contentStyle}>
-                <Listing item={listing} loginStatus={loginStatus} chatIndexes={chatIndexes} />
+              { listing
+              ? <Listing item={listing} loginStatus={loginStatus} chatIndexes={chatIndexes} />
+              : <Listing item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} />
+              }
               </Content>
             </Container>
         )}</LastMessageIds>

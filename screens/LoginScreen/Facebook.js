@@ -3,12 +3,11 @@ import { Button, Platform, StyleSheet, Text, View } from "react-native";
 import { graphql, Mutation, withApollo } from "react-apollo";
 import gql from "graphql-tag";
 
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Layout, Colors, Urls } from '../../constants/';
 import {Alert, Image, ImageBackground } from 'react-native';
 
 
-import { StackActions, NavigationActions } from 'react-navigation';
+import { NavigationActions } from 'react-navigation';
 import {
   FACEBOOK_LOGIN
 , SET_AUTH_STATUS
@@ -31,23 +30,6 @@ const NA_LoginToCreate = NavigationActions.navigate({
     params: { previous_screen: 'loginScreen'
             , loginStatus: true }
 })
-/*
-const SA_LoginToCreate = StackActions.reset({
-    index: 0
-  , actions: [
-      NavigationActions.navigate({
-        routeName: 'mainScreen'
-      , actions: [
-        NavigationActions.navigate({
-          routeName: 'homeScreen'
-        , params: { loginStatus: true }
-        })
-      , NavigationActions.navigate({
-          routeName: 'createNewItemScreen'
-      })
-    ]
-})
-*/
 
 const FacebookOauth = graphql(SET_AUTH_STATUS)(
   class extends Component {

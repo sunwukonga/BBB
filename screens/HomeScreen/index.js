@@ -172,7 +172,6 @@ export default class HomeScreen extends React.Component {
   // Auth checking functions
   //-----------------------------------
   checkAuthForCreate = (loginStatus) => {
-    console.log(loginStatus)
     if( loginStatus.authorized ) {
       this.props.navigation.navigate('createNewItemScreen')
     } else{

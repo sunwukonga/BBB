@@ -1,7 +1,6 @@
 import React from 'react'
 import { FlatList, Image, TouchableOpacity, View } from 'react-native'
 import { Container, Content, List, ListItem, Body, Left, Right, Text, Button, Icon } from 'native-base'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 // custom components
 import Baby from '../../components/Baby'

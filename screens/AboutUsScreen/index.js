@@ -69,7 +69,7 @@ render() {
                   Linking.openURL( "http://www.bebebargains.com/privacy-policy/" )
                 }}>
                 <Ionicons
-                  name="ios-link-outline"
+                  name="ios-link"
                   size={Layout.moderateScale(20)}
                   color={Colors.secondaryColor}
                   style={styles.menuIcon}
@@ -81,7 +81,7 @@ render() {
                   Linking.openURL( "http://www.bebebargains.com/terms-of-use/" )
                 }}>
                 <Ionicons
-                  name="ios-link-outline"
+                  name="ios-link"
                   size={Layout.moderateScale(20)}
                   color={Colors.secondaryColor}
                   style={styles.menuIcon}

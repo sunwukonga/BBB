@@ -13,7 +13,6 @@ import {
 	Icon,
 } from 'native-base';
 import { graphql, compose } from "react-apollo";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { NavigationActions } from 'react-navigation';
 // custom components
 import Baby from '../../components/Baby';
@@ -23,8 +22,6 @@ import IdentityVerification from '../../components/IdentityVerification';
 import BBBHeader from '../../components/BBBHeader';
 import BBBIcon from '../../components/BBBIcon';
 import CheckBox from '../../components/CheckBox';
-//import Dropdown from '../../components/Dropdown/dropdown';
-import Slider from '../../components/Slider';
 import { Ionicons } from '@expo/vector-icons';
 
 import MultiSlider from '@ptomasroos/react-native-multi-slider';

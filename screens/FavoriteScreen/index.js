@@ -2,7 +2,6 @@ import React from 'react'
 import { View } from 'react-native'
 import { Container, Content, Button } from 'native-base'
 import { graphql, compose } from "react-apollo";
-//import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 // custom components
 //import Baby from '../../components/Baby'

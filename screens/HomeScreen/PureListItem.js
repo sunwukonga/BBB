@@ -20,8 +20,6 @@ import Stars from '../../components/Stars';
 import LikeButton from '../../components/buttons/LikeButton'
 import ChatButton from '../../components/buttons/ChatButton'
 import DeleteButton from '../../components/buttons/DeleteButton'
-import CreateChat from '../../graphql/mutations/CreateChat'
-import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 import GetProfile from '../../graphql/queries/GetProfile'
 import { w, i18n } from '../../utils/helpers.js'
 
@@ -90,7 +88,7 @@ class PureListItem extends Component {
         <View style={styles.imagesSubView}>
           <View>
             { w(item, ['primaryImage', 'imageKey']) === null
-              ? <Baby style={styles.rowImage} />
+              ? <Baby style={styles.babyIcon} />
               : <Image source={{ uri: Urls.s3ImagesURL + item.primaryImage.imageKey }} style={styles.rowImage} />
             }
             <LikeButton item={item} loginStatus={loginStatus} />

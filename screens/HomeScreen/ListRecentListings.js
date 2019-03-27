@@ -82,7 +82,7 @@ const ListRecentListings = graphql(UNSET_AUTH_STATUS, {name: "unsetAuthStatus"})
                 <FlatList
                   horizontal = {true}
                   contentContainerStyle={styles.listContent}
-                  keyExtractor={(item, index) => index.toString()}
+                  keyExtractor={(item, index) => "MostRecent-" + item.id}
                   data = {dataPointer}
                   renderItem={({ item }) => {
                     return <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Home} createNew={createNew} translations={translations} />

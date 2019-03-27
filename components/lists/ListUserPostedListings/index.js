@@ -63,7 +63,7 @@ class ListUserPostedListings extends Component {
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => "YourListedItems-" + item.id}
                 data = {data.getUserPostedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.OwnListing} translations={translations} />

@@ -70,7 +70,7 @@ class ListUserLikedListings extends Component {
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => "YourLiked-" + item.id}
                 data = {data.getUserLikedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Favorite} translations={translations} />

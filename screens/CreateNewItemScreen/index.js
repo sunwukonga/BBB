@@ -26,10 +26,7 @@ import RedioSelected from '../../components/RedioSelected';
 import RedioUnselect from '../../components/RedioUnselect';
 import Add from '../../components/Add';
 //import SearchBtn from '../../components/SearchBtn';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-//import FontAwesome from 'react-native-vector-icons/FontAwesome';
-//import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Feather from 'react-native-vector-icons/Feather';
+import { Ionicons, Feather } from '@expo/vector-icons';
 //import Dropdown from '../../components/Dropdown/dropdown';
 import { create } from 'apisauce';
 import getSignedUrl from './SignedUrl';
@@ -75,19 +72,34 @@ const resetAction = StackActions.reset({
   ],
 });
 //NavigationActions.navigate
+const NA_CreateToProduct = (item, loginStatus) => NavigationActions.navigate({
+  routeName: 'mainScreen'
+, action: NavigationActions.navigate({
+    routeName: 'productDetailsScreen'
+  , params: {
+      item: item
+    , loginStatus: loginStatus
+    }
+  })
+})
+/*
 const SA_CreateToProduct = (item, loginStatus) => StackActions.reset({
   index: 1
 , actions: [
-    StackActions.push({ routeName: 'homeDrawer' })
-  , StackActions.push({
-      routeName: 'productDetailsScreen'
-    , params: {
-        item: item
-      , loginStatus: loginStatus
-      }
+    NavigationActions.navigate({ routeName: 'mainScreen' })
+  , NavigationActions.navigate({
+      routeName: 'mainScreen',
+      action: NavigationActions.navigate({
+        routeName: 'productDetailsScreen'
+      , params: {
+          item: item
+        , loginStatus: loginStatus
+        }
+      })
     })
   ]
 })
+*/
 
 var currency = ''
 var postCurrency = ''
@@ -209,7 +221,7 @@ class extends React.Component {
         })
       }
     } catch (error) {
-      console.log(error);
+      console.log(JSON.stringify(error));
     }
   };
 
@@ -229,34 +241,34 @@ class extends React.Component {
     imageUploadList = imageList.map( image => {
       return {
         imageId: image.imageId
-      , imageKey: image.imageKey
-      , primary: image.primary
-      , deleted: image.deleted
+        , imageKey: image.imageKey
+        , primary: image.primary
+        , deleted: image.deleted
       }
     })
 
     if (this.state.title.length===0){
-        this.toast.show("Please Enter Title", DURATION.LENGTH_LONG);
-        return false;
+      this.toast.show("Please Enter Title", DURATION.LENGTH_LONG);
+      return false;
     }
 
     if(this.state.longDesc.length===0){
-        this.toast.show("Please Enter Description", DURATION.LENGTH_LONG);
-        return false;
+      this.toast.show("Please Enter Description", DURATION.LENGTH_LONG);
+      return false;
     }
     if(this.state.category.length===0){
-        this.toast.show("Please Select Category", DURATION.LENGTH_LONG);
-        return false;
+      this.toast.show("Please Select Category", DURATION.LENGTH_LONG);
+      return false;
     }
 
     if(postCurrency.length == 0 || (this.state.postCost && this.state.postCost == 0.0)){
       if (postCurrency.length===0){
         this.toast.show("Please Select Post Currency", DURATION.LENGTH_LONG);
-          return false;
+        return false;
       }
       if(this.state.postCost.length===0){
         this.toast.show("Please Enter Post Cost", DURATION.LENGTH_LONG);
-          return false;
+        return false;
       }
     }
     return true
@@ -284,7 +296,7 @@ class extends React.Component {
       var _data=res.data.searchTemplates;
       var tmpList=[];
       Object.keys(res.data.searchTemplates).forEach((key,index)=>{
-            tmpList.push({label:res.data.searchTemplates[key].title,key:res.data.searchTemplates[key].id});
+        tmpList.push({label:res.data.searchTemplates[key].title,key:res.data.searchTemplates[key].id});
       });
       this.setState({
         searchTemplateList:_data,
@@ -293,8 +305,8 @@ class extends React.Component {
       })
 
     })
-    .catch(error => {
-      console.log("Error:" + error.message);
+      .catch(error => {
+        console.log("Error:" + error.message);
       this.setState({
         progressVisible: false,
 
@@ -348,14 +360,12 @@ class extends React.Component {
     return variables
 
     /*
-    console.log("Params",variables);
       this.setState({
         progressVisible: true,
         progressMsg:"Please Wait..."
       });
 
     createNewItemUrl(variables).then((res)=>{
-      console.log("Response ",res)
 
         this.setState({
           progressVisible: false,
@@ -365,7 +375,6 @@ class extends React.Component {
         });
     })
     .catch(error => {
-        console.log("Error:" + error.message);
         this.setState({
           progressVisible: false,
           errorMsg:error.message,
@@ -486,7 +495,6 @@ class extends React.Component {
     })
 
     if ( ! pickerResult.cancelled ) {
-      //console.log("EXIF: ", pickerResult.exif)
       this.setState({
         progressVisible: true,
       });
@@ -502,12 +510,8 @@ class extends React.Component {
       //
       /*
       hashPromise.then( hash => {
-        console.log("Hash: ", hash)
       })*/
       let fileinfo = await Expo.FileSystem.getInfoAsync(pickerResult.uri, { size: true, md5: true })
-      //console.log(fileinfo.md5)
-      //console.log("Hi")
-      //console.log("Starting size: ", fileinfo.size)
       let tryResize = pickerResult
        // If filesize is below 150kb don't attempt to reduce it further.
       let compressionFactor = 0.95
@@ -516,31 +520,24 @@ class extends React.Component {
         // #######################################
         // Resize any dimension greater than maxPixels
         // #######################################
-        //console.log("fileinfo: ", fileinfo)
-        //console.log("pickerResult: ", pickerResult)
-        //console.log("size: ", fileinfo.size, " width: ", pickerResult.width, " height: ", pickerResult.height)
-        //console.log("size: ", fileinfo.size)
         ////
         if ( pickerResult.height > maxPixels ) {
           if (pickerResult.width >= pickerResult.height) {
             // Width needs reduction to maxPixels
-            tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
+            tryResize = await Expo.ImageManipulator.manipulateAsync(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
           } else {
             // Height needs reduction to maxPixels
-            tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {height: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
+            tryResize = await Expo.ImageManipulator.manipulateAsync(pickerResult.uri, [{ resize: {height: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
           }
         } else if (pickerResult.width > maxPixels) {
           // Width needs reduction to maxPixels
-          tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
+          tryResize = await Expo.ImageManipulator.manipulateAsync(pickerResult.uri, [{ resize: {width: maxPixels}}], { format: 'jpeg', compress: compressionFactor})
         } else {
           // No need for resize
-          tryResize = await Expo.ImageManipulator.manipulate(pickerResult.uri, [], { format: 'jpeg', compress: compressionFactor})
-          //console.log("Pixel size fine: ")
+          tryResize = await Expo.ImageManipulator.manipulateAsync(pickerResult.uri, [], { format: 'jpeg', compress: compressionFactor})
         }
         fileinfo = await Expo.FileSystem.getInfoAsync(tryResize.uri, {size: true})
         ////
-        //console.log("Tried Size: ", fileinfo.size, " maxPixels: ", maxPixels)
-        //console.log("compLevel: ", compressionFactor)
         compressionFactor -= 0.05
         if (compressionFactor < 0.1) {
           if (maxPixels > 256) {
@@ -607,15 +604,15 @@ class extends React.Component {
     while ( C > 1.5 ) {
       if ( Q > 1 ) {
           console.log("Compression ratio >= 1.5 and Q > 1")
-          compressed = await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 0 })
+          compressed = await Expo.ImageManipulator.manipulateAsync(compressed.uri, [], { compress: 0 })
       } else if ( Q < 0.1 ) {
         // It is possible that this restriction could result in image sizes greater than 200kb
         console.log("Q < 0.1")
-        return await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 0 })
+        return await Expo.ImageManipulator.manipulateAsync(compressed.uri, [], { compress: 0 })
         //return compressed
       } else {
         console.log("0.1 <= Q <= 1")
-        compressed = await Expo.ImageManipulator.manipulate(compressed.uri, [], { compress: 0 })
+        compressed = await Expo.ImageManipulator.manipulateAsync(compressed.uri, [], { compress: 0 })
       }
 
       imageInfo = await Expo.FileSystem.getInfoAsync(compressed.uri, {size: true})
@@ -648,7 +645,7 @@ class extends React.Component {
     getSignedUrl( 'image/jpeg' )
     .then( ({ data, refetch, error }) => {
       if (error) {
-        console.log("Error: ", error)
+        console.log("Error: ", JSON.stringify(error))
         // Try again?
         return null
       }
@@ -690,10 +687,8 @@ class extends React.Component {
     })
     .then( (response) =>{
       if ( w(response, ['ok']) ) {
-        //console.log("Response: ", response)
         //
       } else {
-        //console.log("Response: ", response)
         // Some kind of error
 //        response.data contains %EntityTooLarge%
 //       response.ok == false
@@ -934,7 +929,7 @@ class extends React.Component {
       if (e.persist) {
         e.persist();  // Avoids warnings relating to https://fb.me/react-event-pooling
       }
-      console.log("LongPressEvent: ", e)
+      console.log("LongPressEvent: ", JSON.stringify(e))
       /*
       this.setState(prevState => ({
         marker: { ...this.state.marker, [
@@ -950,7 +945,7 @@ class extends React.Component {
       if (e.persist) {
         e.persist();  // Avoids warnings relating to https://fb.me/react-event-pooling
       }
-      console.log("PressEvent: ", e)
+      console.log("PressEvent: ", JSON.stringify(e))
       /*
       this.setState(prevState => ({
         marker: { ...this.state.marker, [
@@ -997,9 +992,9 @@ class extends React.Component {
           <Button transparent onPress={() => {
             let collatedVariables = this.collateVariables( loginStatus.countryCode )
             if (collatedVariables) {
-              mutateCreateListing( collatedVariables )
+              mutateCreateListing( collatedVariables, loginStatus )
               .then(({ data }) => {
-                this.props.navigation.dispatch(SA_CreateToProduct(data.createListing, loginStatus))
+                this.props.navigation.dispatch(NA_CreateToProduct(data.createListing, loginStatus))
               })
             }
           }}>
@@ -1225,7 +1220,7 @@ class extends React.Component {
                 <View style={styles.deliveryOption}>
                   <Text style={styles.txtDelOpt}>{i18n(translations, parentName, "DeliveryOptions", loginStatus.iso639_2, "Delivery Options")}</Text>
                   <View style={styles.faceToFace}>
-                    <Text style={styles.txtfacetoFace}>{i18n(translations, parentName, "Face to Face", loginStatus.iso639_2, "Face to Face")}</Text>
+                    <Text style={styles.txtfacetoFace}>{i18n(translations, parentName, "FaceToFace", loginStatus.iso639_2, "Face to Face")}</Text>
                     <View style={styles.bottomline} />
                     <View style={styles.subFacetoFace}>
                       <View style={styles.dataFacetoFace}>
@@ -1291,7 +1286,7 @@ class extends React.Component {
                         </View>
                       </View>
                       <View style={styles.mapFacetoFace}>
-                        {console.log(w(this.state, ['region', 'latitudeDelta']) ? this.state.region : Object.assign({}, defaultRegions[country.isoCode], this.state.region))}
+                        {console.log(w(this.state, ['region', 'latitudeDelta']) ? JSON.stringify(this.state.region) : JSON.stringify(Object.assign({}, defaultRegions[country.isoCode], this.state.region)))}
                         <MapView
                           initialRegion={defaultRegions[country.isoCode]}
                           region={w(this.state, ['region', 'latitudeDelta']) ? this.state.region : Object.assign({}, defaultRegions[country.isoCode], this.state.region)}
@@ -1302,7 +1297,7 @@ class extends React.Component {
                                 marker: { ...this.state.marker, latlng: e.nativeEvent.coordinate, title: 'title', descrpition: 'description' }
                               , address: { ...this.state.address, lat: e.nativeEvent.coordinate.latitude, long: e.nativeEvent.coordinate.longitude }
                               })
-                            } else { console.log("onLongPressEvente: ", e) }}}
+                            } else { console.log("onLongPressEvente: ", JSON.stringify(e)) }}}
                           showsUserLocation
                           showsMyLocationButton
                         >

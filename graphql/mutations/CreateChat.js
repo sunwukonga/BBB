@@ -37,11 +37,11 @@ export const CreateChat = graphql(CREATE_CHAT) (
         variables: { listingId: item.id },
         update: (cache, { data: { createChat } }) => {
           // ------------------- READING -------------------
-          console.log("CreateChat: ", createChat)
+          //console.log("CreateChat: ", createChat)
           const { getChatMessages } = cache.readQuery({
             query: GET_CHAT_MESSAGES
           })
-          console.log("getChatMessages: ", getChatMessages)
+          //console.log("getChatMessages: ", getChatMessages)
           const { getUserLikedListings } = cache.readQuery({
             query: GET_USER_LIKED_LIST
           , variables: {"countryCode": loginStatus.countryCode}

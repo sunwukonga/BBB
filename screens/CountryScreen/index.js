@@ -200,32 +200,32 @@ const CountryScreen = compose (
             update = {(cache, { data: { setCountry } }) => {
               cache.writeQuery({
                 query: GET_USER_LIKED_LIST
-              , variables: {"countryCode": setCountry.isoCode}
+              , variables: {"countryCode": setCountry.getCachedCountry.isoCode}
               , data: { getUserLikedListings: [] }
               })
               cache.writeQuery({
                 query: GET_USER_VISITED_LIST
-              , variables: {"countryCode": setCountry.isoCode}
+              , variables: {"countryCode": setCountry.getCachedCountry.isoCode}
               , data: { getUserVisitedListings: [] }
               })
               cache.writeQuery({
                 query: GET_USER_POSTED_LIST
-              , variables: {"countryCode": setCountry.isoCode}
+              , variables: {"countryCode": setCountry.getCachedCountry.isoCode}
               , data: { getUserPostedListings: [] }
               })
               cache.writeQuery({
                 query: GET_MOST_RECENT_LIST
-              , variables: {"countryCode": setCountry.isoCode}
+              , variables: {"countryCode": setCountry.getCachedCountry.isoCode}
               , data: { getMostRecentListings: [] }
               })
               cache.writeQuery({
                 query: GET_MOST_VISITED_LIST
-              , variables: {"countryCode": setCountry.isoCode}
+              , variables: {"countryCode": setCountry.getCachedCountry.isoCode}
               , data: { getMostVisitedListings: [] }
               })
               cache.writeQuery({
                 query: GET_MOST_LIKED_LIST
-              , variables: {"countryCode": setCountry.isoCode}
+              , variables: {"countryCode": setCountry.getCachedCountry.isoCode}
               , data: { getMostLikedListings: [] }
               })
               /*

@@ -3,8 +3,6 @@ import { Image, View, ImageBackground } from 'react-native';
 //import { Mutation } from 'react-apollo';
 //import gql from 'graphql-tag';
 import { Container, Content, Left, Text, Button } from 'native-base';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // custom components
 import BebeBARGAINS from '../../components/BebeBARGAINS';

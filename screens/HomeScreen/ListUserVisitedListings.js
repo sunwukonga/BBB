@@ -70,7 +70,7 @@ class ListUserVisitedListings extends Component {
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item, index) => "YourVisited-" + item.id}
                 data = {data.getUserVisitedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Home} translations={translations} />

@@ -185,6 +185,11 @@ mutation createListing(
       category {
         id
         name
+        locus {
+          id
+          name
+          parentName
+        }
       }
       primaryImage {
         id

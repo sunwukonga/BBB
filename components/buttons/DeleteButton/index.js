@@ -54,7 +54,7 @@ class DeleteButton extends Component {
           >
             <View >
               <Ionicons
-                name="ios-trash-outline"
+                name="ios-trash"
                 size={Layout.moderateScale(18)}
                 color={Colors.white}
                 style={{alignSelf: 'center', justifyContent: 'center', backgroundColor: 'transparent', marginTop: Layout.moderateScale(3) }}

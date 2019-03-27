@@ -4,7 +4,7 @@
  *  Custom Icon Pack
  */
 
-import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
+import { createIconSetFromIcoMoon } from '@expo/vector-icons';
 import icoMoonConfig from './selection.json';
 import { Platform } from 'react-native';
 

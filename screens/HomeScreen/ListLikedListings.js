@@ -67,7 +67,7 @@ class ListLikedListings extends Component {
               <FlatList
                 horizontal = {true}
                 contentContainerStyle={styles.listContent}
-                keyExtractor={(item, index) => item.id.toString()}
+                keyExtractor={(item, index) => "MostLiked-" + item.id}
                 data = {data.getMostLikedListings || []}
                 renderItem={({ item }) =>
                    <PureListItem item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} resetTo={Locations.Home} translations={translations} />

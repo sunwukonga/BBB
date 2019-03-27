@@ -42,6 +42,12 @@ const defaultRegions = {
   , latitudeDelta: 6.6091
   , longitudeDelta: 4.8574
   }
+, IN: {
+    latitude: 20.5937
+  , longitude: 78.9629
+  , latitudeDelta: 26.3475
+  , longitudeDelta: 21.0000
+  }
 , KE: {
     latitude: 0.6815
   , longitude: 37.7088

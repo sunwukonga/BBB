@@ -5,7 +5,7 @@ import { HttpLink } from "apollo-link-http";
 import { withClientState } from "apollo-link-state";
 import { onError } from "apollo-link-error";
 import { InMemoryCache, defaultDataIdFromObject } from "apollo-cache-inmemory";
-import { Mutation } from "react-apollo";
+//import { Mutation } from "react-apollo";
 
 import {
   GET_CACHED_COUNTRY
@@ -37,7 +37,6 @@ const cache = new InMemoryCache({
       getListing: (_, { id }, { getCacheKey }) =>
         getCacheKey({ __typename: 'Listing', id: id })
     , getCachedCountry: (_, { isoCode }, { getCacheKey }) => {
-        console.log("HIT")
         return getCacheKey({ __typename: 'Country', isoCode: isoCode })
       }
     , getCachedLocus: (_, { locusId, countryCode }, { getCacheKey }) =>
@@ -99,7 +98,7 @@ const stateLink = withClientState({
   resolvers: {
     Mutation: {
       setAuthStatus: (_, args, { cache }) => {
-        console.log('setAuthStatus client-side mutation fired');
+        //console.log('setAuthStatus client-side mutation fired');
         if (! args.token ) {
           // populate from secureStore if available.
           return Expo.SecureStore.getItemAsync("authStatus")
@@ -120,14 +119,14 @@ const stateLink = withClientState({
         }
       },
       unsetAuthStatus: (_, args, { cache }) => {
-        console.log('unsetAuthStatus client-side mutation fired');
+        //console.log('unsetAuthStatus client-side mutation fired');
         token = default_token
         cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: -1, profileName: "", nameChangeCount: 0, profileImageURL: "" }}});
         Expo.SecureStore.deleteItemAsync("authStatus")
         return null;
       },
       updateAuthStatus: (_, args, { cache }) => {
-        console.log('updateAuthStatus client-side mutation fired');
+        //console.log('updateAuthStatus client-side mutation fired');
           let change = false
           let newMyProfile = {
             __typename: 'MyProfile'
@@ -166,11 +165,10 @@ const stateLink = withClientState({
     }
   },
 });
-const link = ApolloLink.from([errorLink, stateLink, middlewareLink, httpLink]);
 
 const client = new ApolloClient({
-  link
-, cache
+  cache
+, link: ApolloLink.from([stateLink, errorLink, middlewareLink, httpLink])
 });
 
 client.onResetStore(stateLink.writeDefaults);

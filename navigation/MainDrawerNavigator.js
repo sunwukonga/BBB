@@ -61,6 +61,7 @@ export default createStackNavigator(
   {
     headerMode: 'none',
     initialRouteName: 'homeDrawer',
+    initialRouteKey: 'home',
     navigationOptions: ({ navigation }) => ({
       gesturesEnabled: false,
     }),

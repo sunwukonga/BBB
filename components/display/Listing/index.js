@@ -22,6 +22,7 @@ import Stars from '../../Stars';
 
 import LikeButton from '../../buttons/LikeButton'
 import ChatButton from '../../buttons/ChatButton'
+import DeleteButton from '../../buttons/DeleteButton'
 import CreateChat from '../../../graphql/mutations/CreateChat'
 import LastMessageIds from '../../../screens/ChatListScreen/LastMessageIds'
 import { optimisticCreateChat } from '../../../graphql/mutations/Optimistic.js'
@@ -121,7 +122,7 @@ class extends Component {
     if ( !w(this.props, ['i18n', 'getCachedLocus']) ) {
       return null
     }
-    let {item, loginStatus, chatIndexes, i18n: {getCachedLocus: translations}} = this.props
+    let {item, loginStatus, chatIndexes, i18n: {getCachedLocus: translations}, resetTo = 'homeScreen' } = this.props
     const parentName = "ProductDetailsScreen"
 
     let exchangeMode = null
@@ -171,6 +172,7 @@ class extends Component {
         >
           <LikeButton item={item} loginStatus={loginStatus} />
           <ChatButton item={item} loginStatus={loginStatus} chatIndexes={chatIndexes} />
+          <DeleteButton item={item} loginStatus={loginStatus} resetTo={resetTo} />
         </View>
         <Item style={styles.userItemDetailsSec}>
           <View style={{ flexDirection: 'row' }}>
@@ -212,7 +214,7 @@ class extends Component {
           <View style={{alignSelf: 'flex-start'}}>
             <Text style={styles.regularLarge}>{i18n(translations, parentName, "Category", loginStatus.iso639_2, "Category")}</Text>
             <Text style={[styles.regularSmall, styles.tagContainer]}>
-              {i18n(translations, parentName, w(item, ['category', 'locus']), loginStatus.iso639_2, w(item, ['category', 'name']))}
+              {i18n(translations, parentName, w(item, ['category', 'locus', 'name']), loginStatus.iso639_2, w(item, ['category', 'name']))}
             </Text>
           </View>
           <View>
@@ -290,7 +292,6 @@ import {
 	Item,
 } from 'native-base';
 import Swiper from 'react-native-swiper';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationActions } from 'react-navigation';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import Toast from 'react-native-simple-toast';

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { graphql, compose, withApollo } from 'react-apollo'
-import { StackActions, withNavigation } from 'react-navigation';
+import { StackActions, NavigationActions, withNavigation } from 'react-navigation';
 import {
   DELETE_LISTING
 } from '../../graphql/Mutations'
@@ -15,17 +15,23 @@ import {
 //import { optimisticCreateChat } from '../../graphql/mutations/Optimistic.js'
 import { Locations } from '../../constants/';
 
+const NA_resetHomeDrawer = NavigationActions.navigate({ routeName: 'mainScreen' })
+/*
 const SA_resetHomeDrawer = StackActions.reset({
   index: 0
 , actions: [
-    StackActions.push({ routeName: 'homeDrawer' })
+    NavigationActions.navigate({ routeName: 'mainScreen' })
   ]
 })
+*/
 const SA_resetOwnListing = StackActions.reset({
   index: 1
 , actions: [
-    StackActions.push({ routeName: 'homeDrawer' })
-  , StackActions.push({ routeName: 'ownListingsScreen' })
+    NavigationActions.navigate({ routeName: 'mainScreen' })
+  , NavigationActions.navigate({
+      routeName: 'mainScreen'
+    , action: NavigationActions.navigate({ routeName: 'ownListingsScreen' })
+    })
   ]
 })
 
@@ -48,6 +54,7 @@ export const DeleteListing = compose(
           ]
         },
 */
+    //withApollo and this.props.client do not seem to be used anymore.
     render() {
       let { listingId, loginStatus, resetTo, client, navigation } = this.props
 //      let optimisticResponse = optimisticCreateChat( item, currentUser )
@@ -105,7 +112,7 @@ export const DeleteListing = compose(
             cache.writeQuery({
               query: GET_MOST_RECENT_LIST
             , variables: {"countryCode": loginStatus.countryCode}
-            , data: { getMostRecentListings: getMostRecentListings.filter( listing => listing.id != listingId )}
+            , data: { getMostRecentListings: JSON.parse(JSON.stringify( getMostRecentListings.filter( listing => listing.id != listingId )))}
             })
           } // END if
         }
@@ -114,7 +121,7 @@ export const DeleteListing = compose(
         if (deleteListing) {
           //client.queryManager.broadcastQueries()
           if (resetTo === Locations.Home) {
-            navigation.dispatch(SA_resetHomeDrawer)
+            navigation.dispatch(NA_resetHomeDrawer)
           } else {
             navigation.dispatch(SA_resetOwnListing)
           }

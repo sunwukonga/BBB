@@ -173,7 +173,7 @@ export const DrawerContainer = compose(
                 navigation.navigate('ownListingsScreen')
               }}>
               <Ionicons
-                name="ios-images-outline"
+                name="ios-images"
                 size={Layout.moderateScale(20)}
                 color={Colors.secondaryColor}
                 style={styles.menuIcon}
@@ -199,7 +199,7 @@ export const DrawerContainer = compose(
                 navigation.navigate('aboutUsScreen')
               }}>
               <Ionicons
-                name="ios-link-outline"
+                name="ios-link"
                 size={Layout.moderateScale(20)}
                 color={Colors.secondaryColor}
                 style={styles.menuIcon}
