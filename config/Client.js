@@ -26,9 +26,9 @@ var token = default_token
 const cache = new InMemoryCache({
   dataIdFromObject: object => {
     switch (object.__typename) {
-      case 'Country': return object.isoCode
-      case 'Currency': return object.iso4217
-      case 'Language': return object.iso639_2
+      case 'Country': return `Country:${object.isoCode}`
+      case 'Currency': return `Currency:${object.iso4217}`
+      case 'Language': return `Language:${object.iso639_2}`
       default: return defaultDataIdFromObject(object) // object.id || object._id // fall back to `id` and `_id` for all other types
     }
   },

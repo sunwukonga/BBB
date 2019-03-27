@@ -72,6 +72,7 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
                 startTime = new Date()
                 const { data } = await loginFacebook({
                   variables: { token: token },
+                  fetchPolicy: 'no-cache'
                 });
                 console.log("Time (ms) to get BBToken: ", new Date() - startTime)
 
