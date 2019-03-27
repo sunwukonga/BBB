@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 
 import { Layout, Colors, Urls } from '../../constants/';
 import {Alert, Image, ImageBackground } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 
 import { NavigationActions } from 'react-navigation';
