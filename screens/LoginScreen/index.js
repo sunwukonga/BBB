@@ -45,7 +45,7 @@ export default class LoginScreen extends React.Component {
               />
               <Text style={styles.connectSec}>
                 <Ionicons
-                  name="ios-remove-outline"
+                  name="ios-remove"
                   style={[
                     styles.lineStyle,
                     { marginRight: Layout.moderateScale(10) },
@@ -53,7 +53,7 @@ export default class LoginScreen extends React.Component {
                 />{' '}
                 CONNECT WITH{' '}
                 <Ionicons
-                  name="ios-remove-outline"
+                  name="ios-remove"
                   style={[
                     styles.lineStyle,
                     { marginLeft: Layout.moderateScale(10) },

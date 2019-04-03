@@ -71,7 +71,7 @@ const resetAction = StackActions.reset({
     NavigationActions.navigate({ routeName: 'Settings' }),
   ],
 });
-//NavigationActions.navigate
+
 const NA_CreateToProduct = (item, loginStatus) => NavigationActions.navigate({
   routeName: 'mainScreen'
 , action: NavigationActions.navigate({
@@ -101,8 +101,6 @@ const SA_CreateToProduct = (item, loginStatus) => StackActions.reset({
 })
 */
 
-var currency = ''
-var postCurrency = ''
 
 
 export default CreateNewItemScreen = compose(
@@ -168,6 +166,9 @@ class extends React.Component {
     , mode: Constants.SALE
     , images: imageList
     , cost: 0.0
+    , currency: null
+    , postCost: 0.0
+    , postCurrency: null
     , counterOffer: false
     , template: null
     , barterTemplates: [] // [ [{template, qty}, {template, qty}], [{template, qty}] ]
@@ -181,7 +182,6 @@ class extends React.Component {
       , lat: 0.0
       , directions: ''
       }
-    , postCost: 0.0
     , shortDesc: null
     , longDesc: ''
     , category: ''
@@ -261,30 +261,11 @@ class extends React.Component {
       return false;
     }
 
-    if(postCurrency.length == 0 || (this.state.postCost && this.state.postCost == 0.0)){
-      if (postCurrency.length===0){
-        this.toast.show("Please Select Post Currency", DURATION.LENGTH_LONG);
-        return false;
-      }
-      if(this.state.postCost.length===0){
-        this.toast.show("Please Enter Post Cost", DURATION.LENGTH_LONG);
-        return false;
-      }
-    }
-    return true
-  }
-
-  // Not currently used
-  _isImageExits(base64){
-    if(imageList.length===0){
+    if(w(this.state, ['cost']) == 0.0 && !isCollapsedSale ){
+      this.toast.show("Please Enter Cost", DURATION.LENGTH_LONG);
       return false;
     }
-    for(var i=1;i<imageList.length;i++){
-      if(imageList[i].base_64===base64){
-        return true;
-      }
-    }
-    return false;
+    return true
   }
 
   _getTemplates(){
@@ -315,7 +296,7 @@ class extends React.Component {
   }
 
 //"barterTemplates":[[{"templateId":"1","quantity":1,"tags":["1","2"]},{"templateId":"2","quantity":2,"tags":["1","2"]}]]
-  collateVariables( countryCode ){
+  collateVariables( countryCode, country ){
 
     if(!this._validateAllRequiredFileds()){
         return false;
@@ -334,8 +315,12 @@ class extends React.Component {
     , lat: this.state.address.lat
     , directions: ''
     }
-    if(postCurrency.length!=0){
-      post_={"postCurrency":postCurrency,"postCost":this.state.postCost};
+    if (this.state.postCost != 0){
+      // If donate select, I 'expect' that this doesn't matter whether set or not.
+      post_ = {
+        "postCurrency": this.state.postCurrency ? this.state.postCurrency : country.currencies[0].iso4217
+      , "postCost": this.state.postCost
+      };
     }
     if(addr_.lineOne.length == 0 && this.state.address.lat == 0.0){
       addr_ = null
@@ -343,7 +328,7 @@ class extends React.Component {
     variables = { variables: {
       "mode":this.state.mode,
       "images":imageUploadList,
-      "currency": currency,
+      "currency": this.state.currency ? this.state.currency : country.currencies[0].iso4217,
       "cost":this.state.cost,
       "counterOffer":this.state.counterOffer,
     /*  "barterTemplates":this.state.barterTemplates,*/
@@ -356,34 +341,7 @@ class extends React.Component {
       "tags":tagsList,
       "countryCode": countryCode
     }}
-    //variables.fetchPolicy = 'network-only'
     return variables
-
-    /*
-      this.setState({
-        progressVisible: true,
-        progressMsg:"Please Wait..."
-      });
-
-    createNewItemUrl(variables).then((res)=>{
-
-        this.setState({
-          progressVisible: false,
-          errorMsg:"New Item Created Successfully",
-          showDialog:true,
-          dialogTitle:"Success"
-        });
-    })
-    .catch(error => {
-        this.setState({
-          progressVisible: false,
-          errorMsg:error.message,
-          showDialog:true,
-          dialogTitle:"Error!"
-        })
-    });
-    */
-
   }
 
   componentDidMount(){
@@ -417,18 +375,7 @@ class extends React.Component {
 
       });
     });
-
   }
-
-
-  onClick(data) {
-    data.checked = !data.checked;
-    let msg = data.checked ? 'you checked ' : 'you unchecked ';
-  }
-
-  static navigationOptions = {
-    header: null,
-  };
 
   _renderRow( {item} ) {
 
@@ -650,7 +597,7 @@ class extends React.Component {
         return null
       }
       const formData = new FormData();
-      this.storeImageDetails( data.getSignedUrl.key, data.getSignedUrl.id, uri, base64);
+      this.setStateImages( data.getSignedUrl.key, data.getSignedUrl.id, uri );
       formData.append('key', data.getSignedUrl.key);
       formData.append('bucket', data.getSignedUrl.bucket);
       formData.append('Policy', data.getSignedUrl.policy);
@@ -702,32 +649,21 @@ class extends React.Component {
     })
   }
 
-  storeImageDetails(imageKey,imgId,uri,base_64){
+  setStateImages(imageKey, imageId, uri) {
     let inputTile = imageList.pop()
-    var _id=imageList.length+1;
-    var isPrimary=_id===1;
+    let _id = imageList.length + 1
+    let isPrimary = _id === 1
+
     imageList.push({
-      id: "_"+_id
-    , imageId:imgId
+      id: "_" + _id
+    , imageId: imageId
     , url: uri
-    , inputFlag:false
-    , imageKey:imageKey
-    , primary:isPrimary
-    , deleted:false
+    , inputFlag: false
+    , imageKey: imageKey
+    , primary: isPrimary
+    , deleted: false
     })
     imageList.push(inputTile)
-
-  /*  realm.write(() => {
-
-         var ID = realm.objects('Image_Info').length + 1;
-
-          realm.create('Image_Info', {
-            img_id: ID,
-            img_key: imageKey,
-            img_data:base_64
-           });
-
-       });*/
 
     this.setState({
       images:imageList
@@ -920,10 +856,6 @@ class extends React.Component {
     dataObjectsTags=newarray;
   }
 
-  handleCurreny(value){
-    postCurrency = value
-  }
-
   longPressEvent(name) {
     return e => {
       if (e.persist) {
@@ -986,11 +918,11 @@ class extends React.Component {
       />
       </Button>
     );
-    var rightComponent = (loginStatus) => (
+    var rightComponent = (loginStatus, country) => (
       <CreateListing>{ mutateCreateListing => (
         <View>
           <Button transparent onPress={() => {
-            let collatedVariables = this.collateVariables( loginStatus.countryCode )
+            let collatedVariables = this.collateVariables( loginStatus.countryCode, country )
             if (collatedVariables) {
               mutateCreateListing( collatedVariables, loginStatus )
               .then(({ data }) => {
@@ -1011,18 +943,12 @@ class extends React.Component {
 
     return (
       <GetCachedCountry loginStatus={loginStatus}>{ country => {
-        if (currency === '') {
-          currency = country.currencies[0].iso4217
-        }
-        if (postCurrency === '') {
-          postCurrency = country.currencies[0].iso4217
-        }
         return (
         <View style={styles.container}>
           <BBBHeader
           title={i18n(translations, parentName, "CreateItem", loginStatus.iso639_2, "Create A New Item")}
           leftComponent={leftComponent}
-          rightComponent={rightComponent(loginStatus)}
+          rightComponent={rightComponent(loginStatus, country)}
           />
           <Toast ref={component => this.toast = component}/>
           <ScrollView
@@ -1130,7 +1056,11 @@ class extends React.Component {
                             <Text style={styles.txtTitle}>{i18n(translations, parentName, "Currency", loginStatus.iso639_2, "Currency")}</Text>
                             <Picker
                               style={styles.dateDropDown}
-                              onValueChange={(value, index, data) => { currency = value }}
+                              onValueChange={(value, index, data) => {
+                                this.setState({
+                                  currency: value
+                                })
+                              }}
                             >
                               {country.currencies.map((c, i) => {
                                 return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
@@ -1321,7 +1251,11 @@ class extends React.Component {
                       <Text style={styles.txtTitle}>{i18n(translations, parentName, "Currency", loginStatus.iso639_2, "Currency")}</Text>
                       <Picker
                         style={styles.dateDropDown}
-                        onValueChange={(value, index, data) => { postCurrency = value }}
+                        onValueChange={(value, index, data) => {
+                          this.setState({
+                            postCurrency: value
+                          })
+                        }}
                       >
                         {country.currencies.map((c, i) => {
                           return <Picker.Item key={c.iso4217} label={c.iso4217} value={c.iso4217} />
