@@ -14,6 +14,7 @@ import {
 , Text
 } from 'native-base';
 import { StackActions, NavigationActions } from 'react-navigation';
+import * as SecureStore from 'expo-secure-store'
 //import { RootStackNavigator } from '../../navigation/RootNavigation'
 
 // custom components
@@ -99,7 +100,7 @@ const CountryScreen = compose (
     }
 
     onBackPress = (countryCode, iso639_2) => {
-      return Expo.SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: countryCode, iso639_2: iso639_2}))
+      return SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: countryCode, iso639_2: iso639_2}))
       .then( () => {
         this.props.navigation.dispatch( SA_CountryToHome( this.props.navigation ) )
         this.removeCountryHandler()
@@ -118,7 +119,7 @@ const CountryScreen = compose (
 
     componentWillMount() {
       if (! this.state.countryCode) {
-        let countryInfoPromise = Expo.SecureStore.getItemAsync("countryInfo")
+        let countryInfoPromise = SecureStore.getItemAsync("countryInfo")
         Promise.all([countryInfoPromise])
         .then( ([ countryInfo ]) => {
           //console.log("countryInfo: ", countryInfo)
@@ -155,7 +156,7 @@ const CountryScreen = compose (
           setCountry({ variables: { countryCode: country.isoCode, iso639_2: iso639_2 }})
           .then( () => {
             if (save) {
-              Expo.SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: country.isoCode, iso639_2: iso639_2}))
+              SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: country.isoCode, iso639_2: iso639_2}))
               .then( () => {
                 this.removeCountryHandler()
                 this.props.navigation.dispatch(SA_CountryToHome(this.props.navigation))

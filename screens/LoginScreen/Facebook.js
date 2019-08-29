@@ -6,6 +6,7 @@ import gql from "graphql-tag";
 import { Layout, Colors, Urls } from '../../constants/';
 import {Alert, Image, ImageBackground } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import * as Facebook from 'expo-facebook';
 
 
 import { NavigationActions } from 'react-navigation';
@@ -62,7 +63,7 @@ const FacebookOauth = graphql(SET_AUTH_STATUS)(
             }}
             onPress={async () => {
               let startTime = new Date()
-              const { type, token } = await Expo.Facebook.logInWithReadPermissionsAsync('279793089219775', {
+              const { type, token } = await Facebook.logInWithReadPermissionsAsync('279793089219775', {
                   permissions: ['public_profile', 'email'],
                 });
               console.log("Time (ms) to get Facebook Token: ", new Date() - startTime)

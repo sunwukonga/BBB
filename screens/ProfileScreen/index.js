@@ -7,6 +7,7 @@ import {
 , Picker
 } from 'react-native'
 import { Container, Content, List, ListItem, Body, Left, Right, Text, Button, Icon } from 'native-base'
+import * as SecureStore from 'expo-secure-store'
 
 // custom components
 import Baby from '../../components/Baby'
@@ -134,7 +135,7 @@ class extends React.Component {
                 // https://github.com/facebook/react-native/pull/22821
                 setTimeout(() => {
                   setCountry({ variables: { countryCode: cachedCountry.getCachedCountry.isoCode, iso639_2: value }})
-                  Expo.SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: cachedCountry.getCachedCountry.isoCode, iso639_2: value}))
+                  SecureStore.setItemAsync("countryInfo", JSON.stringify({countryCode: cachedCountry.getCachedCountry.isoCode, iso639_2: value}))
                 }, 0)
               }}
             >
@@ -146,7 +147,7 @@ class extends React.Component {
 
           <TouchableOpacity
             onPress = {() => {
-              Expo.SecureStore.deleteItemAsync("countryInfo")
+              SecureStore.deleteItemAsync("countryInfo")
               .then( () => {
                 //console.log("key: ", this.props.navigation.state.params.rootNavigation.state.key)
                 //this.props.navigation.dispatch(SA_changeCountry(loginStatus.countryCode, this.props.navigation, this.props.navigation.state.params.rootNavigation.state.key))

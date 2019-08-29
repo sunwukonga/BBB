@@ -5,13 +5,14 @@ import { HttpLink } from "apollo-link-http";
 import { withClientState } from "apollo-link-state";
 import { onError } from "apollo-link-error";
 import { InMemoryCache, defaultDataIdFromObject } from "apollo-cache-inmemory";
+import * as SecureStore from 'expo-secure-store';
 //import { Mutation } from "react-apollo";
 
 import {
   GET_CACHED_COUNTRY
 } from '../graphql/Queries'
 
-let Production = false
+let Production = true
 let default_token
 let BBB_BASE_URL
 if (Production) {
@@ -101,7 +102,7 @@ const stateLink = withClientState({
         //console.log('setAuthStatus client-side mutation fired');
         if (! args.token ) {
           // populate from secureStore if available.
-          return Expo.SecureStore.getItemAsync("authStatus")
+          return SecureStore.getItemAsync("authStatus")
           .then( ssAuthStatus => {
             if (ssAuthStatus) {
               let authStatus = JSON.parse( ssAuthStatus )
@@ -114,7 +115,7 @@ const stateLink = withClientState({
           token = args.token
           cache.writeData({ data: { authorized: true, jwt_token: args.token, myProfile: {__typename: 'MyProfile', id: args.id, profileName: args.profileName, nameChangeCount: args.nameChangeCount, profileImageURL: args.profileImageURL }}});
           // populate secureStore
-          Expo.SecureStore.setItemAsync("authStatus", JSON.stringify({ jwt_token: args.token, myProfile: {id: args.id, profileName: args.profileName, nameChangeCount: args.nameChangeCount, profileImageURL: args.profileImageURL }}))
+          SecureStore.setItemAsync("authStatus", JSON.stringify({ jwt_token: args.token, myProfile: {id: args.id, profileName: args.profileName, nameChangeCount: args.nameChangeCount, profileImageURL: args.profileImageURL }}))
           return { userId: args.id }
         }
       },
@@ -122,7 +123,7 @@ const stateLink = withClientState({
         //console.log('unsetAuthStatus client-side mutation fired');
         token = default_token
         cache.writeData({ data: { authorized: false, jwt_token: default_token, myProfile: {__typename: 'MyProfile', id: -1, profileName: "", nameChangeCount: 0, profileImageURL: "" }}});
-        Expo.SecureStore.deleteItemAsync("authStatus")
+        SecureStore.deleteItemAsync("authStatus")
         return null;
       },
       updateAuthStatus: (_, args, { cache }) => {
