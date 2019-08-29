@@ -23,6 +23,7 @@
     "android": {
       "package": "com.bebebargains.bbb",
       "versionCode": 20,
+      "versionCode": 19,
       "permissions": [
         "ACCESS_COARSE_LOCATION"
       , "ACCESS_FINE_LOCATION"
