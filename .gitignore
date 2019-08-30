@@ -15,6 +15,10 @@ DerivedData
 *.xccheckout
 *.xcscmblueprint
 
+# Java Keystore
+BBB.jks
+bbb_encrypted_private_key
+
 # Android Studio
 **/.idea/libraries
 **/.idea/workspace.xml
